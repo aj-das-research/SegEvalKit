@@ -9,7 +9,7 @@ import numpy as np
 from ..plotting.theme import ERROR_COLORS, INK, theme
 
 __all__ = ["WINDOWS", "apply_window", "to_canonical", "pick_slice", "error_overlay", "triplanar",
-           "slice_montage", "error_projection", "case_gallery"]
+           "slice_montage", "error_projection", "case_gallery", "error_legend"]
 
 #: CT display windows as (level, width) in HU.
 WINDOWS: Dict[str, Tuple[float, float]] = {
@@ -153,30 +153,63 @@ def _zoom_box(masks, margin: int = 12):
             (max(cc.min() - margin, 0), min(cc.max() + margin, m.shape[1] - 1)))
 
 
-def _legend(fig, show_pred: bool, style: str = "fill"):
+def _window_note(window, has_image: bool) -> str:
+    if not has_image:
+        return "Background: no image given"
+    if window is None:
+        return "Grey: image intensity (full range)"
+    if isinstance(window, str):
+        lvl, wid = WINDOWS[window]
+        return f"Grey: CT, {window.replace('_', ' ')} window (L {lvl:g} / W {wid:g} HU)"
+    lo, hi = window
+    return f"Grey: image, window {lo:g} to {hi:g}"
+
+
+def _legend(fig, show_pred: bool, style: str = "fill", note: Optional[str] = None):
+    """Figure legend explaining every colour and line, placed below the axes.
+
+    ``note`` is a first line of notation (what the grey background shows).
+    """
     from matplotlib.lines import Line2D
     from matplotlib.patches import Patch
 
-    if style == "contour" and show_pred:
-        handles = [Line2D([], [], color=ERROR_COLORS["ref"], lw=1.6, label="Reference"),
-                   Line2D([], [], color=ERROR_COLORS["fp"], lw=1.4, ls="--", label="Prediction")]
-        fig.legend(handles=handles, loc="outside lower center", ncol=2, frameon=False, fontsize=8)
-        return
-    handles = [Patch(color=ERROR_COLORS["tp"], label="True positive"),
-               Patch(color=ERROR_COLORS["fn"], label="False negative (missed)"),
-               Patch(color=ERROR_COLORS["fp"], label="False positive (added)")] if show_pred else \
-              [Patch(color=ERROR_COLORS["ref"], label="Reference")]
+    handles = []
+    if not show_pred:
+        handles.append(Patch(color=ERROR_COLORS["ref"], label="Reference"))
+    elif style in ("fill", "both"):
+        handles += [Patch(color=ERROR_COLORS["tp"], label="Agreement (TP)"),
+                    Patch(color=ERROR_COLORS["fn"], label="Missed: under-segmented (FN)"),
+                    Patch(color=ERROR_COLORS["fp"], label="Added: over-segmented (FP)")]
+    if show_pred and style in ("contour", "both"):
+        handles += [Line2D([], [], color=ERROR_COLORS["ref"], lw=1.6, label="Reference outline"),
+                    Line2D([], [], color=ERROR_COLORS["fp"], lw=1.4, ls="--", label="Prediction outline")]
     # "outside" reserves space below the axes in the constrained layout, so the legend
     # never overlaps an image.
-    fig.legend(handles=handles, loc="outside lower center", ncol=len(handles), frameon=False, fontsize=8)
+    ncol = 1 if fig.get_figwidth() < 6 else min(len(handles), 3)
+    fig.legend(handles=handles, loc="outside lower center", ncol=ncol, frameon=False,
+               fontsize=8, title=note, title_fontsize=7.5)
+
+
+def error_legend(fig, *, style: str = "fill", window="abdomen", has_image: bool = True, show_pred: bool = True,
+                 note: Optional[str] = None):
+    """Add the standard error-colour key below a figure you composed yourself
+    (e.g. a grid of `error_overlay` panels drawn with ``legend=False``)."""
+    extra = f" · {note}" if note else ""
+    _legend(fig, show_pred, style, _window_note(window, has_image) + extra)
+    return fig
 
 
 def error_overlay(image: Optional[np.ndarray], pred: Optional[np.ndarray], ref: np.ndarray, *,
                   affine: Optional[np.ndarray] = None, view: str = "axial", index: Optional[int] = None,
                   window="abdomen", style: str = "fill", zoom: bool = True, ax=None, title: Optional[str] = None,
-                  legend: bool = True, figsize=(4.2, 4.4)):
+                  legend: bool = True, figsize=(4.2, 5.2)):
     """One slice with TP / FN / FP colour-coded (``style="fill"``), or as reference
-    (lavender) and prediction (teal, dashed) contours (``style="contour"``)."""
+    (lavender) and prediction (teal, dashed) contours (``style="contour"``).
+
+    Colours: violet = agreement (TP), orange = missed reference voxels
+    (under-segmentation, FN), teal = added voxels (over-segmentation, FP); the
+    grey background is the image in the given display window. ``legend=True``
+    (default, own figure only) writes this below the image."""
     import matplotlib.pyplot as plt
 
     img, p, r, sp = _prep(image, None if pred is None else pred.astype(bool), ref.astype(bool), affine)
@@ -187,14 +220,16 @@ def error_overlay(image: Optional[np.ndarray], pred: Optional[np.ndarray], ref: 
         box = _zoom_box([s(r), s(p)]) if zoom else None
         _draw(ax, s(img), s(p), s(r), _aspect(sp, view), window, style=style, zoom=box,
               title=title or f"{view.capitalize()} slice {index}")
-        if legend and ax is not None and len(fig.axes) == 1:
-            _legend(fig, pred is not None, style)
+        if legend and len(fig.axes) == 1:
+            _legend(fig, pred is not None, style, _window_note(window, image is not None))
     return fig
 
 
 def triplanar(image, pred, ref, *, affine=None, window="abdomen", mode: str = "error", style: str = "fill",
-              zoom: bool = True, title: Optional[str] = None, figsize=(10.5, 3.9)):
-    """Axial, coronal and sagittal slices through the region of largest error."""
+              zoom: bool = True, title: Optional[str] = None, legend: bool = True, figsize=(10.5, 4.1)):
+    """Axial, coronal and sagittal slices through the region of largest error.
+
+    Same colours as `error_overlay`; ``legend=False`` drops the colour key."""
     import matplotlib.pyplot as plt
 
     img, p, r, sp = _prep(image, None if pred is None else pred.astype(bool), ref.astype(bool), affine)
@@ -208,13 +243,17 @@ def triplanar(image, pred, ref, *, affine=None, window="abdomen", mode: str = "e
                   title=f"{view.capitalize()} · {idx}")
         if title:
             fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="bold", color=INK["primary"])
-        _legend(fig, pred is not None, style)
+        if legend:
+            _legend(fig, pred is not None, style, _window_note(window, image is not None))
     return fig
 
 
 def slice_montage(image, pred, ref, *, affine=None, view: str = "axial", n: int = 8, window="abdomen",
-                  style: str = "fill", zoom: bool = True, title: Optional[str] = None, ncols: int = 4):
-    """``n`` evenly spaced slices through the extent of the reference ∪ prediction."""
+                  style: str = "fill", zoom: bool = True, title: Optional[str] = None, ncols: int = 4,
+                  legend: bool = True):
+    """``n`` evenly spaced slices through the extent of the reference ∪ prediction.
+
+    Panel titles are slice indices; colours as in `error_overlay`."""
     import matplotlib.pyplot as plt
 
     img, p, r, sp = _prep(image, None if pred is None else pred.astype(bool), ref.astype(bool), affine)
@@ -242,15 +281,21 @@ def slice_montage(image, pred, ref, *, affine=None, view: str = "axial", n: int 
             _draw(ax, s(img), s(p), s(r), _aspect(sp, view), window, style=style, zoom=box, title=f"{idxs[k]}")
         if title:
             fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="bold", color=INK["primary"])
-        _legend(fig, pred is not None)
+        if legend:
+            note = _window_note(window, image is not None) + f" · panel titles: {view} slice index"
+            _legend(fig, pred is not None, style, note)
     return fig
 
 
-def error_projection(pred, ref, *, affine=None, title: Optional[str] = None, figsize=(10.5, 3.6)):
+def error_projection(pred, ref, *, affine=None, title: Optional[str] = None, legend: bool = True,
+                     figsize=(10.5, 3.9)):
     """Maximum-intensity projections of FN and FP voxels along the three axes.
 
     A one-glance summary of *where in 3D* a case fails, useful for spotting
-    distant false-positive islands that a single slice would miss.
+    distant false-positive islands that a single slice would miss. A pixel is
+    coloured when any voxel along the line of sight has that label: light grey
+    is the reference's silhouette, violet agreement, and orange (missed) and
+    teal (added) are drawn on top, so an error anywhere along the ray shows.
     """
     import matplotlib.pyplot as plt
 
@@ -279,18 +324,28 @@ def error_projection(pred, ref, *, affine=None, title: Optional[str] = None, fig
             ax.set_title(f"{view.capitalize()} projection", fontsize=9, loc="left")
         if title:
             fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="bold", color=INK["primary"])
-        _legend(fig, True)
+        if legend:
+            from matplotlib.patches import Patch
+
+            handles = [Patch(facecolor=INK["neutral"], edgecolor=INK["muted"], lw=0.6, label="Reference silhouette"),
+                       Patch(color=ERROR_COLORS["tp"], alpha=0.35, label="Agreement (TP)"),
+                       Patch(color=ERROR_COLORS["fn"], label="Missed: under-segmented (FN)"),
+                       Patch(color=ERROR_COLORS["fp"], label="Added: over-segmented (FP)")]
+            fig.legend(handles=handles, loc="outside lower center", ncol=4, frameon=False, fontsize=8,
+                       title="Projection through the whole volume: a pixel shows a colour if any voxel along "
+                             "the line of sight has it (errors drawn on top)", title_fontsize=7.5)
     return fig
 
 
 def case_gallery(items: Sequence[Dict], *, view: str = "axial", window="abdomen", style: str = "fill",
-                 ncols: int = 4, title: Optional[str] = None):
+                 ncols: int = 4, title: Optional[str] = None, legend: bool = True):
     """Grid of error overlays for several cases.
 
     ``items``: dicts with keys ``image`` (optional), ``pred``, ``ref``,
     ``affine`` (optional) and ``title`` (e.g. ``"case_012 · DSC 0.41"``).
     Typical use is the *k* worst cases from
-    `worst_cases`.
+    `worst_cases`. Each panel shows the slice with the most error; colours as
+    in `error_overlay`.
     """
     import matplotlib.pyplot as plt
 
@@ -309,5 +364,7 @@ def case_gallery(items: Sequence[Dict], *, view: str = "axial", window="abdomen"
             ax.axis("off")
         if title:
             fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="bold", color=INK["primary"])
-        _legend(fig, True)
+        if legend:
+            has_img = any(it.get("image") is not None for it in items)
+            _legend(fig, True, style, _window_note(window, has_img) + f" · each panel: {view} slice with most error")
     return fig

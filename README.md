@@ -23,7 +23,7 @@
 A Dice score alone does not say whether a model finds small tumours, breaks vessels, draws acceptable boundaries,
 produces trustworthy probabilities, or really beats the baseline, and the tools that compute the other metrics
 disagree silently: HD95 has two definitions in use, MedPy changed what its `assd` computes between versions, and
-empty masks are handled in at least four ways. **SegEvalKit** puts 53 metrics behind one standard input/output
+empty masks are handled in at least four ways. **SegEvalKit** puts 56 metrics behind one standard input/output
 interface, makes every convention explicit, tests them against the reference implementations, and adds the
 statistics and figures needed to report results you can defend.
 
@@ -34,7 +34,7 @@ statistics and figures needed to report results you can defend.
 
 <table>
 <tr>
-<td width="33%" valign="top"><b>Every metric family</b><br>Overlap, volume, surface distance, topology, lesion-wise detection, calibration and agreement: 53 metrics sharing one cached computation context.</td>
+<td width="33%" valign="top"><b>Every metric family</b><br>Overlap, volume, surface distance, topology, lesion-wise detection, calibration and agreement: 56 metrics sharing one cached computation context.</td>
 <td width="33%" valign="top"><b>Explicit, tested conventions</b><br>Empty-mask policies (BraTS, Metrics Reloaded, nnU-Net presets), directed vs pooled HD95, ASSD vs MASD, tolerances; conformance-tested against MONAI, MedPy and DeepMind.</td>
 <td width="33%" valign="top"><b>Knows which metric to use</b><br>A Metrics Reloaded-style recommender, a pitfalls catalogue, and a sensitivity study on real CT anatomy showing what each metric notices.</td>
 </tr>

@@ -2,6 +2,10 @@
 
 <div class="grid cards" markdown>
 
+-   :material-clipboard-check-outline:{ .lg } **[What you need](prepare.md)**
+
+    Scans, masks, predictions, hardware; a five-step checklist.
+
 -   :material-download:{ .lg } **[Installation](installation.md)**
 
     pip, optional extras, development setup.

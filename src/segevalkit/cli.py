@@ -11,6 +11,7 @@ segevalkit metrics
 segevalkit recommend --structure small_lesion --multi-instance
 segevalkit datasets [NAME]
 segevalkit visualize --pred p.nii.gz --ref g.nii.gz --image ct.nii.gz --label 1 --out fig.png
+segevalkit view --image ct.nii.gz --ref labels/ --pred nnunet=pred.nii.gz --labels liver=1,tumour=2
 ```
 """
 
@@ -405,6 +406,95 @@ def cmd_visualize(a) -> int:
     return 0
 
 
+def _pairs(items: Optional[List[str]], what: str) -> Dict[str, str]:
+    out: Dict[str, str] = {}
+    for it in items or []:
+        name, sep, val = it.partition("=")
+        if not sep:
+            raise SystemExit(f"error: {what} must be NAME=VALUE, got {it!r}")
+        out[name.strip()] = val.strip()
+    return out
+
+
+def cmd_view(a) -> int:
+    from ._console import banner, console
+
+    cfg: Dict[str, Any] = _load_mapping(Path(a.config)) if a.config else {}
+    preds: Dict[str, Any] = {}
+    pred_labels: Dict[str, Any] = {}
+    results: Dict[str, Any] = dict(cfg.get("results", {}))
+    for name, v in (cfg.get("preds") or {}).items():
+        if isinstance(v, dict):
+            preds[name] = v["path"]
+            if v.get("labels") is not None:
+                pred_labels[name] = v["labels"]
+            if v.get("results"):
+                results[name] = v["results"]
+        else:
+            preds[name] = v
+    preds.update(_pairs(a.pred, "--pred"))
+    pred_labels.update({k: _parse_label_arg(v) for k, v in _pairs(a.pred_labels, "--pred-labels").items()})
+    results.update(_pairs(a.results, "--results"))
+    image = a.image or cfg.get("image")
+    if not image and not a.demo:
+        print("error: --image (or a config with image, or --demo) is required", file=sys.stderr)
+        return 2
+    labels = _parse_label_arg(a.labels) if a.labels else cfg.get("labels")
+    lesions = [x.strip() for x in a.lesions.split(",")] if a.lesions else cfg.get("lesions")
+    crop = a.crop if a.crop is not None else cfg.get("crop_margin_mm", 25.0 if a.export else None)
+    max_dim = a.max_dim if a.max_dim is not None else cfg.get("max_dim", 224 if a.export else None)
+    if crop is not None and float(crop) < 0:
+        crop = None
+    banner("view")
+    from .app import ViewerSession
+
+    if a.demo:
+        from .app import demo_session
+
+        with console.status("[sek.brand]generating the synthetic demo phantom…", spinner="dots12"):
+            s = demo_session(crop_margin_mm=crop, max_dim=max_dim)
+        console.print("[sek.muted]demo      [/] synthetic abdominal phantom with three synthetic models "
+                      "(no patient data)")
+    else:
+        with console.status("[sek.brand]loading case…", spinner="dots12"):
+            s = ViewerSession(image, ref=a.ref or cfg.get("ref"), preds=preds, labels=labels,
+                              pred_labels=pred_labels, results=results, case=a.case or cfg.get("case"),
+                              lesions=lesions, crop_margin_mm=crop, max_dim=max_dim,
+                              min_lesion_voxels=int(cfg.get("min_lesion_voxels", a.min_lesion_voxels)))
+    console.print(f"[sek.muted]case      [/] [sek.key]{s.case}[/]  [sek.muted]grid[/] {'x'.join(map(str, s.shape))}"
+                  f"{'  (stride ' + 'x'.join(map(str, s.steps)) + ')' if s.step > 1 else ''}")
+    console.print(f"[sek.muted]structures[/] {len(s.structures)}  [sek.muted]lesions[/] {', '.join(s.lesions) or '–'}")
+    console.print(f"[sek.muted]models    [/] {', '.join(s.models) or '–'}")
+    if a.export:
+        from .app import export_html
+
+        with console.status("[sek.brand]writing self-contained HTML…", spinner="dots12"):
+            out = export_html(s, a.export, focus=[x.strip() for x in a.focus.split(",")] if a.focus else None)
+        console.print(f"[sek.ok]✓[/] [sek.key]{out}[/]  [sek.muted]({out.stat().st_size / 1e6:.1f} MB)[/]")
+        return 0
+    import socket
+    import threading
+    import webbrowser
+
+    from .app.server import make_server
+
+    srv = make_server(s, a.host, a.port)
+    port = srv.server_address[1]
+    url = f"http://localhost:{port}/"
+    console.print(f"[sek.ok]✓[/] viewer at [sek.key]{url}[/]  [sek.muted](Ctrl+C to stop)[/]")
+    console.print(f"[sek.muted]  on a remote machine: ssh -L {port}:{socket.gethostname()}:{port} <login-host>, "
+                  f"then open {url}[/]")
+    if not a.no_browser:
+        threading.Timer(0.8, lambda: webbrowser.open(url)).start()
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:  # pragma: no cover
+        pass
+    finally:
+        srv.server_close()
+    return 0
+
+
 def cmd_home(a) -> int:
     from rich.table import Table
 
@@ -421,6 +511,7 @@ def cmd_home(a) -> int:
                       ("rank", "rank methods with bootstrap stability"),
                       ("recommend", "which metrics to report for your problem"),
                       ("visualize", "error overlays, projections, 3D surface-distance maps"),
+                      ("view", "interactive viewer in the browser: 2D, montage, 3D, model comparison"),
                       ("cohort", "subgroup statistics from case metadata (site, phase, sex...)"),
                       ("audit", "check reference headers against images before evaluating"),
                       ("metrics", "list every metric with direction and unit"),
@@ -556,6 +647,29 @@ def build_parser() -> argparse.ArgumentParser:
     v.add_argument("--title")
     v.add_argument("--out", required=True)
     v.set_defaults(fn=cmd_visualize)
+
+    w = sub.add_parser("view", formatter_class=fmt_cls,
+                       help="interactive viewer: image, reference and models in the browser (2D, montage, 3D, compare)")
+    w.add_argument("--image", help="CT/MR file, or a dataset image folder (with --case)")
+    w.add_argument("--ref", help="reference: label map, per-structure folder, or dataset folder (with --case)")
+    w.add_argument("--pred", action="append", metavar="NAME=PATH", help="a model's prediction (repeat for several)")
+    w.add_argument("--labels", help="structures, as in `evaluate --labels` (ids, regions, files, a+b unions, JSON/YAML)")
+    w.add_argument("--pred-labels", action="append", metavar="NAME=SPEC", help="label spec of one model when its convention differs")
+    w.add_argument("--results", action="append", metavar="NAME=DIR", help="SegEvalKit results folder of a model (shows stored metrics)")
+    w.add_argument("--case", help="case id when folders hold many cases")
+    w.add_argument("--config", help="YAML/JSON with image, ref, case, labels, preds {name: path | {path, labels, results}}")
+    w.add_argument("--lesions", help="comma-separated lesion structures (default: names with lesion/tumour/...)")
+    w.add_argument("--min-lesion-voxels", type=int, default=10)
+    w.add_argument("--crop", type=float, help="crop to all structures plus this margin in mm (-1: full field of view)")
+    w.add_argument("--max-dim", type=int, help="downsample so no axis exceeds this many voxels")
+    w.add_argument("--host", default="127.0.0.1")
+    w.add_argument("--port", type=int, default=8765, help="0 picks a free port")
+    w.add_argument("--no-browser", action="store_true", help="do not open a browser")
+    w.add_argument("--export", metavar="OUT.html", help="write one self-contained HTML file instead of serving")
+    w.add_argument("--focus", help="export: structures whose TP/FN/FP surfaces are embedded besides the lesions")
+    w.add_argument("--demo", action="store_true",
+                   help="open a built-in synthetic phantom with three synthetic models (no data needed)")
+    w.set_defaults(fn=cmd_view)
     return p
 
 

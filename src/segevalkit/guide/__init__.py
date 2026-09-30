@@ -195,6 +195,7 @@ def recommend(fp: Optional[Fingerprint] = None, **kwargs) -> Recommendation:
         r.add("lesion_recall", "secondary", "Detection sensitivity, independent of lesion size.")
         r.add("lesion_precision", "secondary", "False discoveries at lesion level.")
         r.add("lesionwise_dice", "secondary", "BraTS 2023-style: every lesion weighs equally, misses score 0.")
+        r.add("lesionwise_hd95", "secondary", "BraTS 2023-style boundary error per lesion; misses and false lesions score the penalty.")
         r.add("panoptic_quality", "secondary", "Detection x segmentation quality in one number (Kirillov et al. 2019).")
         r.add("lesion_count_difference", "diagnostic", "Over-/under-counting (ISLES'22).")
         r.add("split_count", "diagnostic", "Fragmentation of single lesions.")

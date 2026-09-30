@@ -1,5 +1,5 @@
 site_name: SegEvalKit
-site_description: "Evaluation of volumetric (CT/MR) medical image segmentation: 53 metrics with explicit, tested conventions, statistics, plots and reports."
+site_description: "Evaluation of volumetric (CT/MR) medical image segmentation: 56 metrics with explicit, tested conventions, statistics, plots and reports."
 site_url: https://aj-das-research.github.io/SegEvalKit/
 repo_url: https://github.com/aj-das-research/SegEvalKit
 repo_name: aj-das-research/SegEvalKit
@@ -108,6 +108,7 @@ nav:
   - Home: index.md
   - Getting started:
       - getting-started/index.md
+      - What you need: getting-started/prepare.md
       - Installation: getting-started/installation.md
       - Quickstart: getting-started/quickstart.md
       - Data & output format: getting-started/data-format.md
@@ -137,6 +138,7 @@ nav:
       - Quantitative plots: analysis/plots.md
       - Qualitative visualisation: analysis/qualitative.md
       - HTML report: analysis/report.md
+      - Interactive viewer: analysis/viewer.md
   - Datasets & benchmarks:
       - datasets/index.md
       - Dataset presets: datasets/presets.md

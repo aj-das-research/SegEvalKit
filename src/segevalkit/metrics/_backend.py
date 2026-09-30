@@ -28,6 +28,7 @@ __all__ = [
     "skeleton",
     "torch_available",
     "cuda_available",
+    "mps_available",
 ]
 
 
@@ -48,6 +49,15 @@ def cuda_available() -> bool:
     return torch.cuda.is_available()
 
 
+def mps_available() -> bool:
+    """True when PyTorch can use the Apple-silicon GPU (``device="mps"``)."""
+    if not torch_available():
+        return False
+    import torch
+
+    return bool(getattr(torch.backends, "mps", None) and torch.backends.mps.is_available())
+
+
 def _is_gpu(device: str) -> bool:
     return device is not None and str(device) != "cpu"
 
@@ -65,6 +75,8 @@ def _torch_device(device: str):
     dev = torch.device("cpu" if device == "torch" else device)
     if dev.type == "cuda" and not torch.cuda.is_available():
         raise RuntimeError(f"device={device!r} requested but CUDA is not available")
+    if dev.type == "mps" and not mps_available():
+        raise RuntimeError(f"device={device!r} requested but Apple MPS is not available")
     return dev
 
 
@@ -125,12 +137,14 @@ def _nn_dist(a, b, budget: int = 1 << 27):
     import torch
 
     chunk = max(1, budget // max(1, b.shape[0]))
-    out = torch.empty(a.shape[0], dtype=torch.float64, device=a.device)
+    # The result lives on the CPU: Apple MPS has no float64, and the minimum per
+    # row is all that leaves the device.
+    out = torch.empty(a.shape[0], dtype=torch.float64)
     for i in range(0, a.shape[0], chunk):
         # float32 cdist then a float64 sqrt of the squared minimum keeps the
         # result within ~1e-6 mm of the float64 EDT.
         d2 = torch.cdist(a[i:i + chunk], b, compute_mode="donot_use_mm_for_euclid_dist").pow_(2)
-        out[i:i + chunk] = d2.min(dim=1).values.double().sqrt()
+        out[i:i + chunk] = d2.min(dim=1).values.cpu().double().sqrt()
     return out
 
 

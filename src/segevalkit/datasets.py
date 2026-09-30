@@ -309,7 +309,7 @@ register_dataset(DatasetPreset(
     key="brats2023", title="BraTS 2023 Adult Glioma", modality="MR",
     anatomy="Glioma sub-regions (evaluated as ET / TC / WT regions)",
     labels={"enhancing_tumor": [3], "tumor_core": [1, 3], "whole_tumor": [1, 2, 3]},
-    metrics=["lesionwise_dice", "dice", "hd95", "lesion_f1", "lesion_recall", "lesion_precision"],
+    metrics=["lesionwise_dice", "lesionwise_hd95", "dice", "hd95", "lesion_f1", "lesion_recall", "lesion_precision"],
     empty_policy="brats2023", ref_layout="auto",
     cases="1,251 train / 219 validation", url="https://www.synapse.org/brats2023",
     license="Synapse data use terms (CC BY-NC for most subsets)",

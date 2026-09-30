@@ -6,7 +6,9 @@ from their own code and checkpoints) on 8 PanTS test CTs chosen to span tumour s
 and 2 tumour-free.
 
 !!! info "Real outputs, not a benchmark"
-    Eight cases illustrate the library; they are too few to rank models.
+    Eight cases illustrate the library; they are too few to rank models. Preparing your own data?
+    Start with [What you need](prepare.md). No data at hand? `segevalkit view --demo` opens the
+    [interactive viewer](../analysis/viewer.md) on a synthetic phantom ([live demo](../assets/viewer/demo_phantom.html){ target="_blank" }).
 
 ## 1. Describe what to evaluate
 

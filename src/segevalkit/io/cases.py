@@ -238,7 +238,7 @@ def discover_cases(
 
 
 def audit_geometry(ref: "Source", image: "Source", cases: Optional[Sequence[str]] = None,
-                   atol_mm: float = 1e-2, n_workers: int = 1):
+                   atol_mm: float = 1e-2, n_workers: int = 1) -> "pd.DataFrame":
     """Check that every reference file lives on the same grid as its image.
 
     Label files are sometimes written with a header (affine / orientation /
@@ -248,8 +248,8 @@ def audit_geometry(ref: "Source", image: "Source", cases: Optional[Sequence[str]
     when shapes match. Run this audit once per dataset before choosing.
 
     Returns:
-        DataFrame with one row per mismatching file: ``case_id, structure,
-        issues, same_shape, same_spacing``. An empty frame means all consistent.
+        One row per mismatching file, with the columns ``case_id``, ``structure``,
+        ``issues``, ``same_shape`` and ``same_spacing``; empty when all files are consistent.
     """
     import pandas as pd
 

@@ -48,6 +48,38 @@ See [Configuration → Empty masks](../getting-started/configuration.md#empty-ma
 | Matching for detection | Any overlap, many-to-many (`criterion="overlap"`) | IoU > 0.5 one-to-one (`criterion="iou"`); BraTS dilates the reference first |
 | Panoptic quality | Hungarian IoU matching, IoU > 0.5 | Kirillov et al. 2019 |
 
+## Failure thresholds
+
+`plotting.failure_quadrants` flags a case when it is **worse than a uniform boundary error of `error_mm`**, the
+largest error accepted for its structure class: its Dice is below the Dice such an error produces, or its HD95 is
+above `error_mm` (a uniform error of *e* mm has an HD95 of about *e* mm). Both limits therefore describe the same
+physical error, so the two axes flag consistently.
+
+| Class (matched from the label name) | `error_mm` | Dice below | HD95 above | Dice measured at `error_mm` on PanTS |
+|---|---|---|---|---|
+| Large organ (liver, spleen, stomach, lung) | 5 | 0.85 | 5 mm | liver 0.860 |
+| Compact organ (kidney, bladder, heart) | 5 | 0.65 | 5 mm | kidney 0.687 |
+| Elongated organ (pancreas, duodenum, bowel) | 5 | 0.50 | 5 mm | pancreas 0.546 |
+| Small organ (gallbladder, adrenal, ducts) | 5 | 0.35 | 5 mm | gallbladder 0.363 |
+| Vessel (aorta, IVC, arteries) | 3 | 0.75 | 3 mm | aorta 0.755 |
+| Small vessel (veins, portal and mesenteric veins) | 3 | 0.45 | 3 mm | veins 0.462 |
+| Lesion / tumour | 3 | 0.65 | 3 mm | pancreatic lesion 0.673 |
+
+The Dice column is the median, over real PanTS masks, of the mean Dice after eroding and after dilating by
+`error_mm` ([sensitivity study](sensitivity-study.md)), rounded down to 0.05. The same physical error costs a
+small structure far more Dice than a large one, which is why one Dice threshold for all structures flags small
+organs that are fine and misses large ones that are not. `error_mm` (5 mm for organs, 3 mm for vessels and
+lesions) is a SegEvalKit convention, not a published clinical standard: replace it with your clinical tolerance,
+for example from inter-rater variability ([Nikolov et al. 2021](../metrics/distance.md)).
+
+```python
+P.failure_quadrants(res, "pancreas")                                          # class defaults
+P.failure_quadrants(res, "pancreas", thresholds={"pancreas": {"dice": 0.7, "hd95": 10}})
+P.failure_thresholds("gall_bladder")   # {'error_mm': 5.0, 'dice': 0.35, 'hd95': 5.0, 'class': 'small_organ'}
+```
+
+Unknown names use the compact-organ row. The thresholds and the rule are printed in the plot legend.
+
 ## Conformance tests
 
 `tests/test_reference_implementations.py` runs on every change and asserts:

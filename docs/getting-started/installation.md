@@ -3,6 +3,9 @@
 SegEvalKit needs Python ≥ 3.9 and is tested on **3.10, 3.11 and 3.12** (3.11 recommended). Core dependencies:
 NumPy, SciPy, nibabel, pandas, scikit-image, matplotlib, PyYAML, tqdm, Jinja2 and rich.
 
+!!! tip "New to evaluation?"
+    [What you need](prepare.md) lists the files to prepare and the hardware, in one page.
+
 ## 1. Create a clean environment
 
 Install into a fresh environment with a supported Python rather than into the system Python, and install with

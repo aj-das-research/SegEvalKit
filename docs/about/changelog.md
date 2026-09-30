@@ -7,6 +7,12 @@
   in the results; cohort analysis from case metadata (`segevalkit.cohort.cohort_summary`, `cohort_tests`,
   `plotting.cohort_plot`, `segevalkit cohort`).
 - Union of per-structure files in label specs (`"a.nii.gz+b.nii.gz"`).
+- **Detection analysis:** per-lesion confidence scores in the lesion table (`score`, `score_type`: maximum or mean
+  probability, or volume without probabilities; `Evaluator(lesion_score=...)`); FROC curve with the CPM score
+  (`stats.froc`), lesion- and patient-level precision-recall with AP (`stats.lesion_pr`, `stats.patient_pr`),
+  localized patient-level detection (`stats.localized_presence`); plots `froc_plot`, `roc_plot`, `pr_plot`.
+- New metrics `lesionwise_hd95` (BraTS 2023), `lesionwise_nsd` and `lesion_ap`; the `detection` set and the
+  BraTS 2023 preset include them.
 
 ## 0.1.0 (2026-09-30)
 

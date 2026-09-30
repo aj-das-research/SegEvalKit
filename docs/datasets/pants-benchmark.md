@@ -23,6 +23,48 @@ Three official models, run here from their official code and checkpoints, on the
 | Missing predictions | scored as empty |
 | Statistics | 95 % bootstrap CIs over cases; cohort tests Kruskal–Wallis / Mann–Whitney, Holm-corrected |
 
+## Tumours
+
+Tumours come first: missing or adding a tumour matters more than a small organ error. Lesion metrics are reported for the 151 tumour patients; the 750 tumour-free patients are summarised by how many get a false tumour.
+
+| Measure | MedFormer |
+|---|---:|
+| FROC CPM (mean sensitivity at 1/8–8 FP per scan) | 0.803 [0.73, 0.87] |
+| Lesion sensitivity at 1/8 · 1/4 · 1 FP per scan | 0.76 · 0.80 · 0.81 |
+| Lesion-level AP | 0.599 |
+| Patient AUC, plain / localized | 0.905 / 0.816 |
+| Patient sensitivity at specificity 0.90, plain / localized | 0.788 / 0.762 |
+| Patient AP, plain / localized | 0.778 / 0.710 |
+| Tumour-free patients with a false tumour (MedFormer) | 265 / 750 |
+
+*Localized*: a flagged patient counts as a true positive only if a predicted tumour overlaps a reference tumour. The star in the ROC marks the operating point reported on the R-Super GitHub.
+
+![FROC, patient ROC and lesion PR](../assets/figures/pants/detection_curves_lesion.png)
+
+![Tumour Dice per tumour patient](../assets/figures/pants/dist_dice_lesion.png)
+
+<div class="grid" markdown>
+
+![Tumour Dice vs size](../assets/figures/pants/size_lesion_dice.png)
+
+![Detection rate by tumour size](../assets/figures/pants/detection_by_size_lesion.png)
+
+</div>
+
+## Examples
+
+Chosen by rule from the full test set: **found**: detected tumour whose DSC is closest to the median DSC of all detected tumours (PanTS_00009765); **missed**: largest reference tumour that no predicted component touches (PanTS_00009659); **false positive**: tumour-free patient whose total false-tumour volume is the median over tumour-free patients with a false tumour (PanTS_00009810).
+
+![Found, missed and false tumours](../assets/figures/pants/lesion_cases.png)
+
+![Tri-planar view of the found tumour](../assets/figures/pants/triplanar_lesion.png)
+
+![Surface distance of the found tumour](../assets/figures/pants/surface_lesion.png)
+
+[Open the rotatable 3D tumour surface](../assets/figures/pants/surface_lesion.html)
+
+The full HTML report of MedFormer on all 901 test CTs (summary per structure, figures, worst cases, metric glossary): [open the report](../assets/showcase/report_medformer_full.html).
+
 ## Organ segmentation (mean over cases)
 
 | Structure | DSC MedFormer | DSC TotalSeg. | NSD MedFormer | NSD TotalSeg. | HD95 MedFormer | HD95 TotalSeg. |
@@ -46,6 +88,18 @@ Three official models, run here from their official code and checkpoints, on the
 | Veins | .860 | -- | .922 | -- | 21.4 | -- |
 
 DSC and NSD: higher is better; HD95 in mm, lower is better.
+
+![Per-case organ Dice](../assets/figures/pants/dist_dice_organs.png)
+
+![Per-case organ NSD](../assets/figures/pants/dist_nsd_organs.png)
+
+<div class="grid" markdown>
+
+![Paired comparison](../assets/figures/pants/forest_compare.png)
+
+![Pancreas ranking stability](../assets/figures/pants/ranking_stability_pancreas.png)
+
+</div>
 
 ## Macro and pooled Dice
 

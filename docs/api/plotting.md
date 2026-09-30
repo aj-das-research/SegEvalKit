@@ -4,3 +4,5 @@
 
 ::: segevalkit.plotting.quantitative
 
+
+::: segevalkit.plotting.detection

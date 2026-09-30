@@ -343,11 +343,43 @@ def main() -> None:
         rr = lp.loc[k]
         rows.append(f"{lab} & {fmt.format(rr.value)} {{\\scriptsize [{rr.ci_low:.2f}, {rr.ci_high:.2f}]}} \\\\")
     fp_neg, fp_pos = neg.false_positive_lesions.mean(), pos.false_positive_lesions.mean()
-    rows += [f"False tumours per scan, tumour-free / tumour patients & {fp_neg:.2f} / {fp_pos:.2f} \\\\",
+    rows += [f"False tumours per scan: tumour-free / tumour pat. & {fp_neg:.2f} / {fp_pos:.2f} \\\\",
              f"Per tumour patient: lesion precision & {f3(pos.lesion_precision.mean())} \\\\",
              f"Per tumour patient: tumour Dice (mean / median) & {f3(pos.dice.mean())} / {f3(pos.dice.median())} \\\\",
              f"Lesion probabilities: ECE / Brier & {mm.loc[('pancreatic_lesion', 'ece'), 'mean']:.3f} / "
              f"{mm.loc[('pancreatic_lesion', 'brier'), 'mean']:.3f} \\\\"]
+    # detection curves: lesion scores = max lesion probability per predicted tumour (benchmarks/pants/lesion_scores.py)
+    det = json.loads((REPORT / "detection_curves.json").read_text())["MedFormer"]
+    pv = det["presence_volume"]
+    rows += [f"FROC CPM (1/8--8 FP per scan) & {det['cpm']:.3f} "
+             f"{{\\scriptsize [{det['cpm_ci'][0]:.2f}, {det['cpm_ci'][1]:.2f}]}} \\\\",
+             f"Lesion-level average precision & {det['lesion_ap']:.3f} \\\\",
+             f"Patient sens.\\ at spec.\\ 0.90, plain / localized & {pv['sensitivity']:.3f} / "
+             f"{pv['sensitivity_localized']:.3f} \\\\",
+             f"Patient AUC, plain / localized & {pv['auc']:.3f} / {pv['auc_localized']:.3f} \\\\"]
+    cmd("cpm", f"{det['cpm']:.3f}")
+    cmd("frocEighth", f"{det['sensitivity_at']['0.125']:.2f}")
+    cmd("frocOne", f"{det['sensitivity_at']['1.0']:.2f}")
+    cmd("lesAP", f"{det['lesion_ap']:.2f}")
+    cmd("aucLoc", f"{pv['auc_localized']:.3f}")
+    cmd("aucPlain", f"{pv['auc']:.3f}")
+    cmd("sensLoc", f"{pv['sensitivity_localized']:.3f}")
+    cmd("sensPlain", f"{pv['sensitivity']:.3f}")
+    scored = sek.load_results(EVAL / "medformer_lesion_scores")
+    scored.meta["name"] = "MedFormer"
+    with theme():
+        fig, axs = plt.subplots(1, 2, figsize=(6.4, 2.05), constrained_layout=True)
+        P.froc_plot(scored, "pancreatic_lesion", n_boot=500, ax=axs[0])
+        P.pr_plot(scored, "pancreatic_lesion", ax=axs[1])
+        for ax, t in zip(axs, ("FROC (lesion level)", "Precision--recall (lesion level)")):
+            retitle(ax, t.replace("--", "–"))
+            ax.tick_params(labelsize=7.5)
+            ax.xaxis.label.set_size(8)
+            ax.yaxis.label.set_size(8)
+            if ax.get_legend():
+                for tx in ax.get_legend().get_texts():
+                    tx.set_fontsize(7)
+    save(fig, "f_froc_pr")
     table("t_tumour", "lr", "Tumour metric (95\\% CI) & MedFormer", rows)
     cmd("lesSens", f"{lp.loc['pooled_lesion_sensitivity'].value:.2f}")
     cmd("lesPrec", f"{lp.loc['pooled_lesion_precision'].value:.2f}")
@@ -465,7 +497,7 @@ def main() -> None:
             cx, cy, half = (x0 + x1) / 2, (y0 + y1) / 2, max(x1 - x0, y1 - y0, 60) / 2 + 10
             ax.set_xlim(cx - half, cx + half)
             ax.set_ylim(cy + half, cy - half)
-    viz.overlay._legend(fig, True)
+    viz.error_legend(fig, window="abdomen")
     save(fig, "f_cases")
     for i, (c, _) in enumerate(picks):
         cmd(f"case{'ABC'[i]}", c)

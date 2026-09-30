@@ -30,6 +30,9 @@ fig.savefig("dice.png", dpi=200)             # raster for slides
 | How stable is the ranking? | [`ranking_stability_plot`](#ranking-stability) | bootstrap blob plot |
 | Are probabilities calibrated? | [`reliability_diagram`](#calibration) | top-label reliability with gap |
 | Are small lesions found? | [`detection_by_size`](#lesion-detection) | detection rate per size bin |
+| How many false positives does a sensitivity cost? | [`froc_plot`](#detection-curves) | FROC with the CPM score |
+| Does the model flag the right patients? | [`roc_plot`](#detection-curves) | patient ROC, plain and localized, with a bootstrap band |
+| How precise are the detections? | [`pr_plot`](#detection-curves) | lesion- or patient-level PR with AP |
 | What kind of failure is it? | [`failure_quadrants`](#failure-modes) | Dice vs HD95, flagged cases |
 | What does each metric respond to? | [`sensitivity_curves`](#sensitivity-curves) | `segevalkit.synthetic` studies |
 
@@ -214,6 +217,39 @@ reference lesions in a size bin, with the lesion count printed in the bar.
 [![Lesion detection rate by size bin](../assets/showcase/detection_by_size.png)](../assets/showcase/detection_by_size.png)
 <figcaption>Are small lesions found? Neither model detects a lesion under 1 mL; both find the two 1–10 mL lesions and one of the two above 10 mL.</figcaption>
 </figure>
+
+## Detection curves
+
+```python
+P.froc_plot(res, "pancreatic_lesion")                       # lesion sensitivity vs FP lesions per scan, CPM
+P.roc_plot(res, "pancreatic_lesion", localized=True,        # patient level; dashed: flagged lesion must
+           reference_point={"sensitivity": 0.76,            #   overlap a reference lesion
+                            "specificity": 0.91, "label": "reported"})
+P.pr_plot(res, "pancreatic_lesion", level="lesion")         # or level="patient"
+```
+
+These need per-lesion confidence scores, which the lesion table holds when detection metrics run (maximum
+probability inside each predicted lesion with a probability source, else its volume); see
+[FROC and CPM](statistics.md#froc-and-cpm). Pass `{name: result}` to overlay several models.
+
+<figure class="sk-fig sk-fig--plot" markdown>
+[![FROC of MedFormer on the PanTS test set](../assets/figures/froc_pants_lesion.png)](../assets/figures/froc_pants_lesion.png)
+<figcaption>How many false positives does a sensitivity cost? MedFormer, pancreatic lesion, full PanTS test set (901 scans, 161 lesions, lesions scored by their maximum probability): 76 % of lesions at 1/8 false positive per scan, 81 % from 1/2 on, where the curve ends (0.49 FP lesions per scan in total). CPM 0.803 [0.73, 0.87].</figcaption>
+</figure>
+
+<div class="grid" markdown>
+
+<figure class="sk-fig sk-fig--square" markdown>
+[![Patient-level ROC of MedFormer](../assets/figures/roc_pants_lesion.png)](../assets/figures/roc_pants_lesion.png)
+<figcaption>Does the model flag the right patients? Predicted tumour volume as the patient score: AUC 0.905 (band: 95 % bootstrap). Requiring the flagged lesion to overlap the real one (dashed) lowers it to 0.816; at specificity 0.90, sensitivity drops from 0.788 to 0.762. Star: the operating point reported on the R-Super GitHub for this checkpoint (76 % / 91 %).</figcaption>
+</figure>
+
+<figure class="sk-fig sk-fig--square" markdown>
+[![Lesion-level precision-recall of MedFormer](../assets/figures/pr_pants_lesion.png)](../assets/figures/pr_pants_lesion.png)
+<figcaption>How precise are the detections? Lesion-level precision-recall over all 901 scans: AP 0.599. Precision stays near 0.77 up to 68 % recall, then falls as low-confidence detections, mostly in tumour-free scans, are admitted.</figcaption>
+</figure>
+
+</div>
 
 ## Failure modes
 

@@ -111,3 +111,58 @@ r["auc"], r["sensitivity"], r["specificity"], r["threshold"]
 A case is positive if its reference contains the structure (volume > `min_ref_ml`), and called positive if
 `score` exceeds a threshold. The operating point is the lowest threshold reaching `target_specificity`; the result
 also holds `n_pos`, `n_neg` and the ROC arrays. This is the PanTS patient-wise protocol.
+
+### Localized presence
+
+A patient flagged as positive may have been flagged for a false blob somewhere else. `localized_presence` reports
+the plain patient-level sensitivity next to a *localized* one, which also requires at least one predicted lesion to
+overlap a reference lesion, and the lesion-level sensitivity at the same threshold:
+
+```python
+from segevalkit.stats import localized_presence
+r = localized_presence(res, "pancreatic_lesion", score="pred_volume_ml", target_specificity=0.9)
+r["sensitivity"], r["sensitivity_localized"], r["lesion_sensitivity"], r["auc"], r["auc_localized"]
+```
+
+Specificity is the same for both; the gap between the two sensitivities is the fraction of positive patients found
+only by accident. `score="lesion"` ranks patients by their most confident lesion instead of the predicted volume,
+and a patient is then localized at a threshold only if a lesion touching the reference is still called.
+
+## FROC and CPM
+
+The free-response ROC curve plots lesion sensitivity against the mean number of false-positive lesions per scan
+while the lesion confidence threshold is lowered, over all scans including lesion-free ones (Chakraborty & Berbaum
+2004). The **Competition Performance Metric** is the mean sensitivity at 1/8, 1/4, 1/2, 1, 2, 4 and 8 false
+positives per scan (LUNA16, Setio et al. 2017):
+
+\[
+\mathrm{CPM} = \frac{1}{7}\sum_{r\in\{\frac18,\frac14,\frac12,1,2,4,8\}} \mathrm{Sens}(r)
+\]
+
+```python
+from segevalkit.stats import froc
+f = froc(res, "pancreatic_lesion", n_boot=1000)
+f["cpm"], f["cpm_ci"], f["sensitivity_at"], f["max_sensitivity"]
+```
+
+FROC needs a confidence per predicted lesion. The `Evaluator` stores it in the lesion table whenever detection
+metrics run: the maximum probability inside the component when a probability source is given
+(`evaluate(..., prob="probs/")`, `lesion_score="max"` or `"mean"`), otherwise the component volume in mL, recorded
+in `score_type`. Sensitivity at each FP rate is read off the curve by linear interpolation; beyond the largest FP
+rate the model reaches, its final sensitivity holds, so a CPM below the maximum sensitivity means the model reaches
+it only with many false positives. The interval resamples cases.
+
+## Precision-recall curves
+
+```python
+from segevalkit.stats import lesion_pr, patient_pr
+lesion_pr(res, "pancreatic_lesion")["ap"]                     # lesions ranked by confidence
+patient_pr(res, "pancreatic_lesion", score="pred_volume_ml")  # patients ranked by predicted volume
+patient_pr(res, "pancreatic_lesion", localized=True)          # mislocalized calls count as false positives
+```
+
+Lesion-level precision counts detected reference lesions as true positives,
+\(TP_{\mathrm{les}}/(TP_{\mathrm{les}}+FP_{\mathrm{les}})\), as [lesion F1](../metrics/detection.md#lesion_f1) does;
+AP is the all-point interpolated area. Unlike ROC, PR curves depend on prevalence: at patient level the chance line
+is the fraction of positive patients (`prevalence`), not 0.5.
+

@@ -47,7 +47,8 @@ __all__ = ["Evaluator", "EvalConfig"]
 log = logging.getLogger("segevalkit")
 
 _DETECTION = {"lesion_recall", "lesion_precision", "lesion_f1", "panoptic_quality", "split_count", "merge_count",
-              "lesionwise_dice", "lesion_count_difference", "false_positive_lesions",
+              "lesionwise_dice", "lesionwise_hd95", "lesionwise_nsd", "lesion_ap",
+              "lesion_count_difference", "false_positive_lesions",
               "false_negative_lesions"}
 
 
@@ -64,6 +65,7 @@ class EvalConfig:
     alignment: str = "strict"
     missing_pred: str = "empty"
     lesion_table: bool = True
+    lesion_score: str = "max"
     device: str = "cpu"
 
     @property
@@ -97,6 +99,10 @@ class Evaluator:
             (the challenge convention; a model cannot skip hard cases) or
             ``"skip"`` drops the case.
         lesion_table: Also collect per-lesion rows when detection metrics run.
+        lesion_score: Confidence of each predicted lesion in the lesion table:
+            ``"max"`` (default) or ``"mean"`` probability inside the component
+            when a probability source is given, else its volume in mL. Used by
+            `segevalkit.stats.froc` and `segevalkit.stats.lesion_pr`.
     """
 
     def __init__(
@@ -112,11 +118,14 @@ class Evaluator:
         alignment: str = "strict",
         missing_pred: str = "empty",
         lesion_table: bool = True,
+        lesion_score: str = "max",
     ) -> None:
         if alignment not in ("strict", "resample", "ignore"):
             raise ValueError("alignment must be 'strict', 'resample' or 'ignore'")
         if missing_pred not in ("empty", "skip"):
             raise ValueError("missing_pred must be 'empty' or 'skip'")
+        if lesion_score not in ("max", "mean"):
+            raise ValueError("lesion_score must be 'max' or 'mean'")
         self.labels: List[LabelSpec] = parse_labels(labels)
         names = resolve_metrics(metrics)
         for n in (params or {}):
@@ -126,7 +135,7 @@ class Evaluator:
             both_empty=empty.both_empty, one_empty_distance=empty.one_empty_distance,
             connectivity=connectivity, min_lesion_voxels=min_lesion_voxels,
             alignment=alignment, missing_pred=missing_pred, lesion_table=lesion_table,
-            device=device,
+            lesion_score=lesion_score, device=device,
         )
 
     # --------------------------------------------------------------- arrays
@@ -289,7 +298,7 @@ def _score_label(case_id, lab: LabelSpec, pred, ref, spacing, prob, cfg: EvalCon
         m = match_instances(ctx, criterion="overlap")
         flags += [("n_ref_lesions", float(m.n_ref)), ("n_pred_lesions", float(m.n_pred)),
                   ("tp_ref_lesions", float(m.tp_ref)), ("tp_pred_lesions", float(m.tp_pred))]
-        for r in lesion_table(ctx):
+        for r in lesion_table(ctx, score=cfg.lesion_score):
             lesions.append({"case_id": case_id, "label": lab.name, **r})
     for key, val in flags:
         rows.append({"case_id": case_id, "label": lab.name, "metric": f"_{key}", "value": val})

@@ -104,7 +104,7 @@ def quantitative(res, out):
     save(P.volume_agreement(first, "liver"), out, "volume_agreement_liver")
     save(P.bland_altman_plot(first, "pancreas"), out, "bland_altman_pancreas")
     save(P.metric_profile(res, ["dice", "nsd", "hd95", "assd"], label="pancreas"), out, "metric_profile_pancreas")
-    save(P.failure_quadrants(first, "pancreas", x_thr=0.8), out, "failure_quadrants_pancreas")
+    save(P.failure_quadrants(first, "pancreas"), out, "failure_quadrants_pancreas")
     lesion = {k: v for k, v in res.items() if "pancreatic_lesion" in v.labels}
     save(P.detection_by_size(lesion, label="pancreatic_lesion", bins_ml=(0, 1, 10, np.inf)), out, "detection_by_size")
     a, b = "nnU-Net ResEnc-M", "MedFormer"
@@ -186,14 +186,7 @@ def model_comparison(img, rl, rp, cid, out):
                                   legend=False,
                                   title=f"{name} · {'pancreas ∪ lesion' if struct == 'pancreas' else 'lesion'}"
                                         + (" (no lesion class)" if m == "totalseg" and struct != "pancreas" else ""))
-        from matplotlib.patches import Patch
-
-        from segevalkit.plotting.theme import ERROR_COLORS
-
-        fig.legend(handles=[Patch(color=ERROR_COLORS["tp"], label="True positive"),
-                            Patch(color=ERROR_COLORS["fn"], label="Missed"),
-                            Patch(color=ERROR_COLORS["fp"], label="Added")],
-                   loc="outside lower center", ncol=3, frameon=False)
+        viz.error_legend(fig, window="pancreas")
         fig.suptitle(f"Three official models, one slice ({cid})", x=0.01, ha="left", fontsize=12,
                      fontweight="bold", color=INK["primary"])
     save(fig, out, "model_comparison")

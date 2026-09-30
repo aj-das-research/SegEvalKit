@@ -1,6 +1,6 @@
 # Metrics
 
-SegEvalKit registers 53 metrics in seven families; each answers a different question and is blind to something
+SegEvalKit registers 56 metrics in seven families; each answers a different question and is blind to something
 the others see. Combine **at least one overlap and one boundary metric**, plus detection metrics whenever there are
 several instances (Metrics Reloaded). Every metric carries its metadata in one registry, from which the
 [full catalogue](catalogue.md), `segevalkit metrics -v`, plot labels and reports are generated. For a

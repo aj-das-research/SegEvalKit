@@ -11,7 +11,9 @@ from .quantitative import (
     comparison_forest,
     detection_by_size,
     ecdf,
+    FAILURE_CLASSES,
     failure_quadrants,
+    failure_thresholds,
     metric_correlation,
     metric_distribution,
     metric_heatmap,
@@ -22,6 +24,7 @@ from .quantitative import (
     sensitivity_curves,
     volume_agreement,
 )
+from .detection import froc_plot, pr_plot, roc_plot
 from .theme import CATEGORICAL, ERROR_COLORS, PURPLE, apply_theme, theme
 
 __all__ = [
@@ -36,6 +39,8 @@ __all__ = [
     "detection_by_size",
     "ecdf",
     "failure_quadrants",
+    "failure_thresholds",
+    "FAILURE_CLASSES",
     "metric_correlation",
     "metric_distribution",
     "metric_heatmap",
@@ -45,4 +50,7 @@ __all__ = [
     "reliability_diagram",
     "sensitivity_curves",
     "volume_agreement",
+    "froc_plot",
+    "roc_plot",
+    "pr_plot",
 ]

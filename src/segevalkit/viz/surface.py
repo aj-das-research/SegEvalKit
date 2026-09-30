@@ -12,6 +12,9 @@ from ..plotting.theme import INK, diverging_cmap, theme
 
 __all__ = ["surface_distance_map", "signed_distance_at_surface"]
 
+_CB_LABEL = ("Signed distance from the predicted surface to the reference surface [mm]\n"
+             "− inside the reference: under-segmented  ·  0 on the boundary  ·  + outside: over-segmented")
+
 
 def _signed_distance(ref: np.ndarray, spacing) -> np.ndarray:
     """Signed distance to the reference boundary in mm: > 0 outside (over-segmentation), < 0 inside."""
@@ -45,7 +48,7 @@ def signed_distance_at_surface(pred: np.ndarray, ref: np.ndarray, spacing: Seque
 def surface_distance_map(pred: np.ndarray, ref: np.ndarray, spacing: Sequence[float] = (1, 1, 1), *,
                          clip_mm: Optional[float] = None, backend: str = "matplotlib", step: int = 1,
                          title: Optional[str] = None, views: Sequence[tuple] = ((20, -60), (20, 120)),
-                         html_path: Optional[str] = None, figsize=(9.0, 4.2)):
+                         html_path: Optional[str] = None, legend: bool = True, figsize=(9.0, 4.2)):
     """Render the predicted surface coloured by signed distance to the reference.
 
     Args:
@@ -54,8 +57,10 @@ def surface_distance_map(pred: np.ndarray, ref: np.ndarray, spacing: Sequence[fl
             (interactive; saved to ``html_path`` when given).
         step: Marching-cubes step size; >1 for faster previews of large organs.
 
-    Colour: purple = prediction outside the reference (over-segmentation),
-    orange = inside (under-segmentation), grey = on the boundary.
+    Colour: purple = prediction outside the reference (over-segmentation,
+    positive mm), orange = inside (under-segmentation, negative mm), grey = on
+    the boundary. The mesh is the *predicted* surface. ``legend=True`` spells out
+    this sign convention on the colour bar; ``False`` keeps only the unit.
     """
     verts, faces, dist = signed_distance_at_surface(pred, ref, spacing, step)
     if clip_mm is None:
@@ -69,7 +74,8 @@ def surface_distance_map(pred: np.ndarray, ref: np.ndarray, spacing: Sequence[fl
         fig = go.Figure(go.Mesh3d(
             x=verts[:, 0], y=verts[:, 1], z=verts[:, 2], i=faces[:, 0], j=faces[:, 1], k=faces[:, 2],
             intensity=np.clip(dist, -clip_mm, clip_mm), cmin=-clip_mm, cmax=clip_mm, colorscale=stops,
-            colorbar=dict(title="Signed distance [mm]"), flatshading=False,
+            colorbar=dict(title=_CB_LABEL.replace("\n", "<br>") if legend else "Signed distance [mm]"),
+            flatshading=False,
             lighting=dict(ambient=0.55, diffuse=0.7, specular=0.15),
             hovertemplate="%{intensity:.2f} mm<extra></extra>"))
         fig.update_layout(title=title or "Surface distance to reference", scene=dict(aspectmode="data"),
@@ -97,8 +103,9 @@ def surface_distance_map(pred: np.ndarray, ref: np.ndarray, spacing: Sequence[fl
             ax.view_init(elev=elev, azim=azim)
             ax.set_axis_off()
         sm = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
-        cb = fig.colorbar(sm, ax=fig.axes, fraction=0.03, pad=0.02, shrink=0.8)
-        cb.set_label("Signed distance to reference [mm]\n← under-segmented · over-segmented →")
+        cb = fig.colorbar(sm, ax=fig.axes, orientation="horizontal", location="bottom", fraction=0.05, pad=0.02,
+                          shrink=0.6, aspect=40)
+        cb.set_label(_CB_LABEL if legend else "Signed distance to reference [mm]", fontsize=8)
         cb.outline.set_visible(False)
         fig.suptitle(title or "Surface distance to reference", x=0.01, ha="left", fontsize=11,
                      fontweight="bold", color=INK["primary"])

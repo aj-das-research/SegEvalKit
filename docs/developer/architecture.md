@@ -13,7 +13,7 @@ flowchart TB
     end
     subgraph CORE["segevalkit.metrics"]
         direction LR
-        C["PairContext<br/>cached intermediates"] --> R["Metric registry<br/>53 metrics · MetricInfo"]
+        C["PairContext<br/>cached intermediates"] --> R["Metric registry<br/>56 metrics · MetricInfo"]
     end
     subgraph RUN["segevalkit.evaluator"]
         direction LR

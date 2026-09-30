@@ -53,7 +53,7 @@ def banner():
     ax.text(2.45, cy + 0.2, "SegEvalKit", fontsize=50, color="white", fontweight="bold", va="center", zorder=5)
     ax.text(2.48, cy - 0.5, "Explicit, tested evaluation of volumetric medical image segmentation",
             fontsize=17, color="#e6dcff", style="italic", va="center", zorder=5)
-    chips = ["53 metrics", "CT · MR · NIfTI", "GPU distances", "statistics & ranking", "plots · reports"]
+    chips = ["56 metrics", "CT · MR · NIfTI", "GPU distances", "statistics & ranking", "plots · reports"]
     x = 2.5
     for c in chips:
         t = ax.text(x + 0.12, 0.42, c, fontsize=11.5, color="white", va="center", zorder=6)

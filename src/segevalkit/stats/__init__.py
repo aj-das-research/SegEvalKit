@@ -17,7 +17,11 @@ very little (Maier-Hein et al. 2018, *Nat Commun* 9:5217; Wiesenfarth et al.
 * `stratify`: summaries within bins of a covariate such as structure size.
 * `presence_detection`: case-level ("does this patient have a tumour?")
   sensitivity / specificity / ROC-AUC from predicted volume, the PanTS
-  patient-wise protocol.
+  patient-wise protocol; `localized_presence` additionally requires the
+  flagged lesion to overlap a reference lesion.
+* `froc`, `lesion_pr`, `patient_pr`: FROC curve with the CPM score, and
+  lesion- and patient-level precision-recall curves with average precision
+  (`segevalkit.stats.detection`).
 """
 
 from __future__ import annotations
@@ -41,6 +45,12 @@ __all__ = [
     "icc",
     "stratify",
     "presence_detection",
+    "froc",
+    "lesion_pr",
+    "patient_pr",
+    "localized_presence",
+    "roc_band",
+    "CPM_RATES",
 ]
 
 
@@ -367,3 +377,6 @@ def presence_detection(result, label: str, score: str = "pred_volume_ml", target
     k = ok[np.argmin(thr[ok])] if ok.size else len(thr) - 1
     return {"auc": auc, "threshold": float(thr[k]), "sensitivity": float(tpr[k]), "specificity": float(spec[k]),
             "n_pos": n_pos, "n_neg": n_neg, "fpr": fpr, "tpr": tpr, "thresholds": thr}
+
+
+from .detection import CPM_RATES, froc, lesion_pr, localized_presence, patient_pr, roc_band  # noqa: E402

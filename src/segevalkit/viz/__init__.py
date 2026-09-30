@@ -4,9 +4,11 @@ Numbers say *how much* is wrong; pictures say *what* is wrong. All views use
 the same error encoding (see `segevalkit.plotting.theme.ERROR_COLORS`):
 
 * **violet**: true positive (agreement),
-* **orange**: false negative (reference tissue the model missed),
-* **teal**: false positive (tissue the model added),
+* **orange**: false negative (reference tissue the model missed: under-segmentation),
+* **teal**: false positive (tissue the model added: over-segmentation),
+* **grey background**: the image in the chosen CT window,
 
+every view carries this key below the image (``legend=False`` removes it),
 and show slices in radiological convention (patient right on screen left)
 after reorienting to RAS with the NIfTI affine, with the correct physical
 aspect ratio from the voxel spacing.
@@ -16,6 +18,7 @@ from .overlay import (
     WINDOWS,
     apply_window,
     case_gallery,
+    error_legend,
     error_overlay,
     error_projection,
     pick_slice,
@@ -29,6 +32,7 @@ __all__ = [
     "WINDOWS",
     "apply_window",
     "case_gallery",
+    "error_legend",
     "error_overlay",
     "error_projection",
     "pick_slice",

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SegEvalKit viewer</title>
+<link rel="stylesheet" href="static/app.css">
+<!--SEK_BOOT-->
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">◆</span> SegEvalKit <span class="muted">viewer</span></div>
+  <div class="case" id="case">loading…</div>
+  <div class="controls">
+    <div class="seg" id="views" role="group" aria-label="View">
+      <button data-view="multi" class="on" title="Axial, coronal, sagittal and 3D">MPR</button>
+      <button data-view="axial" title="Axial (A)">Ax</button>
+      <button data-view="coronal" title="Coronal (C)">Cor</button>
+      <button data-view="sagittal" title="Sagittal (S)">Sag</button>
+      <button data-view="montage" title="Slice montage through the selected structure (M)">Montage</button>
+      <button data-view="3d" title="Rotatable 3D surfaces (R)">3D</button>
+    </div>
+    <div class="seg" id="layouts" role="group" aria-label="Layout">
+      <button data-layout="single" class="on">Single</button>
+      <button data-layout="compare" title="Reference and every model side by side, synchronised">Compare models</button>
+    </div>
+    <div class="seg" id="overlays" role="group" aria-label="Overlay">
+      <button data-overlay="labels" class="on" title="Structure labels">Labels</button>
+      <button data-overlay="errors" title="Errors of the selected structure against the reference (E)">Errors</button>
+    </div>
+    <label class="inline">Source <select id="source"></select></label>
+    <label class="inline">Window <select id="window"></select></label>
+    <label class="inline">Opacity <input id="opacity" type="range" min="0" max="100" value="60"></label>
+  </div>
+</header>
+<main>
+  <aside class="side">
+    <section>
+      <h2>Structures <span class="hint">click to highlight</span></h2>
+      <div id="structures" class="list"></div>
+    </section>
+    <section id="lesion-section" hidden>
+      <h2>Lesions <span class="hint">found · missed · false positive</span></h2>
+      <div id="lesions" class="list"></div>
+    </section>
+    <section>
+      <h2>Metrics <span class="hint" id="metric-source"></span></h2>
+      <div id="metrics"></div>
+    </section>
+  </aside>
+  <section class="stage">
+    <div id="grid" class="grid"></div>
+    <footer class="legend" id="legend"></footer>
+  </section>
+</main>
+<div id="toast" class="toast" hidden></div>
+<script src="static/niivue.umd.js"></script>
+<script src="static/app.js"></script>
+</body>
+</html>

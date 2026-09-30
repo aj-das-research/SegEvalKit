@@ -17,7 +17,7 @@
   {
     "title": "lesions",
     "code": "res.lesions.query(\"kind == 'ref'\")[[\"case_id\", \"volume_ml\", \"detected\", \"dice\"]]",
-    "output": "       case_id  volume_ml  detected  dice\nPanTS_00009152     15.251      True 0.778\nPanTS_00009760     23.745     False 0.000\nPanTS_00009287      0.145     False 0.000\nPanTS_00009287      0.103     False 0.000\nPanTS_00009329      2.187      True 0.702\nPanTS_00009027      0.181     False 0.000\nPanTS_00009544      9.765      True 0.666"
+    "output": "       case_id  volume_ml  detected  dice\nPanTS_00009152     15.251      True 0.778\nPanTS_00009760     23.745     False 0.000\nPanTS_00009287      0.145     False 0.000\nPanTS_00009287      0.103     False 0.000\nPanTS_00009027      0.181     False 0.000\nPanTS_00009329      2.187      True 0.702\nPanTS_00009544      9.765      True 0.666"
   },
   {
     "title": "compare",

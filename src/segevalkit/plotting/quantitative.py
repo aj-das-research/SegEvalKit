@@ -30,6 +30,8 @@ __all__ = [
     "reliability_diagram",
     "detection_by_size",
     "failure_quadrants",
+    "failure_thresholds",
+    "FAILURE_CLASSES",
     "sensitivity_curves",
     "cohort_plot",
 ]
@@ -460,9 +462,11 @@ def detection_by_size(results: Results, label: Optional[str] = None,
             n = les.groupby(b, observed=False)["detected"].size()
             x = np.arange(len(names)) + (k - (len(items) - 1) / 2) * width
             ax.bar(x, rate.to_numpy(float), width=width * 0.9, color=colors[name], label=name)
-            for xi, ni in zip(x, n):
-                ax.text(xi, 0.02, f"n={ni}", ha="center", va="bottom", fontsize=6.5, color=INK["surface"],
-                        rotation=90)
+            for xi, ni, ri in zip(x, n, rate.to_numpy(float)):
+                # count above the bar, in text ink, so it stays visible on short or empty bars
+                top = ri if np.isfinite(ri) else 0.0
+                ax.text(xi, min(top, 0.93) + 0.015, f"n={ni}", ha="center", va="bottom", fontsize=6.5,
+                        color=INK["secondary"])
         ax.set_xticks(range(len(names)))
         ax.set_xticklabels(names)
         ax.set_ylim(0, 1.05)
@@ -474,25 +478,92 @@ def detection_by_size(results: Results, label: Optional[str] = None,
     return fig
 
 
-def failure_quadrants(result, label: str, x: str = "dice", y: str = "hd95", x_thr: float = 0.7,
-                      y_thr: Optional[float] = None, ax=None, figsize=(4.8, 3.8)):
-    """Overlap vs boundary error scatter split into quadrants.
+# ------------------------------------------------------------ failure thresholds
+#: A case *fails* when it is worse than a uniform boundary error of ``error_mm``,
+#: the largest boundary error accepted for that structure class. HD95 of a
+#: uniform error of e mm is about e mm, so ``hd95 = error_mm``; ``dice`` is the
+#: median Dice that the same uniform error produces on real PanTS masks (mean of
+#: erosion and dilation by ``error_mm``, SegEvalKit sensitivity study,
+#: docs/guide/sensitivity-study.md), rounded down to 0.05. ``error_mm`` itself
+#: is a documented SegEvalKit convention (5 mm for organs, 3 mm for vessels and
+#: lesions), not a published clinical standard: set it from your clinical
+#: tolerance, e.g. inter-rater variability (Nikolov et al. 2021).
+FAILURE_CLASSES: Dict[str, Dict[str, float]] = {
+    "large_organ": {"error_mm": 5.0, "dice": 0.85, "hd95": 5.0},      # liver: Dice 0.860 at 5 mm
+    "compact_organ": {"error_mm": 5.0, "dice": 0.65, "hd95": 5.0},    # kidney: 0.687
+    "elongated_organ": {"error_mm": 5.0, "dice": 0.50, "hd95": 5.0},  # pancreas: 0.546
+    "small_organ": {"error_mm": 5.0, "dice": 0.35, "hd95": 5.0},      # gallbladder: 0.363
+    "vessel": {"error_mm": 3.0, "dice": 0.75, "hd95": 3.0},           # aorta: 0.755 at 3 mm
+    "small_vessel": {"error_mm": 3.0, "dice": 0.45, "hd95": 3.0},     # veins: 0.462
+    "lesion": {"error_mm": 3.0, "dice": 0.65, "hd95": 3.0},           # pancreatic lesion: 0.673
+}
+
+#: Name fragments → structure class (first match wins; checked on the lower-cased label).
+FAILURE_CLASS_KEYS = [
+    (("lesion", "tumo", "cyst", "nodule", "metast", "cancer", "enhancing", "necro", "edema"), "lesion"),
+    (("vein", "portal", "splenic_v", "mesenteric", "renal_v", "iliac", "hepatic_v"), "small_vessel"),
+    (("aorta", "cava", "postcava", "ivc", "artery", "vessel", "carotid", "pulmonary_a"), "vessel"),
+    (("gall", "adrenal", "thyroid", "bile", "duct", "prostate", "optic", "cochlea", "parotid"), "small_organ"),
+    (("pancrea", "duodenum", "esophag", "oesophag", "bowel", "intestin", "rectum", "colon", "sigmoid"),
+     "elongated_organ"),
+    (("kidney", "bladder", "heart", "uterus", "spinal", "vertebra"), "compact_organ"),
+    (("liver", "spleen", "stomach", "lung", "brain", "muscle", "femur"), "large_organ"),
+]
+
+
+def failure_thresholds(label: str, overrides: Optional[Mapping[str, Mapping[str, float]]] = None) -> Dict:
+    """Dice and HD95 failure thresholds for one structure.
+
+    Resolution order: ``overrides[label]``, then the structure class matched from
+    the label name (`FAILURE_CLASS_KEYS`), then ``compact_organ``. Returns
+    ``{"dice", "hd95", "error_mm", "class"}``; an override may give any subset.
+    """
+    cls = next((c for keys, c in FAILURE_CLASS_KEYS if any(k in label.lower() for k in keys)), None)
+    out = dict(FAILURE_CLASSES[cls or "compact_organ"], **{"class": cls or "compact_organ (default)"})
+    if overrides and label in overrides:
+        out.update(overrides[label])
+        out["class"] = "user-defined"
+    return out
+
+
+def failure_quadrants(result, label: str, x: str = "dice", y: str = "hd95", x_thr: Optional[float] = None,
+                      y_thr: Optional[float] = None, thresholds: Optional[Mapping[str, Mapping[str, float]]] = None,
+                      ax=None, figsize=(4.8, 3.8)):
+    """Overlap vs boundary error scatter, with per-structure failure thresholds.
+
+    A case is *flagged* when it is worse than a uniform boundary error of
+    ``error_mm`` (the largest error accepted for its structure class): Dice
+    below the Dice such an error gives, or HD95 above ``error_mm``. Defaults
+    come from `failure_thresholds` (`FAILURE_CLASSES`: 5 mm for organs, 3 mm
+    for vessels and lesions, with Dice levels measured on real PanTS masks);
+    pass ``thresholds={"pancreas": {"dice": 0.7, "hd95": 10}}`` or explicit
+    ``x_thr`` / ``y_thr`` to use your clinical tolerance instead.
 
     Cases with good Dice but large HD95 have distant spurious fragments; poor
     Dice with small HD95 are systematic boundary shifts or under-segmentation.
+    For metrics other than Dice / HD95 without explicit thresholds, the x
+    threshold is 0.7 and the y threshold twice the median.
     """
     xi, yi = get_metric(x), get_metric(y)
     w = result.wide()
     w = w[w["label"] == label].dropna(subset=[x, y])
-    y_thr = float(np.nanmedian(w[y])) * 2 if y_thr is None else y_thr
+    t = failure_thresholds(label, thresholds)
+    explicit = x_thr is not None or y_thr is not None
+    if x_thr is None:
+        x_thr = t["dice"] if x == "dice" else 0.7
+    if y_thr is None:
+        y_thr = t["hd95"] if y == "hd95" else float(np.nanmedian(w[y])) * 2
     with theme():
         fig, ax = _new_ax(ax, figsize)
         bad = (w[x] < x_thr) | (w[y] > y_thr)
-        ax.scatter(w.loc[~bad, x], w.loc[~bad, y], s=16, color=PURPLE[600], alpha=0.6, edgecolors="none", label="OK")
+        ax.scatter(w.loc[~bad, x], w.loc[~bad, y], s=16, color=PURPLE[600], alpha=0.6, edgecolors="none",
+                   label="Within tolerance")
         ax.scatter(w.loc[bad, x], w.loc[bad, y], s=22, color=ERROR_COLORS["fn"], alpha=0.8, edgecolors="none",
                    label="Flagged")
-        ax.axvline(x_thr, color=INK["muted"], linestyle="--", linewidth=1)
-        ax.axhline(y_thr, color=INK["muted"], linestyle="--", linewidth=1)
+        ax.axvline(x_thr, color=INK["muted"], linestyle="--", linewidth=1,
+                   label=f"{xi.abbr} < {x_thr:g}")
+        ax.axhline(y_thr, color=INK["muted"], linestyle=":", linewidth=1.2,
+                   label=f"{yi.abbr} > {y_thr:g}{' ' + yi.unit if yi.unit else ''}")
         for _, r in w[bad].nsmallest(4, x).iterrows():
             ax.annotate(str(r["case_id"]), (r[x], r[y]), fontsize=6.5, color=INK["secondary"],
                         xytext=(3, 3), textcoords="offset points")
@@ -500,8 +571,11 @@ def failure_quadrants(result, label: str, x: str = "dice", y: str = "hd95", x_th
         ax.set_xlabel(xi.label)
         ax.set_ylabel(yi.label)
         ax.grid(True, axis="both")
+        rule = (f"{t['class'].replace('_', ' ')}: worse than a uniform {t['error_mm']:g} mm error"
+                if x == "dice" and y == "hd95" and t["class"] != "user-defined" and not explicit
+                else "user-defined thresholds")
         ax.set_title(f"Failure modes: {label} ({int(bad.sum())}/{len(w)} flagged)")
-        ax.legend(loc="lower left")  # the upper-left quadrant is where flagged cases fall
+        ax.legend(loc="lower left", fontsize=7, title=rule, title_fontsize=7)
     return fig
 
 

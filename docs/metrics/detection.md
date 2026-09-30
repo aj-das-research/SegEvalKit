@@ -23,6 +23,13 @@ lesion-wise Dice) add per-lesion segmentation quality. Always report how lesions
 | [Merges](#merge_count) | predicted components | any overlap | lesions fused together? |
 | [Panoptic quality](#panoptic_quality) | pairs | IoU > 0.5, Hungarian | detection × outline quality |
 | [Lesion-wise Dice](#lesionwise_dice) | reference lesions + FPs | any overlap | Dice with every lesion weighted equally |
+| [Lesion-wise HD95](#lesionwise_hd95) | reference lesions + FPs | any overlap | boundary error per lesion, misses penalised |
+| [Lesion-wise NSD](#lesionwise_nsd) | reference lesions + FPs | any overlap | boundary agreement per lesion |
+| [Lesion AP](#lesion_ap) | ranked predicted components | any overlap | detection quality over all confidence thresholds |
+
+Dataset-level detection curves (FROC with the CPM score, lesion and patient precision-recall, patient ROC with and
+without localization) pool over all cases: see [Statistics](../analysis/statistics.md#froc-and-cpm) and
+[Plots](../analysis/plots.md#detection-curves).
 
 ## Notation and matching
 
@@ -38,8 +45,8 @@ matched lesions, unmatched predictions and unmatched references.
 | `"iou"` | one-to-one, Hungarian max-IoU | a pair with \(\mathrm{IoU} >\) `iou_threshold` (strict; 0.5 makes matches unique, as in PQ) | same on both sides |
 
 `criterion`, `iou_threshold` and `min_overlap` apply to `lesion_recall`, `lesion_precision`, `lesion_f1`,
-`false_positive_lesions`, `false_negative_lesions`. `split_count`, `merge_count`, `lesionwise_dice` always use any
-overlap; `panoptic_quality` always uses "iou" with its own `iou_threshold`; `lesion_count_difference` only counts.
+`false_positive_lesions`, `false_negative_lesions`. `split_count`, `merge_count` and the lesion-wise metrics
+(`lesionwise_dice`, `lesionwise_hd95`, `lesionwise_nsd`, `lesion_ap`) always use any overlap; `panoptic_quality` always uses "iou" with its own `iou_threshold`; `lesion_count_difference` only counts.
 
 ## Metrics
 
@@ -306,9 +313,89 @@ FN_{\mathrm{les}} = N_G - \#\,\text{detected reference lesions}
 
 </div>
 
+<div class="sek-metric" markdown>
+
+### Lesion-wise HD95 (LW-HD95; BraTS 2023) {#lesionwise_hd95}
+
+<div class="sek-meta"><span class="sek-chip">lesionwise_hd95</span><span class="sek-chip">[0, ∞) mm</span><span class="sek-chip teal">↓ lower is better</span></div>
+
+\[
+\mathrm{LW\text{-}HD95} = \frac{1}{N_G + FP_{\mathrm{les}}}\Big(\sum_{i=1}^{N_G}
+\mathrm{HD95}\big(G_i,\ \textstyle\bigcup_{j:\, P_j\cap G_i\neq\emptyset} P_j\big) + FP_{\mathrm{les}}\cdot d_{\max}\Big)
+\]
+
+**In words** HD95 of each reference lesion against the predicted components touching it, averaged over lesions; a missed lesion and a false-positive component each score the penalty \(d_{\max}\).
+
+**Use when** Multi-focal disease where boundary quality matters per lesion (BraTS 2023 reports it next to lesion-wise Dice).
+
+**Watch out** Dominated by the penalty whenever a lesion is missed or added; read it next to lesion F1.
+
+??? info "Details: empty masks, parameters, reference"
+    **Penalty.** \(d_{\max}\) is the one-mask-empty distance of the [`EmptyPolicy`](../guide/conventions.md): 374 mm under `EmptyPolicy.preset("brats2023")`, the image diagonal by default.
+
+    **Empty masks.** No reference lesions and no predicted components: 0 (`"best"`) or NaN.
+
+    **Parameters.** None; HD95 per lesion uses the directed convention of [HD95](distance.md#hd95).
+
+    **Reference.** Kazerooni AF et al. BraTS 2023: focus on pediatrics. [arXiv:2305.17033](https://arxiv.org/abs/2305.17033) (2023). Evaluation code: [rachitsaluja/BraTS-2023-Metrics](https://github.com/rachitsaluja/BraTS-2023-Metrics)
+
+</div>
+
+<div class="sek-metric" markdown>
+
+### Lesion-wise normalized surface Dice (LW-NSD) {#lesionwise_nsd}
+
+<div class="sek-meta"><span class="sek-chip">lesionwise_nsd</span><span class="sek-chip">[0, 1]</span><span class="sek-chip teal">↑ higher is better</span></div>
+
+\[
+\mathrm{LW\text{-}NSD}_\tau = \frac{1}{N_G + FP_{\mathrm{les}}}\sum_{i=1}^{N_G}
+\mathrm{NSD}_\tau\big(G_i,\ \textstyle\bigcup_{j:\, P_j\cap G_i\neq\emptyset} P_j\big)
+\]
+
+**In words** [NSD](distance.md#nsd) of each lesion, averaged over lesions; missed lesions and false-positive components score 0.
+
+**Use when** Boundary agreement per lesion without the unbounded penalty of LW-HD95.
+
+**Watch out** The tolerance \(\tau\) should match lesion size and annotation variability; 2 mm by default.
+
+??? info "Details: empty masks, parameters, reference"
+    **Empty masks.** No reference lesions and no predicted components: 1 (`"best"`) or NaN.
+
+    **Parameters.** `tolerance_mm=2.0`.
+
+    **Reference.** Lesion-wise protocol of Kazerooni et al. 2023 ([arXiv:2305.17033](https://arxiv.org/abs/2305.17033)) applied to NSD (Nikolov S et al. *J Med Internet Res* 23(7):e26151, 2021, [doi:10.2196/26151](https://doi.org/10.2196/26151)).
+
+</div>
+
+<div class="sek-metric" markdown>
+
+### Lesion-level average precision (L-AP) {#lesion_ap}
+
+<div class="sek-meta"><span class="sek-chip">lesion_ap</span><span class="sek-chip">[0, 1]</span><span class="sek-chip teal">↑ higher is better</span></div>
+
+\[
+\mathrm{AP} = \sum_k (R_k - R_{k-1})\,\max_{k'\ge k} P_{k'},\qquad
+P_k = \frac{TP_{\mathrm{les}}(t_k)}{TP_{\mathrm{les}}(t_k) + FP_{\mathrm{les}}(t_k)}
+\]
+
+**In words** Predicted components are ranked by confidence; lowering the threshold one score at a time traces a precision-recall curve over lesions, and AP is its area.
+
+**Use when** The model outputs a confidence per lesion (a probability map) and no single operating point is agreed.
+
+**Watch out** Per case, AP is undefined without reference lesions; for a test set use the pooled [`stats.lesion_pr`](../analysis/statistics.md#froc-and-cpm), which also counts false positives in lesion-free scans.
+
+??? info "Details: scores, empty masks, reference"
+    **Scores.** With a probability map each component's score is its maximum probability (`lesion_score="max"`, or `"mean"`); without one, its volume in mL. \(R_k\) is the fraction of reference lesions touched by a component kept at \(t_k\); precision counts detected reference lesions as true positives, as [lesion F1](#lesion_f1) does. Precision is made monotone (all-point interpolation).
+
+    **Empty masks.** No reference lesions: 1 (`"best"`) if nothing is predicted, else NaN.
+
+    **Reference.** Everingham M et al. The PASCAL visual object classes (VOC) challenge. *IJCV* 88, 303–338 (2010). [doi:10.1007/s11263-009-0275-4](https://doi.org/10.1007/s11263-009-0275-4)
+
+</div>
+
 ## Code
 
-The `detection` set holds all ten metrics. One large lesion is found, three small ones are missed, one FP is added:
+The `detection` set holds all thirteen metrics. One large lesion is found, three small ones are missed, one FP is added:
 
 ```python
 import numpy as np
@@ -329,12 +416,16 @@ rows = lesion_table(ctx)   # one row per reference lesion and per unmatched pred
 
 ```text
 dice 0.9677   lesion_recall 0.2500   lesion_precision 0.5000   lesion_f1 0.3333
-panoptic_quality 0.3167   lesionwise_dice 0.1949   lesion_count_difference 2
-false_positive_lesions 1   false_negative_lesions 3   split_count 0   merge_count 0
+panoptic_quality 0.3167   lesionwise_dice 0.1949   lesionwise_hd95 66.7108   lesionwise_nsd 0.2000
+lesion_ap 0.2500   lesion_count_difference 2   false_positive_lesions 1   false_negative_lesions 3
+split_count 0   merge_count 0
 ```
 
-Voxel Dice 0.97, lesion recall 0.25. The lesion table (also collected by `Evaluator` whenever a detection metric
-runs) has columns `kind`, `component`, `volume_ml`, `detected`, `dice`, `iou`, `n_touching`. Matching options go in
+Voxel Dice 0.97, lesion recall 0.25. Lesion-wise HD95 is (1 mm + 4 × 83.1 mm) / 5: the three missed lesions and the
+false positive each score the image diagonal. The lesion table (also collected by `Evaluator` whenever a detection metric
+runs) has columns `kind`, `component`, `volume_ml`, `detected`, `dice`, `iou`, `n_touching`, `score` and
+`score_type`: each reference lesion carries the highest confidence among the components touching it (the threshold
+up to which it stays detected), each false positive its own; this is all the FROC and PR curves need. Matching options go in
 `params`, e.g. `params={k: {"criterion": "iou"} for k in keys}`, with `connectivity=6` or
 `min_component_voxels=30` as keywords. A 30-voxel threshold here would drop the three missed lesions and the FP
 from both masks and give perfect scores: choose the minimum size from the clinical lesion definition, and report it.
