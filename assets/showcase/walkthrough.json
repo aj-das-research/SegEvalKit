@@ -1,0 +1,32 @@
+[
+  {
+    "title": "summary",
+    "code": "res.summary().query(\"metric in ['dice', 'nsd', 'hd95']\")",
+    "output": "            label metric  n    mean  median  ci_low  ci_high\n         pancreas   dice  8   0.889   0.905   0.840    0.927\n         pancreas    nsd  8   0.843   0.887   0.757    0.915\n         pancreas   hd95  8   5.925   2.890   2.575   10.228\npancreatic_lesion   dice  8   0.350   0.204   0.097    0.619\npancreatic_lesion    nsd  8   0.311   0.196   0.075    0.561\npancreatic_lesion   hd95  8 290.878 252.815 100.865  481.879\n            liver   dice  8   0.981   0.981   0.978    0.985\n            liver    nsd  8   0.937   0.948   0.915    0.958\n            liver   hd95  8   6.264   2.394   2.032   11.556"
+  },
+  {
+    "title": "wide",
+    "code": "res.wide()[[\"case_id\", \"label\", \"dice\", \"nsd\", \"hd95\", \"ref_volume_ml\"]].head(6)",
+    "output": "       case_id    label  dice   nsd   hd95  ref_volume_ml\nPanTS_00009027 pancreas 0.938 0.920  2.500        109.172\nPanTS_00009152 pancreas 0.914 0.878  3.830         61.641\nPanTS_00009287 pancreas 0.862 0.727  2.681         56.506\nPanTS_00009322 pancreas 0.881 0.896  3.099         55.629\nPanTS_00009329 pancreas 0.897 0.854 18.963        105.070\nPanTS_00009544 pancreas 0.941 0.966  1.729         75.261\nPanTS_00009746 pancreas 0.733 0.582 12.093         67.827\nPanTS_00009760 pancreas 0.944 0.920  2.500        110.884"
+  },
+  {
+    "title": "worst",
+    "code": "res.worst_cases(\"dice\", \"pancreas\", k=3)",
+    "output": "       case_id  dice\nPanTS_00009746 0.733\nPanTS_00009287 0.862\nPanTS_00009322 0.881"
+  },
+  {
+    "title": "lesions",
+    "code": "res.lesions.query(\"kind == 'ref'\")[[\"case_id\", \"volume_ml\", \"detected\", \"dice\"]]",
+    "output": "       case_id  volume_ml  detected  dice\nPanTS_00009152     15.251      True 0.778\nPanTS_00009760     23.745     False 0.000\nPanTS_00009287      0.145     False 0.000\nPanTS_00009287      0.103     False 0.000\nPanTS_00009027      0.181     False 0.000\nPanTS_00009329      2.187      True 0.702\nPanTS_00009544      9.765      True 0.666"
+  },
+  {
+    "title": "compare",
+    "code": "compare(res_nnunet, res_medformer, metrics=[\"dice\", \"nsd\", \"hd95\"], labels=[\"pancreas\"])",
+    "output": "   label metric  n  mean_a  mean_b  mean_diff  frac_a_better  p_adjusted\npancreas   dice  8   0.889   0.894     -0.005          0.250       0.445\npancreas    nsd  8   0.843   0.858     -0.016          0.125       0.445\npancreas   hd95  8   5.925   5.785      0.139          0.250       0.445"
+  },
+  {
+    "title": "rank",
+    "code": "rank_methods(results, \"dice\", label=\"pancreas\")",
+    "output": "          method  mean  rank\n       MedFormer 0.894   1.0\nnnU-Net ResEnc-M 0.889   2.0\nTotalSegmentator 0.863   3.0"
+  }
+]

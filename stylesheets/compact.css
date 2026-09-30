@@ -1,0 +1,77 @@
+/* ==========================================================================
+   Metric cards, figure sizing and generated tables.
+   ========================================================================== */
+
+/* -------------------------------------------------------------- metric cards: a thin rule, no frame */
+.md-typeset .sek-metric { border: 0; border-left: 2px solid var(--sk-accent-line); border-radius: 0; background: transparent;
+  padding: .05rem 0 .05rem 1rem; margin: 1.5rem 0; transition: border-color .15s ease; }
+.md-typeset .sek-metric:hover, .md-typeset .sek-metric:target, .md-typeset .sek-metric:has(:target) { border-left-color: var(--sk-500); }
+.md-typeset .sek-metric > h3 { margin: 0 0 .25em !important; font-size: 1.06em; }
+.md-typeset .sek-meta { display: flex; flex-wrap: wrap; gap: .3rem; margin: 0 0 .45rem; }
+.sek-chip { font-family: var(--sk-mono); font-size: .56rem; font-weight: 500; line-height: 1.5; padding: .04rem .42rem;
+  border-radius: var(--sk-r-sm); background: var(--sk-50); color: var(--sk-800); border: 1px solid var(--sk-100); }
+[data-md-color-scheme="slate"] .sek-chip { background: #1f1932; color: #d6c7fb; border-color: #2c2445; }
+.sek-chip.teal { background: rgba(19, 154, 138, .07); color: #0e7468; border-color: rgba(19, 154, 138, .18); }
+.sek-chip.orange { background: rgba(226, 113, 47, .07); color: #a64e1b; border-color: rgba(226, 113, 47, .2); }
+[data-md-color-scheme="slate"] .sek-chip.teal { color: #5fd1c2; background: rgba(95, 209, 194, .07); border-color: rgba(95, 209, 194, .2); }
+[data-md-color-scheme="slate"] .sek-chip.orange { color: #f0a070; background: rgba(240, 160, 112, .07); border-color: rgba(240, 160, 112, .2); }
+.md-typeset .sek-metric .arithmatex { margin: .2em 0 .35em; }
+.md-typeset .sek-metric > p { margin: .18em 0; line-height: 1.55; }
+/* labelled rows (In words / Use when / Watch out): a hanging label, so wrapped lines share one left edge */
+.md-typeset .sek-metric > p > strong:first-child { font-variant: small-caps; letter-spacing: .03em; font-weight: 600;
+  color: var(--sk-muted); }
+.md-typeset .sek-metric > p:has(> strong:first-child) { position: relative; padding-left: 6.2em; }
+.md-typeset .sek-metric > p:has(> strong:first-child) > strong:first-child { position: absolute; left: 0; width: 6em;
+  white-space: nowrap; }
+/* the details fold inside a card: one quiet line */
+.md-typeset .sek-metric details, .md-typeset .sek-metric > details[class] { margin: .4em 0 .1em; border: 0 !important;
+  border-radius: 0; background: transparent; font-size: .92em; }
+.md-typeset .sek-metric details > summary { padding: .25em 1.6em .25em 1.45em; font-weight: 500; color: var(--sk-muted); }
+.md-typeset .sek-metric details > summary::before { left: 0; top: .42em; width: .8rem; height: .8rem; background-color: var(--sk-400) !important; }
+.md-typeset .sek-metric details > summary::after { right: auto; left: auto; position: static; display: inline-block;
+  vertical-align: -.15em; margin-left: .3em; width: .8rem; height: .8rem; background-color: var(--sk-400) !important; }
+.md-typeset .sek-metric details[open] { padding-bottom: .2em; }
+.md-typeset .sek-metric details[open] > :not(summary) { padding-left: 1.45em; }
+.md-typeset .sek-lead { font-size: 1.02em; color: var(--md-default-fg-color--light); margin-bottom: 1.2em; }
+
+/* generated metric catalogue: the one-sentence summary gets the room, short columns stay narrow */
+.md-typeset .sek-catalogue td:first-child { min-width: 9.5em; }
+.md-typeset .sek-catalogue td:last-child { min-width: 15em; }
+.md-typeset .sek-catalogue td:nth-child(2), .md-typeset .sek-catalogue td:nth-child(3) { white-space: nowrap; }
+
+/* phones: labels sit above their text, cards and tables tighten */
+@media screen and (max-width: 30em) {
+  .md-typeset .sek-metric { padding-left: .75rem; }
+  .md-typeset .sek-metric > p:has(> strong:first-child) { padding-left: 0; }
+  .md-typeset .sek-metric > p:has(> strong:first-child) > strong:first-child { position: static; display: block;
+    width: auto; margin-bottom: 0; line-height: 1.3; }
+  .md-typeset .sek-metric .arithmatex { font-size: .88em; }
+  .md-typeset table:not([class]) { font-size: .68rem; }
+  .md-typeset table:not([class]) :is(th, td) { padding: .45em .55em; }
+}
+
+/* -------------------------------------------------------------- figures sized by shape
+   Each figure carries its shape as a class (sk-fig--square / plot / wide / strip, from the image's aspect
+   ratio); the figure itself takes that width, so the image and its caption share one measure.
+   javascripts/figsize.js classifies any image without a class by its natural size. */
+.md-typeset figure { text-align: center; }
+.md-typeset figure.sk-fig, .md-typeset figure:has(> img[data-shape]), .md-typeset figure:has(> a > img[data-shape]),
+.md-typeset figure:has(> p > img[data-shape]) {
+  display: block; width: 100%; max-width: 100%; margin: 1.2em auto 1.4em; }
+.md-typeset figure.sk-fig a:has(> img) { display: block; }
+.md-typeset figure img, .md-typeset p > img[data-shape] { display: block; margin-left: auto; margin-right: auto; height: auto; }
+.md-typeset figure.sk-fig img, .md-typeset figure:has(img[data-shape]) img { width: 100%; max-width: 100%; }
+.md-typeset figure.sk-fig--square, .md-typeset figure.sk-fig--sm { max-width: min(100%, 21rem); }
+.md-typeset figure.sk-fig--plot, .md-typeset figure.sk-fig--md { max-width: min(100%, 29rem); }
+.md-typeset figure.sk-fig--wide { max-width: min(100%, 41rem); }
+.md-typeset figure.sk-fig--strip { max-width: 100%; }
+/* fallback for unclassed figures: the script's data-shape */
+.md-typeset figure:not([class*="sk-fig--"]):has(img[data-shape="square"]) { max-width: min(100%, 21rem); }
+.md-typeset figure:not([class*="sk-fig--"]):has(img[data-shape="plot"])   { max-width: min(100%, 29rem); }
+.md-typeset figure:not([class*="sk-fig--"]):has(img[data-shape="wide"])   { max-width: min(100%, 41rem); }
+.md-typeset p > img[data-shape="square"] { max-width: min(100%, 21rem); }
+.md-typeset p > img[data-shape="plot"]   { max-width: min(100%, 29rem); }
+.md-typeset p > img[data-shape="wide"]   { max-width: min(100%, 41rem); }
+.md-typeset figure figcaption, .md-typeset figure.sk-fig figcaption { width: auto; max-width: none; margin: .55em 0 0;
+  text-align: left; }
+.md-typeset .tabbed-block > figure.sk-fig:first-child { margin-top: .8em; }

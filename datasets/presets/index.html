@@ -1,0 +1,3956 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Evaluation of volumetric (CT/MR) medical image segmentation: 56 metrics with explicit, tested conventions, statistics, plots and reports.">
+      
+      
+      
+        <link rel="canonical" href="https://aj-das-research.github.io/SegEvalKit/datasets/presets/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../pants-benchmark/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/icon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Dataset presets - SegEvalKit</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/segevalkit.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/compact.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dataset-presets" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SegEvalKit" class="md-header__button md-logo" aria-label="SegEvalKit" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SegEvalKit
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Dataset presets
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aj-das-research/SegEvalKit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aj-das-research/SegEvalKit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../metrics/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Metrics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guide/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Choosing metrics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../analysis/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Analysis
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Datasets & benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../research/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developer/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Developer guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../about/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SegEvalKit" class="md-nav__button md-logo" aria-label="SegEvalKit" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    SegEvalKit
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aj-das-research/SegEvalKit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aj-das-research/SegEvalKit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../getting-started/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What you need
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/data-format/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data & output format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/gpu-hpc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU & HPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../metrics/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Metrics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/overlap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overlap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/volume/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Volume
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/distance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distance & boundary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/topology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Detection & instances
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/calibration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/agreement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agreement & information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/catalogue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full catalogue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing metrics
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Choosing metrics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/choosing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decision guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pitfalls
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conventions & conformance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/sensitivity-study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensitivity study
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../analysis/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analysis
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Analysis
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/levels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation levels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/plots/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantitative plots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/qualitative/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qualitative visualisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTML report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/viewer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interactive viewer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets & benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Datasets & benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset presets
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset presets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PanTS: Pancreatic Tumor Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#totalsegmentator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TotalSegmentator CT (v2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#btcv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BTCV Multi-Atlas Labeling Beyond the Cranial Vault (abdomen)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AMOS 2022: Abdominal Multi-Organ Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flare22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FLARE 2022: Fast and Low-resource Abdominal oRgan sEgmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_brain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task01 BrainTumour
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_heart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task02 Heart
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_liver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task03 Liver
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_hippocampus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task04 Hippocampus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_prostate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task05 Prostate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_lung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task06 Lung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_pancreas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task07 Pancreas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_hepaticvessel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task08 HepaticVessel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_spleen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task09 Spleen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_colon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task10 Colon
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LiTS 2017: Liver Tumor Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acdc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACDC: Automated Cardiac Diagnosis Challenge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mnms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M&amp;Ms: Multi-Centre, Multi-Vendor &amp; Multi-Disease Cardiac Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#segthor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SegTHOR: Segmentation of THoracic Organs at Risk
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kits19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KiTS19: Kidney Tumor Segmentation 2019
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kits23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KiTS23: Kidney and Kidney Tumor Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#brats2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BraTS 2023 Adult Glioma
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#isles22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ISLES 2022: Ischemic Stroke Lesion Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autopet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        autoPET: whole-body FDG-PET/CT lesion segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#topcow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TopCoW: Topology-Aware Anatomical Segmentation of the Circle of Willis
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pants-benchmark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PanTS benchmark
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../api/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluator & results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I/O
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/plotting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/synthetic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Synthetic perturbations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../research/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/metrics-literature-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics literature review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/datasets-survey/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets survey
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../developer/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer guide
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/adding-a-metric/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a metric
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/adding-a-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a dataset preset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/plots-and-themes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plots, themes & visualisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing & conformance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/releasing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releasing & maintenance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../about/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/citation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PanTS: Pancreatic Tumor Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#totalsegmentator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TotalSegmentator CT (v2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#btcv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BTCV Multi-Atlas Labeling Beyond the Cranial Vault (abdomen)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AMOS 2022: Abdominal Multi-Organ Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flare22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FLARE 2022: Fast and Low-resource Abdominal oRgan sEgmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_brain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task01 BrainTumour
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_heart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task02 Heart
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_liver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task03 Liver
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_hippocampus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task04 Hippocampus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_prostate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task05 Prostate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_lung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task06 Lung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_pancreas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task07 Pancreas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_hepaticvessel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task08 HepaticVessel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_spleen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task09 Spleen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msd_colon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medical Segmentation Decathlon Task10 Colon
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LiTS 2017: Liver Tumor Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acdc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACDC: Automated Cardiac Diagnosis Challenge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mnms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M&amp;Ms: Multi-Centre, Multi-Vendor &amp; Multi-Disease Cardiac Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#segthor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SegTHOR: Segmentation of THoracic Organs at Risk
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kits19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KiTS19: Kidney Tumor Segmentation 2019
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kits23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KiTS23: Kidney and Kidney Tumor Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#brats2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BraTS 2023 Adult Glioma
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#isles22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ISLES 2022: Ischemic Stroke Lesion Segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autopet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        autoPET: whole-body FDG-PET/CT lesion segmentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#topcow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TopCoW: Topology-Aware Anatomical Segmentation of the Circle of Willis
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="dataset-presets">Dataset presets<a class="headerlink" href="#dataset-presets" title="Permanent link">#</a></h1>
+<p>A preset stores a benchmark's label ids and regions, the layout of its reference labels, its official metrics and their parameters, and its empty-mask convention. Use it with</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">$ </span>segevalkit<span class="w"> </span>datasets<span class="w">               </span><span class="c1"># list</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">$ </span>segevalkit<span class="w"> </span>datasets<span class="w"> </span>kits23<span class="w">        </span><span class="c1"># details</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">$ </span>segevalkit<span class="w"> </span>evaluate<span class="w"> </span>--dataset<span class="w"> </span>kits23<span class="w"> </span>--pred<span class="w"> </span>preds/<span class="w"> </span>--ref<span class="w"> </span>kits23/<span class="w"> </span>--out<span class="w"> </span>eval/
+</code></pre></div>
+<p>or in Python: <code>segevalkit.datasets.get_dataset("kits23")</code>. This page is generated from the preset registry.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Dataset</th>
+<th>Modality</th>
+<th>Cases</th>
+<th>Official metrics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#pants"><code>pants</code></a></td>
+<td>PanTS: Pancreatic Tumor Segmentation</td>
+<td>CT</td>
+<td>36,390 CT volumes (9,000 train / 901 public test; per-voxel annotations)</td>
+<td>dice, nsd, hd95, assd, precision…</td>
+</tr>
+<tr>
+<td><a href="#totalsegmentator"><code>totalsegmentator</code></a></td>
+<td>TotalSegmentator CT (v2)</td>
+<td>CT</td>
+<td>1,228 CT (v2); v3 (2026-09): 1,939 CT + 1,296 MR</td>
+<td>dice, nsd, hd95, assd</td>
+</tr>
+<tr>
+<td><a href="#btcv"><code>btcv</code></a></td>
+<td>BTCV Multi-Atlas Labeling Beyond the Cranial Vault (abdomen)</td>
+<td>CT</td>
+<td>30 train / 20 test</td>
+<td>dice, hd95, nsd, assd</td>
+</tr>
+<tr>
+<td><a href="#amos"><code>amos</code></a></td>
+<td>AMOS 2022: Abdominal Multi-Organ Segmentation</td>
+<td>CT+MR</td>
+<td>Tr 200 CT + 40 MR, Va 100 CT + 20 MR, Ts 240</td>
+<td>dice, nsd, hd95</td>
+</tr>
+<tr>
+<td><a href="#flare22"><code>flare22</code></a></td>
+<td>FLARE 2022: Fast and Low-resource Abdominal oRgan sEgmentation</td>
+<td>CT</td>
+<td>50 labelled + 2,000 unlabelled train; 200 validation; 800 test</td>
+<td>dice, nsd</td>
+</tr>
+<tr>
+<td><a href="#msd_brain"><code>msd_brain</code></a></td>
+<td>Medical Segmentation Decathlon Task01 BrainTumour</td>
+<td>MR</td>
+<td>484 train / 266 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference, lesion_f1…</td>
+</tr>
+<tr>
+<td><a href="#msd_heart"><code>msd_heart</code></a></td>
+<td>Medical Segmentation Decathlon Task02 Heart</td>
+<td>MR</td>
+<td>20 train / 10 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference</td>
+</tr>
+<tr>
+<td><a href="#msd_liver"><code>msd_liver</code></a></td>
+<td>Medical Segmentation Decathlon Task03 Liver</td>
+<td>CT</td>
+<td>131 train / 70 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference, lesion_f1…</td>
+</tr>
+<tr>
+<td><a href="#msd_hippocampus"><code>msd_hippocampus</code></a></td>
+<td>Medical Segmentation Decathlon Task04 Hippocampus</td>
+<td>MR</td>
+<td>260 train / 130 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference</td>
+</tr>
+<tr>
+<td><a href="#msd_prostate"><code>msd_prostate</code></a></td>
+<td>Medical Segmentation Decathlon Task05 Prostate</td>
+<td>MR</td>
+<td>32 train / 16 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference</td>
+</tr>
+<tr>
+<td><a href="#msd_lung"><code>msd_lung</code></a></td>
+<td>Medical Segmentation Decathlon Task06 Lung</td>
+<td>CT</td>
+<td>63 train / 32 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference, lesion_f1…</td>
+</tr>
+<tr>
+<td><a href="#msd_pancreas"><code>msd_pancreas</code></a></td>
+<td>Medical Segmentation Decathlon Task07 Pancreas</td>
+<td>CT</td>
+<td>281 train / 139 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference, lesion_f1…</td>
+</tr>
+<tr>
+<td><a href="#msd_hepaticvessel"><code>msd_hepaticvessel</code></a></td>
+<td>Medical Segmentation Decathlon Task08 HepaticVessel</td>
+<td>CT</td>
+<td>303 train / 140 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference, lesion_f1…</td>
+</tr>
+<tr>
+<td><a href="#msd_spleen"><code>msd_spleen</code></a></td>
+<td>Medical Segmentation Decathlon Task09 Spleen</td>
+<td>CT</td>
+<td>41 train / 20 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference</td>
+</tr>
+<tr>
+<td><a href="#msd_colon"><code>msd_colon</code></a></td>
+<td>Medical Segmentation Decathlon Task10 Colon</td>
+<td>CT</td>
+<td>126 train / 64 test (test labels withheld)</td>
+<td>dice, nsd, hd95, relative_volume_difference, lesion_f1…</td>
+</tr>
+<tr>
+<td><a href="#lits"><code>lits</code></a></td>
+<td>LiTS 2017: Liver Tumor Segmentation</td>
+<td>CT</td>
+<td>131 train / 70 test</td>
+<td>dice, voe, relative_volume_difference, assd, hd…</td>
+</tr>
+<tr>
+<td><a href="#acdc"><code>acdc</code></a></td>
+<td>ACDC: Automated Cardiac Diagnosis Challenge</td>
+<td>MR</td>
+<td>100 train / 50 test</td>
+<td>dice, hd, hd95, assd, absolute_volume_difference</td>
+</tr>
+<tr>
+<td><a href="#mnms"><code>mnms</code></a></td>
+<td>M&amp;Ms: Multi-Centre, Multi-Vendor &amp; Multi-Disease Cardiac Segmentation</td>
+<td>MR</td>
+<td>375 subjects</td>
+<td>dice, hd, hd95, assd</td>
+</tr>
+<tr>
+<td><a href="#segthor"><code>segthor</code></a></td>
+<td>SegTHOR: Segmentation of THoracic Organs at Risk</td>
+<td>CT</td>
+<td>40 train / 20 test</td>
+<td>dice, hd95, assd, masd, cldice</td>
+</tr>
+<tr>
+<td><a href="#kits19"><code>kits19</code></a></td>
+<td>KiTS19: Kidney Tumor Segmentation 2019</td>
+<td>CT</td>
+<td>210 train / 90 test</td>
+<td>dice, nsd, hd95</td>
+</tr>
+<tr>
+<td><a href="#kits23"><code>kits23</code></a></td>
+<td>KiTS23: Kidney and Kidney Tumor Segmentation</td>
+<td>CT</td>
+<td>489 train / 110 test</td>
+<td>dice, nsd, hd95</td>
+</tr>
+<tr>
+<td><a href="#brats2023"><code>brats2023</code></a></td>
+<td>BraTS 2023 Adult Glioma</td>
+<td>MR</td>
+<td>1,251 train / 219 validation</td>
+<td>lesionwise_dice, lesionwise_hd95, dice, hd95, lesion_f1…</td>
+</tr>
+<tr>
+<td><a href="#isles22"><code>isles22</code></a></td>
+<td>ISLES 2022: Ischemic Stroke Lesion Segmentation</td>
+<td>MR</td>
+<td>250 train / 150 test</td>
+<td>dice, absolute_volume_difference, lesion_f1, lesion_count_difference</td>
+</tr>
+<tr>
+<td><a href="#autopet"><code>autopet</code></a></td>
+<td>autoPET: whole-body FDG-PET/CT lesion segmentation</td>
+<td>PET/CT</td>
+<td>1,014 studies (autoPET I/II)</td>
+<td>dice, false_positive_lesions, false_negative_lesions, lesion_f1, absolute_volume_difference</td>
+</tr>
+<tr>
+<td><a href="#topcow"><code>topcow</code></a></td>
+<td>TopCoW: Topology-Aware Anatomical Segmentation of the Circle of Willis</td>
+<td>CT+MR</td>
+<td>125 CTA + 125 MRA (2024)</td>
+<td>dice, cldice, betti0_error, betti1_error, hd95</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pants">PanTS: Pancreatic Tumor Segmentation<a class="headerlink" href="#pants" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">36,390 CT volumes (9,000 train / 901 public test; per-voxel annotations)</span><span class="sek-chip orange">CC BY-NC-ND 4.0 (GitHub LICENSE; the HF card says CC BY-NC-SA 4.0): non-commercial</span></div>
+
+<p><strong>Anatomy:</strong> Pancreas (head / body / tail), pancreatic lesion and duct, 20+ surrounding structures<br />
+<strong>Labels:</strong> all structure files found per case<br />
+<strong>Reference layout:</strong> <code>per_structure</code> (<code>segmentations</code>)<br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>assd</code>, <code>precision</code>, <code>recall</code>, <code>relative_volume_difference</code>, <code>lesion_f1</code>, <code>lesion_recall</code>, <code>lesionwise_dice</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=2.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://github.com/MrGiovanni/PanTS">https://github.com/MrGiovanni/PanTS</a><br />
+<strong>Cite:</strong> Li et al. 2025, PanTS: The Pancreatic Tumor Segmentation Dataset, NeurIPS Datasets &amp; Benchmarks</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Label headers are unreliable: in 227 of 901 test cases at least one label file (the aorta in 218) has an affine that disagrees with its CT although the voxel data is aligned with it; evaluate with alignment='ignore' and check with <code>segevalkit audit</code>. Evaluate from LabelTe/&lt;case&gt;/segmentations/&lt;name&gt;.nii.gz, not combined_labels.nii.gz: the per-structure masks overlap (pancreas contains head/body/tail and duct; veins overlap organs), so the combined map is lossy. The lesion is annotated inconsistently relative to the pancreas mask (sometimes inside it, sometimes outside), so evaluate the pancreas as pancreas ∪ lesion (ref_file 'pancreas.nii.gz+pancreatic_lesion.nii.gz'). Orientation varies per case. Most test cases are tumour-free: report patient-level presence detection (stats.presence_detection) next to lesion Dice. The official leaderboard reports patient-wise sensitivity/specificity/AUC, tumour-wise sensitivity and lesion DSC; the NSD tolerance and the detection rule are not published.</p>
+</div>
+<h2 id="totalsegmentator">TotalSegmentator CT (v2)<a class="headerlink" href="#totalsegmentator" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">1,228 CT (v2); v3 (2026-09): 1,939 CT + 1,296 MR</span><span class="sek-chip orange">CC BY 4.0 (dataset); model weights: see repository</span></div>
+
+<p><strong>Anatomy:</strong> 117 anatomical structures (organs, bones, muscles, vessels)<br />
+<strong>Labels:</strong> all structure files found per case<br />
+<strong>Reference layout:</strong> <code>per_structure</code> (<code>segmentations</code>)<br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>assd</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=3.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://github.com/wasserth/TotalSegmentator">https://github.com/wasserth/TotalSegmentator</a><br />
+<strong>Cite:</strong> Wasserthal et al. 2023, Radiology: AI 5(5):e230024</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>&lt;case&gt;/ct.nii.gz and &lt;case&gt;/segmentations/&lt;structure&gt;.nii.gz. The paper reports Dice and NSD.</p>
+</div>
+<h2 id="btcv">BTCV Multi-Atlas Labeling Beyond the Cranial Vault (abdomen)<a class="headerlink" href="#btcv" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">30 train / 20 test</span><span class="sek-chip orange">Synapse data use terms</span></div>
+
+<p><strong>Anatomy:</strong> 13 abdominal organs<br />
+<strong>Labels:</strong> spleen=1, right_kidney=2, left_kidney=3, gallbladder=4, esophagus=5, liver=6, stomach=7, aorta=8, inferior_vena_cava=9, portal_splenic_vein=10, pancreas=11, right_adrenal=12, left_adrenal=13<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>hd95</code>, <code>nsd</code>, <code>assd</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://www.synapse.org/#!Synapse:syn3193805">https://www.synapse.org/#!Synapse:syn3193805</a><br />
+<strong>Cite:</strong> Landman et al. 2015, MICCAI Multi-Atlas Labeling Challenge</p>
+<h2 id="amos">AMOS 2022: Abdominal Multi-Organ Segmentation<a class="headerlink" href="#amos" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT+MR</span><span class="sek-chip teal">Tr 200 CT + 40 MR, Va 100 CT + 20 MR, Ts 240</span><span class="sek-chip orange">CC BY 4.0 (Zenodo; dataset.json says CC BY-SA 4.0)</span></div>
+
+<p><strong>Anatomy:</strong> 15 abdominal organs<br />
+<strong>Labels:</strong> spleen=1, right_kidney=2, left_kidney=3, gallbladder=4, esophagus=5, liver=6, stomach=7, aorta=8, postcava=9, pancreas=10, right_adrenal=11, left_adrenal=12, duodenum=13, bladder=14, prostate_uterus=15<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=1.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://amos22.grand-challenge.org/">https://amos22.grand-challenge.org/</a><br />
+<strong>Cite:</strong> Ji et al. 2022, NeurIPS Datasets &amp; Benchmarks</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Case id &lt; 500 is CT, ≥ 500 is MR. dataset.json spells aorta 'arota'. Rank-then-aggregate ranking.</p>
+</div>
+<h2 id="flare22">FLARE 2022: Fast and Low-resource Abdominal oRgan sEgmentation<a class="headerlink" href="#flare22" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">50 labelled + 2,000 unlabelled train; 200 validation; 800 test</span><span class="sek-chip orange">CC BY-NC-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> 13 abdominal organs<br />
+<strong>Labels:</strong> liver=1 (NSD τ 5 mm), right_kidney=2 (NSD τ 3 mm), spleen=3 (NSD τ 3 mm), pancreas=4 (NSD τ 5 mm), aorta=5 (NSD τ 2 mm), inferior_vena_cava=6 (NSD τ 2 mm), right_adrenal=7 (NSD τ 2 mm), left_adrenal=8 (NSD τ 2 mm), gallbladder=9 (NSD τ 2 mm), esophagus=10 (NSD τ 3 mm), stomach=11 (NSD τ 5 mm), duodenum=12 (NSD τ 7 mm), left_kidney=13 (NSD τ 3 mm)<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://flare22.grand-challenge.org/">https://flare22.grand-challenge.org/</a><br />
+<strong>Cite:</strong> Ma et al. 2024, Lancet Digital Health 6(11):e815</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Per-organ NSD tolerances from the official code. The official code also forces NSD to 0 when DSC &lt; 0.2 and evaluates aorta / IVC / esophagus only on reference-labelled slices; SegEvalKit does not replicate these two rules.</p>
+</div>
+<h2 id="msd_brain">Medical Segmentation Decathlon Task01 BrainTumour<a class="headerlink" href="#msd_brain" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">MR</span><span class="sek-chip teal">484 train / 266 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Glioma (MSD numbering: 1 edema, 2 non-enhancing, 3 enhancing; not the BraTS ids)<br />
+<strong>Labels:</strong> edema=1, non_enhancing_tumor=2, enhancing_tumor=3, tumor_core=2+3, whole_tumor=1+2+3<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code>, <code>lesion_f1</code>, <code>lesion_recall</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=5.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (5 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="msd_heart">Medical Segmentation Decathlon Task02 Heart<a class="headerlink" href="#msd_heart" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">MR</span><span class="sek-chip teal">20 train / 10 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Left atrium<br />
+<strong>Labels:</strong> left_atrium=1<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=4.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (4 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="msd_liver">Medical Segmentation Decathlon Task03 Liver<a class="headerlink" href="#msd_liver" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">131 train / 70 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Liver and liver tumours<br />
+<strong>Labels:</strong> liver=1, cancer=2, liver_with_tumour=1+2<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code>, <code>lesion_f1</code>, <code>lesion_recall</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=7.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (7 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="msd_hippocampus">Medical Segmentation Decathlon Task04 Hippocampus<a class="headerlink" href="#msd_hippocampus" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">MR</span><span class="sek-chip teal">260 train / 130 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Anterior and posterior hippocampus<br />
+<strong>Labels:</strong> anterior=1, posterior=2<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=1.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (1 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="msd_prostate">Medical Segmentation Decathlon Task05 Prostate<a class="headerlink" href="#msd_prostate" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">MR</span><span class="sek-chip teal">32 train / 16 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Peripheral and transition zones<br />
+<strong>Labels:</strong> peripheral_zone=1, transition_zone=2<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=4.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (4 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="msd_lung">Medical Segmentation Decathlon Task06 Lung<a class="headerlink" href="#msd_lung" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">63 train / 32 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Lung cancer<br />
+<strong>Labels:</strong> cancer=1<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code>, <code>lesion_f1</code>, <code>lesion_recall</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=2.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (2 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="msd_pancreas">Medical Segmentation Decathlon Task07 Pancreas<a class="headerlink" href="#msd_pancreas" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">281 train / 139 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Pancreas and pancreatic tumour<br />
+<strong>Labels:</strong> pancreas=1, tumour=2, pancreas_with_tumour=1+2<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code>, <code>lesion_f1</code>, <code>lesion_recall</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=5.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (5 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="msd_hepaticvessel">Medical Segmentation Decathlon Task08 HepaticVessel<a class="headerlink" href="#msd_hepaticvessel" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">303 train / 140 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Hepatic vessels and tumours<br />
+<strong>Labels:</strong> vessel=1, tumour=2<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code>, <code>lesion_f1</code>, <code>lesion_recall</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=3.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (3 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="msd_spleen">Medical Segmentation Decathlon Task09 Spleen<a class="headerlink" href="#msd_spleen" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">41 train / 20 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Spleen<br />
+<strong>Labels:</strong> spleen=1<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=3.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (3 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="msd_colon">Medical Segmentation Decathlon Task10 Colon<a class="headerlink" href="#msd_colon" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">126 train / 64 test (test labels withheld)</span><span class="sek-chip orange">CC BY-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Primary colon cancer<br />
+<strong>Labels:</strong> colon_cancer=1<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code>, <code>relative_volume_difference</code>, <code>lesion_f1</code>, <code>lesion_recall</code><br />
+<strong>Parameters:</strong> <code>nsd</code>: <code>tolerance_mm=4.0</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="http://medicaldecathlon.com/">http://medicaldecathlon.com/</a><br />
+<strong>Cite:</strong> Antonelli et al. 2022, Nat Commun 13:4128</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official MSD ranking used DSC and NSD with a task-specific tolerance (4 mm), with Wilcoxon-based significance ranking per region. Labels in labelsTr/&lt;prefix&gt;_&lt;id&gt;.nii.gz.</p>
+</div>
+<h2 id="lits">LiTS 2017: Liver Tumor Segmentation<a class="headerlink" href="#lits" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">131 train / 70 test</span><span class="sek-chip orange">see challenge terms</span></div>
+
+<p><strong>Anatomy:</strong> Liver and liver tumours<br />
+<strong>Labels:</strong> liver=1, tumour=2, liver_with_tumour=1+2<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>voe</code>, <code>relative_volume_difference</code>, <code>assd</code>, <code>hd</code>, <code>lesion_f1</code>, <code>lesion_recall</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://competitions.codalab.org/competitions/17094">https://competitions.codalab.org/competitions/17094</a><br />
+<strong>Cite:</strong> Bilic et al. 2023, Medical Image Analysis 84:102680</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>The official code scores ASSD / MSD as 0 when either mask is empty (not penalised); SegEvalKit's default policy penalises it. Files: volume-N.nii / segmentation-N.nii.</p>
+</div>
+<h2 id="acdc">ACDC: Automated Cardiac Diagnosis Challenge<a class="headerlink" href="#acdc" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">MR</span><span class="sek-chip teal">100 train / 50 test</span><span class="sek-chip orange">CC BY-NC-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Right ventricle, myocardium, left ventricle (ED and ES frames)<br />
+<strong>Labels:</strong> right_ventricle=1, myocardium=2, left_ventricle=3<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>hd</code>, <code>hd95</code>, <code>assd</code>, <code>absolute_volume_difference</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://www.creatis.insa-lyon.fr/Challenge/acdc/">https://www.creatis.insa-lyon.fr/Challenge/acdc/</a><br />
+<strong>Cite:</strong> Bernard et al. 2018, IEEE TMI 37(11):2514</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Label order 1 RV, 2 MYO, 3 LV: the REVERSE of M&amp;Ms (use the mnms preset there).</p>
+</div>
+<h2 id="mnms">M&amp;Ms: Multi-Centre, Multi-Vendor &amp; Multi-Disease Cardiac Segmentation<a class="headerlink" href="#mnms" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">MR</span><span class="sek-chip teal">375 subjects</span><span class="sek-chip orange">see challenge terms</span></div>
+
+<p><strong>Anatomy:</strong> Left ventricle, myocardium, right ventricle<br />
+<strong>Labels:</strong> left_ventricle=1, myocardium=2, right_ventricle=3<br />
+<strong>Reference layout:</strong> <code>flat</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>hd</code>, <code>hd95</code>, <code>assd</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://www.ub.edu/mnms/">https://www.ub.edu/mnms/</a><br />
+<strong>Cite:</strong> Campello et al. 2021, IEEE TMI 40(12):3543</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Label order 1 LV, 2 MYO, 3 RV: the REVERSE of ACDC.</p>
+</div>
+<h2 id="segthor">SegTHOR: Segmentation of THoracic Organs at Risk<a class="headerlink" href="#segthor" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">40 train / 20 test</span><span class="sek-chip orange">see challenge terms</span></div>
+
+<p><strong>Anatomy:</strong> Thoracic organs at risk<br />
+<strong>Labels:</strong> esophagus=1, heart=2, trachea=3, aorta=4<br />
+<strong>Reference layout:</strong> <code>folder</code> (<code>GT.nii.gz</code>)<br />
+<strong>Metrics:</strong> <code>dice</code>, <code>hd95</code>, <code>assd</code>, <code>masd</code>, <code>cldice</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://competitions.codalab.org/competitions/21145">https://competitions.codalab.org/competitions/21145</a><br />
+<strong>Cite:</strong> Lambert et al. 2020, IPTA</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>The official distance is the 'average Hausdorff' (max of the directed mean distances).</p>
+</div>
+<h2 id="kits19">KiTS19: Kidney Tumor Segmentation 2019<a class="headerlink" href="#kits19" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">210 train / 90 test</span><span class="sek-chip orange">CC BY-NC-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Kidneys and renal tumours<br />
+<strong>Labels:</strong> kidney_and_tumour=1+2, tumour=2<br />
+<strong>Reference layout:</strong> <code>folder</code> (<code>segmentation.nii.gz</code>)<br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://kits19.grand-challenge.org/">https://kits19.grand-challenge.org/</a><br />
+<strong>Cite:</strong> Heller et al. 2021, Medical Image Analysis 67:101821</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>The official ranking uses the mean of the composite (kidney+tumour) and tumour Dice.</p>
+</div>
+<h2 id="kits23">KiTS23: Kidney and Kidney Tumor Segmentation<a class="headerlink" href="#kits23" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT</span><span class="sek-chip teal">489 train / 110 test</span><span class="sek-chip orange">CC BY-NC-SA 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Kidneys, renal tumours and cysts (hierarchical evaluation classes)<br />
+<strong>Labels:</strong> kidney_and_masses=1+2+3 (NSD τ 1.0331 mm), masses=2+3 (NSD τ 1.1329 mm), tumor=2 (NSD τ 1.1498 mm)<br />
+<strong>Reference layout:</strong> <code>folder</code> (<code>segmentation.nii.gz</code>)<br />
+<strong>Metrics:</strong> <code>dice</code>, <code>nsd</code>, <code>hd95</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://kits-challenge.org/kits23/">https://kits-challenge.org/kits23/</a><br />
+<strong>Cite:</strong> Heller et al. 2023, arXiv:2307.01984</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Hierarchical Evaluation Classes (HECs) with surface-Dice tolerances derived from inter-observer variability (1.0331 / 1.1329 / 1.1498 mm). The official surface Dice uses DeepMind-style surfel weighting; SegEvalKit's voxel NSD agrees closely but not exactly.</p>
+</div>
+<h2 id="brats2023">BraTS 2023 Adult Glioma<a class="headerlink" href="#brats2023" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">MR</span><span class="sek-chip teal">1,251 train / 219 validation</span><span class="sek-chip orange">Synapse data use terms (CC BY-NC for most subsets)</span></div>
+
+<p><strong>Anatomy:</strong> Glioma sub-regions (evaluated as ET / TC / WT regions)<br />
+<strong>Labels:</strong> enhancing_tumor=3, tumor_core=1+3, whole_tumor=1+2+3<br />
+<strong>Reference layout:</strong> <code>auto</code><br />
+<strong>Metrics:</strong> <code>lesionwise_dice</code>, <code>lesionwise_hd95</code>, <code>dice</code>, <code>hd95</code>, <code>lesion_f1</code>, <code>lesion_recall</code>, <code>lesion_precision</code><br />
+<strong>Empty policy:</strong> <code>brats2023</code><br />
+<strong>Source:</strong> <a href="https://www.synapse.org/brats2023">https://www.synapse.org/brats2023</a><br />
+<strong>Cite:</strong> Kazerooni et al. 2023, arXiv:2305.17033; Baid et al. 2021, arXiv:2107.02314</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Label ids 1 = NCR, 2 = ED, 3 = ET. Official lesion-wise metrics dilate the reference before matching and drop lesions ≤ 50 mm³ (set min_lesion_voxels accordingly); empty-case HD95 = 374 mm.</p>
+</div>
+<h2 id="isles22">ISLES 2022: Ischemic Stroke Lesion Segmentation<a class="headerlink" href="#isles22" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">MR</span><span class="sek-chip teal">250 train / 150 test</span><span class="sek-chip orange">CC BY 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Acute/sub-acute ischemic stroke lesions (DWI/ADC/FLAIR)<br />
+<strong>Labels:</strong> lesion=1<br />
+<strong>Reference layout:</strong> <code>auto</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>absolute_volume_difference</code>, <code>lesion_f1</code>, <code>lesion_count_difference</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://isles22.grand-challenge.org/">https://isles22.grand-challenge.org/</a><br />
+<strong>Cite:</strong> Hernandez Petzsche et al. 2022, Sci Data 9:762</p>
+<h2 id="autopet">autoPET: whole-body FDG-PET/CT lesion segmentation<a class="headerlink" href="#autopet" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">PET/CT</span><span class="sek-chip teal">1,014 studies (autoPET I/II)</span><span class="sek-chip orange">TCIA restricted / CC BY 4.0 (see challenge)</span></div>
+
+<p><strong>Anatomy:</strong> Tumour lesions (melanoma, lymphoma, lung cancer)<br />
+<strong>Labels:</strong> lesion=1<br />
+<strong>Reference layout:</strong> <code>auto</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>false_positive_lesions</code>, <code>false_negative_lesions</code>, <code>lesion_f1</code>, <code>absolute_volume_difference</code><br />
+<strong>Empty policy:</strong> <code>segevalkit</code><br />
+<strong>Source:</strong> <a href="https://autopet.grand-challenge.org/">https://autopet.grand-challenge.org/</a><br />
+<strong>Cite:</strong> Gatidis et al. 2022, Sci Data 9:601</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official autoPET uses 18-connected components (evaluate with connectivity=18) and reports false-positive and false-negative <em>volumes</em> (mL); SegEvalKit's lesion table provides the per-component volumes to reproduce them. Tumour-free studies are scored by FP volume only.</p>
+</div>
+<h2 id="topcow">TopCoW: Topology-Aware Anatomical Segmentation of the Circle of Willis<a class="headerlink" href="#topcow" title="Permanent link">#</a></h2>
+<div class="sek-meta"><span class="sek-chip">CT+MR</span><span class="sek-chip teal">125 CTA + 125 MRA (2024)</span><span class="sek-chip orange">CC BY-NC 4.0</span></div>
+
+<p><strong>Anatomy:</strong> Circle of Willis arteries (13 vessel classes)<br />
+<strong>Labels:</strong> all structure files found per case<br />
+<strong>Reference layout:</strong> <code>auto</code><br />
+<strong>Metrics:</strong> <code>dice</code>, <code>cldice</code>, <code>betti0_error</code>, <code>betti1_error</code>, <code>hd95</code><br />
+<strong>Empty policy:</strong> <code>topcow</code><br />
+<strong>Source:</strong> <a href="https://topcow24.grand-challenge.org/">https://topcow24.grand-challenge.org/</a><br />
+<strong>Cite:</strong> Yang et al. 2023, arXiv:2312.17670</p>
+<div class="admonition note">
+<p class="admonition-title">Protocol notes</p>
+<p>Official HD95 uses 90 mm for missing classes (the <code>topcow</code> empty policy). clDice is computed on the merged binary vessel mask; Betti-0 error per class.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Datasets &amp;amp; benchmarks">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Datasets &amp; benchmarks
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../pants-benchmark/" class="md-footer__link md-footer__link--next" aria-label="Next: PanTS benchmark">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                PanTS benchmark
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Abhijit Das · Apache-2.0
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "navigation.instant", "navigation.tracking", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/figsize.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

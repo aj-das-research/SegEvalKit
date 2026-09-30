@@ -1,0 +1,5201 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Evaluation of volumetric (CT/MR) medical image segmentation: 56 metrics with explicit, tested conventions, statistics, plots and reports.">
+      
+      
+      
+        <link rel="canonical" href="https://aj-das-research.github.io/SegEvalKit/research/datasets-survey/">
+      
+      
+        <link rel="prev" href="../metrics-literature-review/">
+      
+      
+        <link rel="next" href="../../developer/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/icon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Datasets survey - SegEvalKit</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/segevalkit.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/compact.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#datasets-benchmarks-survey" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SegEvalKit" class="md-header__button md-logo" aria-label="SegEvalKit" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SegEvalKit
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Datasets survey
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aj-das-research/SegEvalKit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aj-das-research/SegEvalKit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../metrics/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Metrics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guide/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Choosing metrics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../analysis/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Analysis
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../datasets/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Datasets & benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developer/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Developer guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../about/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SegEvalKit" class="md-nav__button md-logo" aria-label="SegEvalKit" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    SegEvalKit
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aj-das-research/SegEvalKit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aj-das-research/SegEvalKit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../getting-started/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What you need
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/data-format/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data & output format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/gpu-hpc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU & HPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../metrics/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Metrics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/overlap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overlap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/volume/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Volume
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/distance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distance & boundary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/topology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Detection & instances
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/calibration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/agreement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agreement & information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/catalogue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full catalogue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing metrics
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Choosing metrics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/choosing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decision guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pitfalls
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conventions & conformance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/sensitivity-study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensitivity study
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../analysis/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analysis
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Analysis
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/levels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation levels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/plots/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantitative plots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/qualitative/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qualitative visualisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTML report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/viewer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interactive viewer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../datasets/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets & benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Datasets & benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/presets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset presets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/pants-benchmark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PanTS benchmark
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../api/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluator & results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I/O
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/plotting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/synthetic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Synthetic perturbations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics-literature-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics literature review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets survey
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets survey
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-read-this-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to read this document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-deep-dive-the-four-priority-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Deep-dive: the four priority datasets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Deep-dive: the four priority datasets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-pants-pancreatic-tumor-segmentation-jhu-neurips-2025-db" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 PanTS (Pancreatic Tumor Segmentation, JHU; NeurIPS 2025 D&amp;B)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-totalsegmentator-ct-and-mri-university-hospital-basel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 TotalSegmentator (CT and MRI; University Hospital Basel)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-msd-task03_liver-medical-segmentation-decathlon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 MSD Task03_Liver (Medical Segmentation Decathlon)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-msd-task10_colon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 MSD Task10_Colon
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-voxel-geometry-statistics-for-task03-and-task10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 Voxel-geometry statistics for Task03 and Task10
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-dataset-catalogue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Dataset catalogue
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Dataset catalogue">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-abdominal-and-whole-body-ctmr-multi-organ" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Abdominal and whole-body CT/MR (multi-organ)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-kidney-liver-and-other-tumour-ct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Kidney, liver and other tumour CT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-medical-segmentation-decathlon-all-10-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Medical Segmentation Decathlon: all 10 tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-neuro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Neuro
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-petct-and-head-and-neck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 PET/CT and head and neck
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-cardiac-thoracic-and-vascular" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Cardiac, thoracic and vascular
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-dental-and-spine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 Dental and spine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-official-evaluation-protocols-metrics-tolerances-empty-masks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Official evaluation protocols (metrics, tolerances, empty masks)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Official evaluation protocols (metrics, tolerances, empty masks)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-quick-reference-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Quick reference table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-notes-on-the-metric-implementations-surface-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Notes on the metric implementations (surface metrics)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-cross-benchmark-empty-mask-and-tolerance-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Cross-benchmark empty-mask and tolerance conventions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-baseline-model-families-and-their-output-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Baseline model families and their output conventions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-recommendations-for-segevalkit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Recommendations for SegEvalKit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#datasets-and-official-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datasets and official repositories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-and-metric-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods and metric libraries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../developer/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer guide
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/adding-a-metric/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a metric
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/adding-a-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a dataset preset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/plots-and-themes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plots, themes & visualisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing & conformance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/releasing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releasing & maintenance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../about/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/citation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-read-this-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to read this document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-deep-dive-the-four-priority-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Deep-dive: the four priority datasets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Deep-dive: the four priority datasets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-pants-pancreatic-tumor-segmentation-jhu-neurips-2025-db" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 PanTS (Pancreatic Tumor Segmentation, JHU; NeurIPS 2025 D&amp;B)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-totalsegmentator-ct-and-mri-university-hospital-basel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 TotalSegmentator (CT and MRI; University Hospital Basel)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-msd-task03_liver-medical-segmentation-decathlon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 MSD Task03_Liver (Medical Segmentation Decathlon)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-msd-task10_colon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 MSD Task10_Colon
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-voxel-geometry-statistics-for-task03-and-task10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 Voxel-geometry statistics for Task03 and Task10
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-dataset-catalogue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Dataset catalogue
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Dataset catalogue">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-abdominal-and-whole-body-ctmr-multi-organ" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Abdominal and whole-body CT/MR (multi-organ)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-kidney-liver-and-other-tumour-ct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Kidney, liver and other tumour CT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-medical-segmentation-decathlon-all-10-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Medical Segmentation Decathlon: all 10 tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-neuro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Neuro
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-petct-and-head-and-neck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 PET/CT and head and neck
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-cardiac-thoracic-and-vascular" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Cardiac, thoracic and vascular
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-dental-and-spine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 Dental and spine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-official-evaluation-protocols-metrics-tolerances-empty-masks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Official evaluation protocols (metrics, tolerances, empty masks)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Official evaluation protocols (metrics, tolerances, empty masks)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-quick-reference-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Quick reference table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-notes-on-the-metric-implementations-surface-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Notes on the metric implementations (surface metrics)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-cross-benchmark-empty-mask-and-tolerance-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Cross-benchmark empty-mask and tolerance conventions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-baseline-model-families-and-their-output-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Baseline model families and their output conventions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-recommendations-for-segevalkit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Recommendations for SegEvalKit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#datasets-and-official-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datasets and official repositories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-and-metric-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods and metric libraries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="datasets-benchmarks-survey">Datasets &amp; benchmarks survey<a class="headerlink" href="#datasets-benchmarks-survey" title="Permanent link">#</a></h1>
+<p>Survey for <strong>SegEvalKit</strong> (an open-source evaluation library). Compiled 2026-09-30.</p>
+<h2 id="how-to-read-this-document">How to read this document<a class="headerlink" href="#how-to-read-this-document" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Verification levels.</strong> Every fact carries one of three tags:<ul>
+<li><strong>[V-code]</strong>: checked directly against official files. That means official evaluation code, <code>dataset.json</code>, a Zenodo record, a HuggingFace card, or label files downloaded and inspected by us.</li>
+<li><strong>[V-doc]</strong>: checked against an official web page, README or paper.</li>
+<li><strong>[UNVERIFIED]</strong>: taken from memory or secondary sources. Check it before encoding it in SegEvalKit defaults.</li>
+</ul>
+</li>
+<li>The <strong>"official metric" rows</strong> describe what the organisers' own code does. In particular they record how it handles <strong>empty masks</strong>, <strong>tolerances</strong>, and <strong>aggregation</strong>. Those three things are where re-implementations usually disagree with leaderboards.</li>
+<li>The table of empty-mask conventions across benchmarks is in <a href="#4-cross-benchmark-empty-mask-and-tolerance-conventions">Section 4</a>.</li>
+</ul>
+<hr />
+<h2 id="1-deep-dive-the-four-priority-datasets">1. Deep-dive: the four priority datasets<a class="headerlink" href="#1-deep-dive-the-four-priority-datasets" title="Permanent link">#</a></h2>
+<h3 id="11-pants-pancreatic-tumor-segmentation-jhu-neurips-2025-db">1.1 PanTS (Pancreatic Tumor Segmentation, JHU; NeurIPS 2025 D&amp;B)<a class="headerlink" href="#11-pants-pancreatic-tumor-segmentation-jhu-neurips-2025-db" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Modality</td>
+<td>CT (3D, multi-phase; 145 centres) [V-doc]</td>
+</tr>
+<tr>
+<td>Scale</td>
+<td>36,390 CT volumes in total. The public release is <strong>PanTS-tr n=9,000</strong> (<code>PanTS_00000001</code> to <code>PanTS_00009000</code>) and <strong>PanTS-te n=901</strong> (<code>PanTS_00009001</code> to <code>PanTS_00009901</code>) [V-code: download scripts]. The remaining volumes are proprietary out-of-distribution test sets (UCSF 13,458; Poland 5,259; Peking Univ. 3,066) plus RSNA-ATD (4,706, re-annotated). These are evaluated by the JHU team when you email them a checkpoint [V-doc].</td>
+</tr>
+<tr>
+<td>Targets</td>
+<td>Pancreatic lesion, pancreas plus head/body/tail, pancreatic duct, common bile duct, and 24 surrounding structures. 28 label names in total [V-code]</td>
+</tr>
+<tr>
+<td>Spacing</td>
+<td>In-plane median 0.81 mm (IQR 0.73–0.92) in train and 0.75 mm (0.70–0.83) in test. Slice thickness median 2.50 mm (IQR 0.87–3.00) in train and 1.25 mm (1.25–2.50) in test. These are the paper's Table 1 values [V-doc]. A case we inspected had 5.0 mm slices [V-code].</td>
+</tr>
+<tr>
+<td>Licence</td>
+<td>The GitHub <code>LICENSE</code> says <strong>CC BY-NC-ND 4.0</strong> ("© The Johns Hopkins University"). The HuggingFace card <code>BodyMaps/PanTSMini</code> declares <strong>cc-by-nc-sa-4.0</strong>. The two conflict [V-code, both]. Treat the data as non-commercial and check with the authors before redistributing derived labels.</td>
+</tr>
+<tr>
+<td>Download</td>
+<td><code>git clone https://github.com/MrGiovanni/PanTS &amp;&amp; bash download_PanTS_data.sh &amp;&amp; bash download_PanTS_label.sh</code>. Images come from HF <code>BodyMaps/PanTSMini</code>: 9 tarballs <code>PanTSMini_ImageTr_XXXXXXXX_YYYYYYYY.tar.gz</code> of about 35 GB each, plus <code>PanTSMini_ImageTe_00009001_00009901.tar.gz</code> (about 28 GB) and <code>metadata.xlsx</code>. Labels are one 15.6 GB tarball at <code>https://www.cs.jhu.edu/~zongwei/dataset/PanTSMini_Label.tar.gz</code>. The total needs about 300 GB [V-code].</td>
+</tr>
+<tr>
+<td>Official benchmark metrics</td>
+<td>The README leaderboard on the in-distribution test set reports <strong>P-Sen</strong> (patient-wise sensitivity: a hit if any tumour is predicted in a tumour patient, location ignored), <strong>T-Sen</strong> (tumour-wise sensitivity: each tumour must be correctly localised), <strong>Specificity</strong>, <strong>AUC</strong>, and <strong>DSC</strong> (pancreatic lesion) [V-doc]. The paper also defines <strong>NSD</strong> with a tolerance τ, but we could <strong>not find a stated value of τ</strong> [V-doc]. <strong>No official evaluation script is published in the repo</strong> (we checked the repo tree). The detection threshold (minimum lesion volume or overlap for a "hit") and the handling of DSC on tumour-free cases are <strong>not documented</strong> [UNVERIFIED; ask the authors].</td>
+</tr>
+<tr>
+<td>Baselines (README)</td>
+<td>nnU-Net (DSC 50.9%, AUC 0.902), MedFormer (52.9%, 0.924), R-Super (53.4%, 0.903; trained with extra report supervision). Checkpoints are on HF (<code>edomerli/nnUNet-PanTS-regions</code>, <code>AbdomenAtlas/MedFormerPanTS</code>, <code>AbdomenAtlas/R-SuperPanTSMerlin</code>) [V-doc]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>File layout</strong> [V-code: <code>data/README.md</code>, plus 3 cases from the label tarball streamed and inspected with nibabel]:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>PanTS/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── metadata.xlsx
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── ImageTr/PanTS_00000001/ct.nii.gz          (ImageTe/ for 00009001–00009901)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── ReportTr/PanTS_00000001/report.pdf        (ReportTe/)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>└── LabelTr/PanTS_00000001/
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├── combined_labels.nii.gz                ← present in the tarball but NOT listed in data/README.md
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    └── segmentations/
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        ├── pancreatic_lesion.nii.gz
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        ├── pancreas.nii.gz, pancreas_head.nii.gz, pancreas_body.nii.gz, pancreas_tail.nii.gz
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        └── ... (28 binary files, one per class; files are always present, even when empty)
+</code></pre></div>
+<p><strong>Class map</strong> (<code>class_map_abdomenatlas_pants</code>, from <code>data/README.md</code>) [V-code]:</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>id</th>
+<th>name</th>
+<th>id</th>
+<th>name</th>
+<th>id</th>
+<th>name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>adrenal_gland_left</td>
+<td>8</td>
+<td>duodenum</td>
+<td>15</td>
+<td>lung_left</td>
+<td>22</td>
+<td>postcava</td>
+</tr>
+<tr>
+<td>2</td>
+<td>adrenal_gland_right</td>
+<td>9</td>
+<td>femur_left</td>
+<td>16</td>
+<td>lung_right</td>
+<td>23</td>
+<td>prostate</td>
+</tr>
+<tr>
+<td>3</td>
+<td>aorta</td>
+<td>10</td>
+<td>femur_right</td>
+<td>17</td>
+<td>pancreas</td>
+<td>24</td>
+<td>spleen</td>
+</tr>
+<tr>
+<td>4</td>
+<td>bladder</td>
+<td>11</td>
+<td>gall_bladder</td>
+<td>18</td>
+<td>pancreas_body</td>
+<td>25</td>
+<td>stomach</td>
+</tr>
+<tr>
+<td>5</td>
+<td>celiac_artery</td>
+<td>12</td>
+<td>kidney_left</td>
+<td>19</td>
+<td>pancreas_head</td>
+<td>26</td>
+<td>superior_mesenteric_artery</td>
+</tr>
+<tr>
+<td>6</td>
+<td>colon</td>
+<td>13</td>
+<td>kidney_right</td>
+<td>20</td>
+<td>pancreas_tail</td>
+<td>27</td>
+<td>veins</td>
+</tr>
+<tr>
+<td>7</td>
+<td>common_bile_duct</td>
+<td>14</td>
+<td>liver</td>
+<td>21</td>
+<td>pancreatic_duct</td>
+<td>28</td>
+<td>pancreatic_lesion</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pitfalls found by inspecting real label files</strong> [V-code]:</p>
+<ol>
+<li><strong>The per-structure masks overlap.</strong> <code>pancreas</code> is the union of <code>pancreas_head</code>, <code>pancreas_body</code> and <code>pancreas_tail</code> (and contains the duct and lesion). <code>veins</code> overlaps pancreas and liver voxels. As a result <code>combined_labels.nii.gz</code> (int16, ids 1–28 above) is <strong>lossy</strong>: in case <code>PanTS_00001349</code> only 906 of the 16,106 pancreas voxels keep id 17, and the rest were overwritten by ids 18–21 and 27. <strong>Evaluate from <code>segmentations/*.nii.gz</code>, not from <code>combined_labels</code>.</strong> The only exception is when you deliberately want the "last label wins" semantics.</li>
+<li><strong>The pancreas sub-part masks are not exact integers once loaded.</strong> <code>pancreas_head</code>, <code>pancreas_body</code> and <code>pancreas_tail</code> are stored as int8 but load via nibabel as <code>{0.0, 1.0000000591}</code>. The other masks load as <code>{0, 1}</code>. <strong>Binarise with <code>&gt; 0.5</code> (or <code>!= 0</code>), never with <code>== 1</code>.</strong></li>
+<li><strong>Orientation and axis order vary per case.</strong> We saw <code>('I','P','L')</code> with zooms <code>(5.0, 0.943, 0.943)</code>, <code>('L','P','S')</code> and <code>('R','A','S')</code>. The slice axis is not always the last array axis. Take spacing per axis from the header or affine. Never assume z is the last axis, and never assume RAS.</li>
+<li><strong>Empty files are common.</strong> Masks with zero voxels are shipped for absent structures. For example, <code>pancreatic_lesion</code>, <code>spleen</code> and <code>kidney_left</code> are empty in <code>PanTS_00001349</code>. Most PanTS cases are tumour-free, so the empty-GT policy dominates the lesion DSC.</li>
+<li><strong>Paths differ between the label tarball and the final layout.</strong> The tarball holds flat <code>PanTS_XXXXXXXX/</code> folders. The download script moves them into <code>LabelTr/</code> and <code>LabelTe/</code> by ID range.</li>
+</ol>
+<h3 id="12-totalsegmentator-ct-and-mri-university-hospital-basel">1.2 TotalSegmentator (CT and MRI; University Hospital Basel)<a class="headerlink" href="#12-totalsegmentator-ct-and-mri-university-hospital-basel" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>CT dataset</th>
+<th>MRI dataset</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Latest version</td>
+<td><strong>v3.0.0</strong> (2026-09-10): <strong>1,939 CT</strong>, 117 structures. v3 adds 291 paediatric CTs, fixes label errors (bones, femur) and <strong>fixes vertebra label mix-ups</strong>. Zenodo record <strong>6802613</strong>, <code>Totalsegmentator_dataset_v300.zip</code> (37.4 GB) [V-code: Zenodo API]</td>
+<td><strong>v3.0.0</strong> (2026-09-10): <strong>1,296 MR</strong>, 50 structures. Zenodo record <strong>11367004</strong>, <code>TotalsegmentatorMRI_dataset_v300.zip</code> (15.2 GB) [V-code]</td>
+</tr>
+<tr>
+<td>Previous versions</td>
+<td>v2.0.1 (Zenodo 10047292, 2023-10-27): 1,228 CT, 117 classes, <code>meta.csv</code> split = <strong>train 1082 / val 57 / test 89</strong> [V-code: counted from <code>meta.csv</code>]. v1 had 104 classes (<code>total_v1</code> in the class map) [V-code]</td>
+<td>v2.0.0 (Zenodo 14710732): 616 MR. v1: 298 MR [V-code]</td>
+</tr>
+<tr>
+<td>Licence</td>
+<td>Zenodo metadata: <strong>CC BY 4.0</strong> [V-code]. The README says the datasets and most weights are "openly available for any usage (Apache-2.0)" and that some subtasks need a licence [V-doc].</td>
+<td>Zenodo v3: CC BY 4.0. <strong>Zenodo v2.0.0 metadata says <code>cc-by-nc-sa-2.0</code></strong> [V-code]. Check which version you use.</td>
+</tr>
+<tr>
+<td>Layout</td>
+<td><code>sXXXX/ct.nii.gz</code> + <code>sXXXX/segmentations/&lt;class&gt;.nii.gz</code> (<strong>one binary file per class</strong>, 117 files) + top-level <code>meta.csv</code> (<strong>semicolon-separated</strong>, UTF-8 BOM; columns <code>image_id;age;gender;institute;study_type;split;manufacturer;scanner_model;kvp;pathology;pathology_location</code>) [V-code: v2.0.1 zip central directory listed remotely]</td>
+<td>Same scheme (<code>sXXXX/mri.nii.gz</code> + <code>segmentations/</code>) [UNVERIFIED: MR image filename]</td>
+</tr>
+<tr>
+<td>Official metrics</td>
+<td>The papers report Dice and NSD per class (Wasserthal et al., <em>Radiology: AI</em> 2023). <strong>There is no challenge and no official evaluation script</strong> [V-doc]. The NSD tolerance used in the paper is not stated here [UNVERIFIED: 3 mm?].</td>
+<td>Same [UNVERIFIED]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Model output conventions</strong> (TotalSegmentator tool) [V-doc/V-code]:</p>
+<ul>
+<li>The default is one binary NIfTI per class in the output folder (<code>&lt;class&gt;.nii.gz</code>). <code>--ml</code> writes a single multi-label NIfTI whose ids follow <code>class_map[task]</code> in <code>totalsegmentator/map_to_binary.py</code>.</li>
+<li>Models run at 1.5 mm. <code>--fast</code> runs at 3 mm. Outputs are resampled back to the input geometry.</li>
+<li><code>map_to_binary.py</code> defines about 55 task maps (<code>total</code>, <code>total_mr</code>, <code>lung_vessels</code>, <code>body</code>, <code>vertebrae_mr</code>, <code>liver_segments</code>, <code>teeth</code>, <code>brain_aneurysm</code>, …).</li>
+</ul>
+<p><strong><code>total</code> (CT) class map, 117 classes</strong> [V-code, parsed from <code>map_to_binary.py</code>]:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>1 spleen  2 kidney_right  3 kidney_left  4 gallbladder  5 liver  6 stomach  7 pancreas
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>8 adrenal_gland_right  9 adrenal_gland_left  10 lung_upper_lobe_left  11 lung_lower_lobe_left
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>12 lung_upper_lobe_right  13 lung_middle_lobe_right  14 lung_lower_lobe_right  15 esophagus
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>16 trachea  17 thyroid_gland  18 small_bowel  19 duodenum  20 colon  21 urinary_bladder
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>22 prostate  23 kidney_cyst_left  24 kidney_cyst_right  25 sacrum  26 vertebrae_S1
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>27 vertebrae_L5 28 L4 29 L3 30 L2 31 L1 32 T12 33 T11 34 T10 35 T9 36 T8 37 T7 38 T6 39 T5
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>40 T4 41 T3 42 T2 43 T1 44 C7 45 C6 46 C5 47 C4 48 C3 49 C2 50 vertebrae_C1   (all "vertebrae_&lt;X&gt;")
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>51 heart  52 aorta  53 pulmonary_vein  54 brachiocephalic_trunk  55 subclavian_artery_right
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>56 subclavian_artery_left  57 common_carotid_artery_right  58 common_carotid_artery_left
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>59 brachiocephalic_vein_left  60 brachiocephalic_vein_right  61 atrial_appendage_left
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>62 superior_vena_cava  63 inferior_vena_cava  64 portal_vein_and_splenic_vein
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>65 iliac_artery_left  66 iliac_artery_right  67 iliac_vena_left  68 iliac_vena_right
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>69 humerus_left  70 humerus_right  71 scapula_left  72 scapula_right  73 clavicula_left
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>74 clavicula_right  75 femur_left  76 femur_right  77 hip_left  78 hip_right  79 spinal_cord
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>80 gluteus_maximus_left  81 gluteus_maximus_right  82 gluteus_medius_left  83 gluteus_medius_right
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>84 gluteus_minimus_left  85 gluteus_minimus_right  86 autochthon_left  87 autochthon_right
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>88 iliopsoas_left  89 iliopsoas_right  90 brain  91 skull
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>92–103 rib_left_1 … rib_left_12   104–115 rib_right_1 … rib_right_12
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>116 sternum  117 costal_cartilages
+</code></pre></div>
+<p><strong><code>total_mr</code> class map, 50 classes</strong> [V-code]:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>1 spleen 2 kidney_right 3 kidney_left 4 gallbladder 5 liver 6 stomach 7 pancreas
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>8 adrenal_gland_right 9 adrenal_gland_left 10 lung_left 11 lung_right 12 esophagus
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>13 small_bowel 14 duodenum 15 colon 16 urinary_bladder 17 prostate 18 sacrum 19 vertebrae
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>20 intervertebral_discs 21 spinal_cord 22 heart 23 aorta 24 inferior_vena_cava
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>25 portal_vein_and_splenic_vein 26 iliac_artery_left 27 iliac_artery_right 28 iliac_vena_left
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>29 iliac_vena_right 30 humerus_left 31 humerus_right 32 scapula_left 33 scapula_right
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>34 clavicula_left 35 clavicula_right 36 femur_left 37 femur_right 38 hip_left 39 hip_right
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>40 gluteus_maximus_left 41 gluteus_maximus_right 42 gluteus_medius_left 43 gluteus_medius_right
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>44 gluteus_minimus_left 45 gluteus_minimus_right 46 autochthon_left 47 autochthon_right
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>48 iliopsoas_left 49 iliopsoas_right 50 brain
+</code></pre></div>
+<p><strong>Pitfalls:</strong></p>
+<ul>
+<li>Class <strong>names</strong> are stable across CT v2 and v3, but <strong>ids differ from v1</strong> (104 classes).</li>
+<li>The MR ids <strong>differ from the CT ids</strong> for the same organ, for example <code>lung_left</code> (MR 10) versus the CT lobes (10–14). A generic "TotalSegmentator" evaluator must therefore key on task plus version, or on names.</li>
+<li>Structures cut off at the edge of the field of view are often left empty in the ground truth, so empty-GT handling matters for partial-FOV scans [UNVERIFIED as to the annotation policy].</li>
+</ul>
+<h3 id="13-msd-task03_liver-medical-segmentation-decathlon">1.3 MSD Task03_Liver (Medical Segmentation Decathlon)<a class="headerlink" href="#13-msd-task03_liver-medical-segmentation-decathlon" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value [V-code: <code>dataset.json</code> extracted from the official MSD tar at <code>msd-for-monai.s3-us-west-2.amazonaws.com/Task03_Liver.tar</code>]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code> / <code>description</code></td>
+<td><code>"Liver"</code> / <code>"Liver, and cancer segmentation"</code></td>
+</tr>
+<tr>
+<td>Modality</td>
+<td><code>{"0": "CT"}</code>, <code>tensorImageSize "3D"</code></td>
+</tr>
+<tr>
+<td><strong>Labels</strong></td>
+<td><strong><code>{"0": "background", "1": "liver", "2": "cancer"}</code></strong>. This is a single multi-label NIfTI in which the tumour (2) is <em>inside</em> the liver: liver voxels = label 1 ∪ label 2.</td>
+</tr>
+<tr>
+<td>Cases</td>
+<td><code>numTraining 131</code>, <code>numTest 70</code> (test labels are withheld)</td>
+</tr>
+<tr>
+<td>Files</td>
+<td><code>Task03_Liver/imagesTr/liver_{N}.nii.gz</code>, <code>labelsTr/liver_{N}.nii.gz</code>, <code>imagesTs/liver_{N}.nii.gz</code>. Training N is 0–130 and test N is 132–201 (the first test entry in <code>dataset.json</code> is <code>liver_132</code>) [training ids 0–130 are UNVERIFIED; the test start is from <code>dataset.json</code>]</td>
+</tr>
+<tr>
+<td>Licence</td>
+<td><code>"licence": "CC-BY-SA 4.0"</code>, release <code>"1.0 04/05/2018"</code></td>
+</tr>
+<tr>
+<td>Source</td>
+<td>Derived from <strong>LiTS 2017</strong> (same 131 train / 70 test volumes) [V-doc]</td>
+</tr>
+<tr>
+<td>Spacing</td>
+<td>See Section 1.5 (computed from the headers)</td>
+</tr>
+<tr>
+<td>Official metrics</td>
+<td>MSD: <strong>DSC and NSD</strong> per label (liver, cancer), ranked by significance ranking [V-doc: Antonelli et al., Nat Commun 2022]. See Section 3 for the per-task NSD tolerances.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="14-msd-task10_colon">1.4 MSD Task10_Colon<a class="headerlink" href="#14-msd-task10_colon" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value [V-code: <code>dataset.json</code> from <code>Task10_Colon.tar</code>]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code> / <code>description</code></td>
+<td><code>"Colon"</code>, release <code>"1.0 06/08/2018"</code></td>
+</tr>
+<tr>
+<td>Modality</td>
+<td><code>{"0": "CT"}</code></td>
+</tr>
+<tr>
+<td><strong>Labels</strong></td>
+<td><strong><code>{"0": "background", "1": "colon cancer primaries"}</code></strong> (binary)</td>
+</tr>
+<tr>
+<td>Cases</td>
+<td><code>numTraining 126</code>, <code>numTest 64</code></td>
+</tr>
+<tr>
+<td>Files</td>
+<td><code>Task10_Colon/imagesTr/colon_{NNN}.nii.gz</code>, <code>labelsTr/colon_{NNN}.nii.gz</code>, <code>imagesTs/colon_{NNN}.nii.gz</code>. The ids are <strong>non-contiguous, zero-padded 3-digit numbers</strong> (for example <code>colon_219</code> in training and <code>colon_198</code> in test)</td>
+</tr>
+<tr>
+<td>Licence</td>
+<td>CC-BY-SA 4.0</td>
+</tr>
+<tr>
+<td>Official metrics</td>
+<td>DSC and NSD (MSD)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Layout gotchas common to all MSD tars</strong> [V-code, from streaming the tar headers]:</p>
+<ul>
+<li>The tars contain <strong>macOS AppleDouble files</strong>: <code>._Task10_Colon</code>, <code>Task10_Colon/._imagesTr</code>, <code>Task03_Liver/imagesTr/._liver_14.nii.gz</code>, and so on. <strong>Any <code>glob('*.nii.gz')</code> picks up <code>._*.nii.gz</code> junk files of 187–331 bytes.</strong> Filter out names that start with <code>._</code>.</li>
+<li><code>dataset.json</code> entries use <code>./imagesTr/...</code> relative paths. Several tasks spell the release key <code>"relase"</code> (a typo).</li>
+<li>Tasks 01 and 05 are 4D, multi-channel in one file (<code>tensorImageSize "4D"</code>).</li>
+</ul>
+<h3 id="15-voxel-geometry-statistics-for-task03-and-task10">1.5 Voxel-geometry statistics for Task03 and Task10<a class="headerlink" href="#15-voxel-geometry-statistics-for-task03-and-task10" title="Permanent link">#</a></h3>
+<p>These were computed by streaming the official tars and reading every NIfTI header (the label files were read in full).</p>
+<p><strong>Task10_Colon</strong> [V-code, all 316 volumes]:</p>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th>n</th>
+<th>In-plane spacing (mm), min / median / max</th>
+<th>Slice spacing (mm), min / median / max</th>
+<th>Shape</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>imagesTr / labelsTr</td>
+<td>126</td>
+<td>0.535 / 0.781 / 0.977</td>
+<td>1.25 / 5.0 / 7.5</td>
+<td>512×512×(37–729)</td>
+</tr>
+<tr>
+<td>imagesTs</td>
+<td>64</td>
+<td>0.578 / 0.768 / 0.977</td>
+<td>2.2 / 5.0 / 6.0</td>
+<td>512×512×(36–263)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Case ids: train 1–219 (126 ids), test 3–209 (64 ids). There are gaps in both.</li>
+<li><strong>Labels are stored as float32</strong> (the images are float32 too). Cast them to an integer type before comparing labels.</li>
+<li><strong>All 126 training labels contain <code>{0, 1}</code>, so no training case has an empty tumour mask.</strong></li>
+</ul>
+<p><strong>Task03_Liver:</strong> Not computed. Streaming the 27 GB tar hit the 1-hour background limit, so this scan did not finish. The LiTS paper (Bilic et al.) reports in-plane spacing of about 0.56–1.0 mm and slice thickness of about 0.45–6.0 mm [UNVERIFIED]. Some LiTS/Task03 training cases are known to have <strong>no tumour (label 2 absent)</strong>, so the empty-GT policy affects the cancer DSC [UNVERIFIED count; re-run <code>msdstats.py</code> locally to confirm].</p>
+<hr />
+<hr />
+<h2 id="2-dataset-catalogue">2. Dataset catalogue<a class="headerlink" href="#2-dataset-catalogue" title="Permanent link">#</a></h2>
+<p>Abbreviations: <strong>ML</strong> = one multi-label integer NIfTI per case. <strong>PS</strong> = per-structure binary files. <strong>Inst</strong> = instance or per-annotator files. Tags follow the conventions in the introduction.</p>
+<h3 id="21-abdominal-and-whole-body-ctmr-multi-organ">2.1 Abdominal and whole-body CT/MR (multi-organ)<a class="headerlink" href="#21-abdominal-and-whole-body-ctmr-multi-organ" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Modality</th>
+<th>Targets / label ids</th>
+<th>Cases</th>
+<th>Label format</th>
+<th>Spacing</th>
+<th>Licence</th>
+<th>Download</th>
+<th>Tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AbdomenAtlas 1.0 (Mini)</strong></td>
+<td>CT</td>
+<td>1 aorta, 2 gall_bladder, 3 kidney_left, 4 kidney_right, 5 liver, 6 pancreas, 7 postcava, 8 spleen, 9 stomach</td>
+<td>5,195 public ("Mini"); the paper describes 8,448</td>
+<td>Case folder <code>BDMAP_XXXXXXXX/</code> with <code>ct.nii.gz</code>, <code>combined_labels.nii.gz</code> (ML) and <code>segmentations/*.nii.gz</code> (PS)</td>
+<td>Multi-source</td>
+<td>HF card: CC BY-NC-SA 4.0 (gated, no redistribution)</td>
+<td>HF <code>AbdomenAtlas/AbdomenAtlas1.0Mini</code>, <code>BodyMaps/AbdomenAtlas1.0Mini</code>; Dropbox; Baidu</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>AbdomenAtlas 1.1 (Mini)</strong></td>
+<td>CT</td>
+<td>The 1.0 ids 1–9, plus 10 adrenal_gland_left, 11 adrenal_gland_right, 12 bladder, 13 celiac_trunk, 14 colon, 15 duodenum, 16 esophagus, 17 femur_left, 18 femur_right, 19 hepatic_vessel, 20 intestine, 21 lung_left, 22 lung_right, 23 portal_vein_and_splenic_vein, 24 prostate, 25 rectum</td>
+<td>9,262 (<code>BDMAP_00000001</code> to <code>BDMAP_00009262</code>)</td>
+<td>As 1.0</td>
+<td>Multi-source (17 public datasets)</td>
+<td>CC BY-NC-SA 4.0</td>
+<td>HF <code>BodyMaps/AbdomenAtlas1.1Mini</code> (gated; the mask-only repo is <code>…1.1MiniMask</code>)</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>AbdomenAtlas 3.0</strong> (RadGPT, ICCV 2025)</td>
+<td>CT</td>
+<td>Per-voxel liver, kidney and pancreatic tumour masks plus structured and narrative reports, on the same 9,262 CTs (3,955 with tumours)</td>
+<td>9,262</td>
+<td>PS (AbdomenAtlas style) [UNVERIFIED: exact file names]</td>
+<td>—</td>
+<td>[UNVERIFIED; likely CC BY-NC-SA]</td>
+<td>Via BodyMaps/AbdomenAtlas HF [UNVERIFIED: repo id]</td>
+<td>V-doc (counts)</td>
+</tr>
+<tr>
+<td><strong>Merlin</strong> (Stanford)</td>
+<td>CT (abdomen/pelvis, emergency department 2012–2018)</td>
+<td><strong>No voxel masks are distributed.</strong> You get reports (Findings), EHR-derived labels, zero-shot disease labels and 5-year disease tasks. The Merlin segmentation work uses nnU-Net (<code>ashwinkumargb/Merlin-nnUNet</code>) [UNVERIFIED: which organ labels it uses]</td>
+<td>25,494 scans / 18,317 patients. The split is in <code>reports_final.xlsx</code></td>
+<td>Images as <code>.nii</code> in <code>merlin_data/</code></td>
+<td>—</td>
+<td>Stanford AIMI DUA</td>
+<td>stanfordaimi.azurewebsites.net (azcopy)</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>TotalSegmentator</strong></td>
+<td>CT / MR</td>
+<td>See §1.2</td>
+<td>1,939 CT / 1,296 MR (v3)</td>
+<td>PS</td>
+<td>Varied</td>
+<td>CC BY 4.0</td>
+<td>Zenodo 6802613 / 11367004</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>AMOS 2022</strong></td>
+<td>CT + MRI</td>
+<td>1 spleen, 2 right kidney, 3 left kidney, 4 gall bladder, 5 esophagus, 6 liver, 7 stomach, 8 aorta (spelled <code>"arota"</code> in <code>dataset.json</code>), 9 postcava/IVC, 10 pancreas, 11 right adrenal, 12 left adrenal, 13 duodenum, 14 bladder, 15 prostate/uterus</td>
+<td>Tr 200 CT + 40 MR; Va 100 CT + 20 MR; Ts 240 (labels withheld). <strong>Case id &lt; 500 means CT, ≥ 500 means MR</strong></td>
+<td>ML (<code>amos_XXXX.nii.gz</code>)</td>
+<td>CT 0.57–0.78 mm in-plane, 5 mm slices; MR 0.69–1.19 mm in-plane, 3 mm slices (sampled)</td>
+<td>Zenodo: CC BY 4.0; <code>dataset.json</code>: CC BY-SA 4.0 (conflict)</td>
+<td>Zenodo 7262581 (<code>amos22.zip</code>, 24 GB)</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>BTCV</strong> (Synapse multi-atlas, abdomen)</td>
+<td>CT (portal venous)</td>
+<td>1 spleen, 2 right kidney, 3 left kidney, 4 gallbladder, 5 esophagus, 6 liver, 7 stomach, 8 aorta, 9 IVC, 10 portal and splenic vein, 11 pancreas, 12 right adrenal, 13 left adrenal. "Some patients may not have (2) right kidney or (4) gallbladder"</td>
+<td>30 train / 20 test</td>
+<td>ML: <code>img/img0001.nii.gz</code>, <code>label/label0001.nii.gz</code></td>
+<td>0.54–0.98 mm in-plane, 2.5–5 mm slices</td>
+<td>Synapse terms [UNVERIFIED]</td>
+<td>Synapse syn3193805 (login)</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>WORD</strong></td>
+<td>CT</td>
+<td>16 organs, in the paper's order: liver, spleen, kidney_L, kidney_R, stomach, gallbladder, esophagus, pancreas, duodenum, colon, intestine, adrenal, rectum, bladder, femoral head L, femoral head R. <strong>Ids 1–16 in this order are UNVERIFIED</strong></td>
+<td>100 / 20 / 30</td>
+<td>ML</td>
+<td>0.976 mm in-plane, 2.5–3 mm slices</td>
+<td>GPL-3.0 (academic)</td>
+<td>Google Drive / Baidu (password by email)</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>AbdomenCT-1K</strong></td>
+<td>CT</td>
+<td>1 liver, 2 kidney, 3 spleen, 4 pancreas</td>
+<td>1,112 in total; fully-supervised subtask 361 train; shared test 100</td>
+<td>ML</td>
+<td>Multi-centre</td>
+<td>Data licence [UNVERIFIED]; repo Apache-2.0</td>
+<td>Google Form (github.com/JunMa11/AbdomenCT-1K)</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>FLARE21</strong></td>
+<td>CT</td>
+<td>1 liver, 2 kidney, 3 spleen, 4 pancreas</td>
+<td>361 train / 50 val / 100 test [UNVERIFIED splits]</td>
+<td>ML</td>
+<td>—</td>
+<td>[UNVERIFIED]</td>
+<td>flare.grand-challenge.org</td>
+<td>V-code (labels from eval code)</td>
+</tr>
+<tr>
+<td><strong>FLARE22</strong></td>
+<td>CT</td>
+<td>1 liver, 2 right kidney, 3 spleen, 4 pancreas, 5 aorta, 6 IVC, 7 right adrenal, 8 left adrenal, 9 gallbladder, 10 esophagus, 11 stomach, 12 duodenum, 13 left kidney</td>
+<td>50 labelled + 2,000 unlabelled train; 200 test [UNVERIFIED]</td>
+<td>ML</td>
+<td>—</td>
+<td>[UNVERIFIED]</td>
+<td>flare22.grand-challenge.org</td>
+<td>V-code (ids from eval code)</td>
+</tr>
+<tr>
+<td><strong>FLARE23</strong></td>
+<td>CT</td>
+<td>FLARE22 ids 1–13 plus <strong>14 lesion</strong> (pan-cancer)</td>
+<td>4,000 partially labelled [UNVERIFIED]</td>
+<td>ML</td>
+<td>—</td>
+<td>[UNVERIFIED]</td>
+<td>codabench / grand-challenge</td>
+<td>V-code (ids)</td>
+</tr>
+<tr>
+<td><strong>FLARE24</strong></td>
+<td>CT / MR</td>
+<td>Task 1: pan-cancer lesion (binary). Tasks 2–3: organs on CT (Task 2) and MRI (Task 3), using the FLARE22 ids [UNVERIFIED]</td>
+<td>[UNVERIFIED]</td>
+<td>ML</td>
+<td>—</td>
+<td>[UNVERIFIED]</td>
+<td>FLARE24 site</td>
+<td>V-code (metric)</td>
+</tr>
+<tr>
+<td><strong>CHAOS</strong></td>
+<td>CT (liver) + MR T1-DUAL in/out phase and T2-SPIR (liver, kidneys, spleen)</td>
+<td>MR PNG intensities: liver 63 (range 55–70), right kidney 126 (110–135), left kidney 189 (175–200), spleen 252 (240–255). The CT mask is binary liver</td>
+<td>CT 20/20; MR 20/20</td>
+<td><strong>DICOM + PNG slices (not NIfTI)</strong></td>
+<td>—</td>
+<td>CC BY-NC-SA 4.0</td>
+<td>Zenodo 3431873</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>CT-ORG</strong></td>
+<td>CT</td>
+<td>1 liver, 2 bladder, 3 lungs, 4 kidneys, 5 bone, 6 brain</td>
+<td>119 / 21</td>
+<td>ML (<code>labels-XX.nii.gz</code>, <strong>float32</strong>)</td>
+<td>—</td>
+<td>CC BY 3.0</td>
+<td>TCIA</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>SAROS</strong></td>
+<td>CT (900 scans, 28 TCIA collections)</td>
+<td><code>body-regions.nii.gz</code>: 1 subcutaneous tissue, 2 muscle, 3 abdominal cavity, 4 thoracic cavity, 5 bones, 6 parotid glands, 7 pericardium, 8 breast implant, 9 mediastinum, 10 brain, 11 spinal cord, 12 thyroid glands, 13 submandibular glands. <code>body-parts.nii.gz</code>: 1 torso, 2 head, 3 right leg, 4 left leg, 5 right arm, 6 left arm</td>
+<td>5 folds × 150 plus test 150</td>
+<td>ML, <strong>sparse: every 5th axial slice annotated, all other slices = 255 (ignore)</strong></td>
+<td>—</td>
+<td>Segmentations [UNVERIFIED]; paper CC BY 4.0</td>
+<td>TCIA</td>
+<td>V-doc</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-kidney-liver-and-other-tumour-ct">2.2 Kidney, liver and other tumour CT<a class="headerlink" href="#22-kidney-liver-and-other-tumour-ct" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Labels</th>
+<th>Cases</th>
+<th>Format</th>
+<th>Licence</th>
+<th>Download</th>
+<th>Tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>KiTS19</strong></td>
+<td>0 background, 1 kidney, 2 tumour</td>
+<td>210 / 90</td>
+<td><code>case_XXXXX/imaging.nii.gz</code> + <code>segmentation.nii.gz</code> (ML)</td>
+<td>Data CC BY-NC-SA 4.0</td>
+<td><code>kits19</code> starter code; HF <code>neheller/KiTS-Challenge-Imaging</code></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>KiTS21</strong></td>
+<td>1 kidney, 2 tumour, 3 cyst. Aggregation order (1, 3, 2): tumour overwrites cyst, which overwrites kidney</td>
+<td>300 / 100 [test UNVERIFIED]</td>
+<td>ML aggregated (<code>aggregated_{OR,AND,MAJ}_seg.nii.gz</code>) + Inst <code>segmentations/{kidney,tumor,cyst}_instance-N_annotation-M.nii.gz</code></td>
+<td>[UNVERIFIED]; HF imaging CC BY-NC-SA</td>
+<td><code>neheller/kits21</code></td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>KiTS23</strong></td>
+<td>1 kidney, 2 tumour, 3 cyst (same as KiTS21)</td>
+<td>489 train / 110 test [counts UNVERIFIED]</td>
+<td><code>dataset/case_XXXXX/imaging.nii.gz</code>, <code>segmentation.nii.gz</code> (+ instances)</td>
+<td>Data CC BY-NC-SA; code MIT</td>
+<td><code>kits23_download_data</code> (HF)</td>
+<td>V-code (labels, metric)</td>
+</tr>
+<tr>
+<td><strong>KiPA22</strong></td>
+<td>1 renal vein, 2 kidney, 3 renal artery, 4 tumour [UNVERIFIED officially]</td>
+<td>70 / 30 open / 30 closed</td>
+<td>NIfTI</td>
+<td>[UNVERIFIED]</td>
+<td>kipa22.grand-challenge.org</td>
+<td>UNVERIFIED</td>
+</tr>
+<tr>
+<td><strong>LiTS 2017</strong></td>
+<td>0 background, 1 liver, 2 tumour</td>
+<td>131 / 70</td>
+<td>ML (<code>volume-N.nii</code>, <code>segmentation-N.nii</code>)</td>
+<td>[UNVERIFIED]</td>
+<td>CodaLab / MSD Task03</td>
+<td>V-code (metric)</td>
+</tr>
+<tr>
+<td><strong>ULS23</strong></td>
+<td>Binary lesion inside a 256×256×128 VOI</td>
+<td>Test 725 lesions / 268 patients. Training draws on DeepLesion3D, KiTS, LiTS, LIDC, MSD and others</td>
+<td>NIfTI VOIs (padded with min − 1)</td>
+<td>CC BY-NC-SA 4.0</td>
+<td>Zenodo 10035161; github DIAGNijmegen/ULS23</td>
+<td>V-doc</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-medical-segmentation-decathlon-all-10-tasks">2.3 Medical Segmentation Decathlon: all 10 tasks<a class="headerlink" href="#23-medical-segmentation-decathlon-all-10-tasks" title="Permanent link">#</a></h3>
+<p>All values below are from each task's <code>dataset.json</code>, extracted from the official AWS tars [V-code]. The licence is CC-BY-SA 4.0 for every task. Layout is <code>TaskXX_Name/{imagesTr,labelsTr,imagesTs}/&lt;prefix&gt;_&lt;id&gt;.nii.gz</code>, with ML labels. The NSD tolerances come from Antonelli et al. 2022 [V-doc].</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Modality (channels)</th>
+<th>Labels</th>
+<th>Train / Test</th>
+<th>File prefix</th>
+<th>NSD tol (mm)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01 BrainTumour</td>
+<td>4D MRI: 0 FLAIR, 1 T1w, 2 t1gd, 3 T2w</td>
+<td>1 edema, 2 non-enhancing tumor, 3 enhancing tumour (<strong>not</strong> the BraTS numbering)</td>
+<td>484 / 266</td>
+<td><code>BRATS_NNN</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td>02 Heart</td>
+<td>MRI</td>
+<td>1 left atrium</td>
+<td>20 / 10</td>
+<td><code>la_NNN</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td>03 Liver</td>
+<td>CT</td>
+<td>1 liver, 2 cancer</td>
+<td>131 / 70</td>
+<td><code>liver_N</code></td>
+<td>7</td>
+</tr>
+<tr>
+<td>04 Hippocampus</td>
+<td>MRI</td>
+<td>1 Anterior, 2 Posterior</td>
+<td>260 / 130 (the paper says 263 / 131)</td>
+<td><code>hippocampus_NNN</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td>05 Prostate</td>
+<td>4D MRI: 0 T2, 1 ADC</td>
+<td>1 PZ, 2 TZ</td>
+<td>32 / 16</td>
+<td><code>prostate_NN</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td>06 Lung</td>
+<td>CT</td>
+<td>1 cancer</td>
+<td>63 / 32 (the paper says 64 / 32)</td>
+<td><code>lung_NNN</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td>07 Pancreas</td>
+<td>CT</td>
+<td>1 pancreas, 2 cancer</td>
+<td>281 / 139 (the paper says 282)</td>
+<td><code>pancreas_NNN</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td>08 HepaticVessel</td>
+<td>CT</td>
+<td>1 Vessel, 2 Tumour</td>
+<td>303 / 140</td>
+<td><code>hepaticvessel_NNN</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td>09 Spleen</td>
+<td>CT</td>
+<td>1 spleen</td>
+<td>41 / 20</td>
+<td><code>spleen_N</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td>10 Colon</td>
+<td>CT</td>
+<td>1 colon cancer primaries</td>
+<td>126 / 64</td>
+<td><code>colon_NNN</code></td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the <code>numTraining</code> values in <code>dataset.json</code> differ from the paper's table for Hippocampus, Lung and Pancreas. Trust the files.</p>
+<h3 id="24-neuro">2.4 Neuro<a class="headerlink" href="#24-neuro" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Modality</th>
+<th>Labels</th>
+<th>Cases</th>
+<th>Format / naming</th>
+<th>Licence</th>
+<th>Download</th>
+<th>Tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BraTS 2021</strong></td>
+<td>mpMRI (T1, T1Gd, T2, FLAIR), SRI24 atlas space, 1 mm³, 240×240×155</td>
+<td>1 NCR, 2 ED, <strong>4 ET</strong>. Regions: ET = {4}, TC = {1, 4}, WT = {1, 2, 4}</td>
+<td>1251 train / 219 val / 570 test [test UNVERIFIED]</td>
+<td><code>BraTS2021_XXXXX_{flair,t1,t1ce,t2,seg}.nii.gz</code> [UNVERIFIED]</td>
+<td>Synapse terms</td>
+<td>Synapse</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>BraTS 2023</strong> (GLI/MEN/MET/PED/SSA)</td>
+<td>mpMRI</td>
+<td>1 NCR, 2 ED (SNFH), <strong>3 ET</strong>. Regions: WT = {1, 2, 3}, TC = {1, 3}, ET = {3}</td>
+<td>GLI 1251 / 219</td>
+<td><code>BraTS-GLI-XXXXX-XXX-{t1c,t1n,t2w,t2f,seg}.nii.gz</code> [UNVERIFIED exact]</td>
+<td>[UNVERIFIED]</td>
+<td>Synapse</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>BraTS 2024</strong> (post-treatment glioma, plus MEN-RT, MET, PED, SSA, …)</td>
+<td>mpMRI</td>
+<td>1 NETC, 2 SNFH, 3 ET, <strong>4 RC</strong> (resection cavity) [UNVERIFIED against the data README]. TC = ET + NETC; WT = ET + SNFH + NETC</td>
+<td>About 2,200 patients, 70/10/20 split</td>
+<td>NIfTI</td>
+<td>CC BY 4.0 [UNVERIFIED]</td>
+<td>Synapse syn53708249</td>
+<td>V-doc (partial)</td>
+</tr>
+<tr>
+<td><strong>BraTS 2025</strong></td>
+<td>Clustered challenges (GLI, MEN, MEN-RT, METS, Africa, PED, GOAT)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>Zenodo 15094823 (design document)</td>
+<td>V-doc (existence)</td>
+</tr>
+<tr>
+<td><strong>ISLES 2022</strong></td>
+<td>MRI: DWI (b = 1000), ADC, FLAIR</td>
+<td>Binary infarct</td>
+<td>250 train / 150 test (400 total)</td>
+<td>BIDS: <code>rawdata/sub-strokecaseXXXX/ses-0001/*_{dwi,adc,flair}.nii.gz</code> and <code>derivatives/.../*_msk.nii.gz</code></td>
+<td>Data CC BY-SA 4.0</td>
+<td>grand-challenge; Zenodo</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>TopCoW 2023 / 2024</strong></td>
+<td>CTA + MRA (paired), Circle of Willis</td>
+<td>1 BA, 2 R-PCA, 3 L-PCA, 4 R-ICA, 5 R-MCA, 6 L-ICA, 7 L-MCA, 8 R-Pcom, 9 L-Pcom, 10 Acom, 11 R-ACA, 12 L-ACA, <strong>15 3rd-A2</strong> (13 and 14 are unused)</td>
+<td>2023: 90 train / 5 val / 35 test pairs. 2024: 125 train pairs / 70+ test</td>
+<td><code>.nii.gz</code> / <code>.mha</code>, LPS, braincase-cropped; <code>cow_seg_labelsTr</code>, <code>roi_loc_labelsTr</code></td>
+<td>"Open use, cite source, commercial use needs permission"</td>
+<td>Zenodo 15692630</td>
+<td>V-code (labels)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="25-petct-and-head-and-neck">2.5 PET/CT and head and neck<a class="headerlink" href="#25-petct-and-head-and-neck" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Modality</th>
+<th>Labels</th>
+<th>Cases</th>
+<th>Format</th>
+<th>Licence</th>
+<th>Tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>autoPET I (2022)</strong></td>
+<td>FDG PET/CT (whole body)</td>
+<td>Binary lesion (<code>SEG.nii.gz</code>). Many studies are lesion-negative</td>
+<td>1,014 studies / 900 patients. Test 150 (later described as 200)</td>
+<td><code>SUV.nii.gz</code>, <code>CTres.nii.gz</code>, <code>SEG.nii.gz</code> (TCIA FDG-PET-CT-Lesions)</td>
+<td>TCIA CC BY-NC [UNVERIFIED exact version]</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>autoPET II (2023)</strong></td>
+<td>FDG PET/CT</td>
+<td>Binary</td>
+<td>Same training data; test 200</td>
+<td>NIfTI / mha</td>
+<td>same</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>autoPET III (2024)</strong></td>
+<td>FDG (UKT, 1,014) + PSMA (LMU, 597) PET/CT; tracer unknown at test time</td>
+<td>Binary</td>
+<td>Test 200 = 4 strata × 50 (PSMA-LMU, FDG-UKT, PSMA-UKT, FDG-LMU)</td>
+<td>NIfTI / mha</td>
+<td>same</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>autoPET IV (2025)</strong></td>
+<td>Interactive: PET/CT clicks (Task 1); longitudinal CT (Task 2)</td>
+<td>Binary</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>autoPET V (2026)</strong></td>
+<td>Scribble-based interactive</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>V-doc (existence)</td>
+</tr>
+<tr>
+<td><strong>HECKTOR 2021</strong></td>
+<td>FDG PET/CT, H&amp;N</td>
+<td>GTVp (binary)</td>
+<td>224 / 101 [UNVERIFIED]</td>
+<td>NIfTI</td>
+<td>[UNVERIFIED]</td>
+<td>V-code (metric)</td>
+</tr>
+<tr>
+<td><strong>HECKTOR 2022</strong></td>
+<td>PET/CT</td>
+<td>1 GTVp, 2 GTVn</td>
+<td>524 / 359 [UNVERIFIED]</td>
+<td>NIfTI</td>
+<td>[UNVERIFIED]</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>HECKTOR 2025</strong></td>
+<td>PET/CT</td>
+<td>1 GTVp, 2 GTVn</td>
+<td>About 700 / about 450</td>
+<td><code>__CT.nii.gz</code>, <code>__PT.nii.gz</code></td>
+<td>[UNVERIFIED]</td>
+<td>V-doc</td>
+</tr>
+</tbody>
+</table>
+<h3 id="26-cardiac-thoracic-and-vascular">2.6 Cardiac, thoracic and vascular<a class="headerlink" href="#26-cardiac-thoracic-and-vascular" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Modality</th>
+<th>Labels</th>
+<th>Cases</th>
+<th>Format</th>
+<th>Licence</th>
+<th>Tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ACDC</strong></td>
+<td>Cine SA MRI (ED/ES)</td>
+<td><strong>1 RV, 2 MYO, 3 LV</strong></td>
+<td>100 / 50</td>
+<td><code>patientXXX_frameYY.nii.gz</code> + <code>_gt.nii.gz</code></td>
+<td>CC BY-NC-SA 4.0 [UNVERIFIED primary]</td>
+<td>V-code (labels)</td>
+</tr>
+<tr>
+<td><strong>M&amp;Ms-1</strong></td>
+<td>Cine SA MRI, 4 vendors</td>
+<td><strong>1 LV, 2 MYO, 3 RV (the reverse of ACDC!)</strong></td>
+<td>375 subjects: 150 labelled + 25 unlabelled train / 34 val / 136 test [UNVERIFIED]</td>
+<td><code>{subject}_sa.nii.gz</code>, <code>_sa_gt.nii.gz</code></td>
+<td>[UNVERIFIED]</td>
+<td>V-code (labels via nnU-Net conversion)</td>
+</tr>
+<tr>
+<td><strong>M&amp;Ms-2</strong></td>
+<td>SA + LA cine MRI</td>
+<td>1 LV, 2 MYO, 3 RV</td>
+<td>160 / 40 / 160</td>
+<td><code>{id}_SA_ED(_gt).nii.gz</code> [UNVERIFIED]</td>
+<td>[UNVERIFIED]</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>LA 2018 (Utah)</strong></td>
+<td>3D LGE-MRI</td>
+<td>LA cavity, <strong>0/255</strong></td>
+<td>154 volumes (100 / 54 [UNVERIFIED])</td>
+<td><strong>NRRD</strong> (<code>lgemri.nrrd</code>, <code>laendo.nrrd</code>)</td>
+<td>[UNVERIFIED]</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>MSD Heart (Task02)</strong></td>
+<td>MRI</td>
+<td>1 left atrium</td>
+<td>20 / 10</td>
+<td>NIfTI</td>
+<td>CC BY-SA 4.0</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>MM-WHS 2017</strong></td>
+<td>CT + MRI</td>
+<td><strong>Intensity codes:</strong> 205 MYO, 420 LA, 500 LV, 550 RA, 600 RV, 820 ascending aorta, 850 pulmonary artery</td>
+<td>20+20 train / 40+40 test</td>
+<td>NIfTI (<code>ct_train_1001_label.nii.gz</code> [UNVERIFIED])</td>
+<td>[UNVERIFIED]</td>
+<td>UNVERIFIED (secondary)</td>
+</tr>
+<tr>
+<td><strong>SegTHOR</strong></td>
+<td>CT</td>
+<td>1 esophagus, 2 heart, 3 trachea, 4 aorta</td>
+<td>40 / 20</td>
+<td><code>Patient_XX/GT.nii.gz</code></td>
+<td>[UNVERIFIED]</td>
+<td>V-code (via nnU-Net conversion)</td>
+</tr>
+<tr>
+<td><strong>Parse2022</strong></td>
+<td>CT</td>
+<td>Pulmonary artery (binary [UNVERIFIED])</td>
+<td>100 / 30 / 70</td>
+<td>NIfTI [UNVERIFIED]</td>
+<td>[UNVERIFIED]</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>LNQ2023</strong></td>
+<td>Contrast CT</td>
+<td>Mediastinal lymph nodes. <strong>Training masks are partial</strong> (a subset of nodes); val/test are fully annotated (nodes ≥ 1 cm)</td>
+<td>383 / 20 / 100</td>
+<td><strong>NRRD</strong></td>
+<td>[UNVERIFIED]</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>LUNA16</strong></td>
+<td>CT</td>
+<td>Nodule centroids and diameters (<strong>detection, no masks</strong>)</td>
+<td>888 scans, 1,186 nodules (≥ 3 mm, ≥ 3 of 4 readers), 10 subsets</td>
+<td><strong>MetaImage <code>.mhd/.raw</code></strong> + CSV</td>
+<td>CC BY (via LIDC) [UNVERIFIED]</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>LIDC-IDRI</strong></td>
+<td>CT</td>
+<td>Up to 4 readers' nodule contours</td>
+<td>1,010 patients / 1,308 studies</td>
+<td><strong>DICOM + XML</strong> (use <code>pylidc</code>)</td>
+<td>CC BY 3.0</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>Duke Breast Cancer MRI</strong></td>
+<td>DCE-MRI</td>
+<td>3D tumour <strong>bounding boxes</strong> for all cases. Breast/FGT (and vessel) segmentations for about 100–127 cases. <strong>No official tumour masks</strong></td>
+<td>922 patients</td>
+<td><strong>DICOM</strong></td>
+<td>CC BY-NC 4.0</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>PI-CAI</strong></td>
+<td>bpMRI (T2W, ADC, HBV)</td>
+<td>csPCa lesions. Expert labels: 0 = ISUP ≤ 1, 2–5 = ISUP grade. AI-derived labels are binary</td>
+<td>1,500 public (1,476 patients; 425 csPCa)</td>
+<td>Images <strong><code>.mha</code></strong> <code>{pid}_{sid}_{t2w,adc,hbv}.mha</code>; labels NIfTI (picai_labels)</td>
+<td>CC BY-NC 4.0</td>
+<td>V-code</td>
+</tr>
+</tbody>
+</table>
+<h3 id="27-dental-and-spine">2.7 Dental and spine<a class="headerlink" href="#27-dental-and-spine" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Modality</th>
+<th>Labels</th>
+<th>Cases</th>
+<th>Format</th>
+<th>Licence</th>
+<th>Tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ToothFairy (2023)</strong></td>
+<td>CBCT</td>
+<td>Binary inferior alveolar canal (IAC)</td>
+<td>443 (153 dense)</td>
+<td><code>.npy</code> → <code>.mha</code></td>
+<td>[UNVERIFIED]</td>
+<td>V-code (eval)</td>
+</tr>
+<tr>
+<td><strong>ToothFairy2 (2024)</strong></td>
+<td>CBCT</td>
+<td>42 classes: 1 lower jawbone, 2 upper jawbone, 3 left IAC, 4 right IAC, 5 left and 6 right maxillary sinus, 7 pharynx, 8 bridge, 9 crown, 10 implant, teeth by FDI code 11–18, 21–28, 31–38, 41–48</td>
+<td>480 / 50</td>
+<td><code>.mha</code></td>
+<td>CC BY-NC-SA [UNVERIFIED]</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>ToothFairy3 (2025)</strong></td>
+<td>CBCT</td>
+<td>77 raw labels (adds 103/104 incisive canals, 105 lingual canal, pulp 111–148). <strong>Pulp labels are merged to 150 for evaluation</strong></td>
+<td>532</td>
+<td>NIfTI</td>
+<td>CC BY-NC-SA</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>SPIDER</strong></td>
+<td>Lumbar MR (T1, T2, T2-SPACE)</td>
+<td>Vertebrae 1..N and IVDs 201..N, numbered <strong>bottom-up</strong> (not anatomical); 100 = spinal canal</td>
+<td>447 series / 218 patients (179 / 39 + hidden 39)</td>
+<td><strong><code>.mha</code></strong> int16</td>
+<td>CC BY 4.0</td>
+<td>V-code (masks sampled)</td>
+</tr>
+<tr>
+<td><strong>VerSe 2019 / 2020</strong></td>
+<td>CT</td>
+<td>1–7 C1–C7, 8–19 T1–T12, 20–25 L1–L6, 28 T13</td>
+<td>'19: 80/40/40; '20: 113/103/103</td>
+<td>BIDS NIfTI <code>*_seg-vert_msk.nii.gz</code> + centroid JSON</td>
+<td>CC BY-SA 4.0</td>
+<td>V-code</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-official-evaluation-protocols-metrics-tolerances-empty-masks">3. Official evaluation protocols (metrics, tolerances, empty masks)<a class="headerlink" href="#3-official-evaluation-protocols-metrics-tolerances-empty-masks" title="Permanent link">#</a></h2>
+<h3 id="31-quick-reference-table">3.1 Quick reference table<a class="headerlink" href="#31-quick-reference-table" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Official metrics</th>
+<th>Tolerance / threshold</th>
+<th>Empty GT and empty pred</th>
+<th>Empty GT, non-empty pred (FP)</th>
+<th>Non-empty GT, empty pred (FN)</th>
+<th>Aggregation / ranking</th>
+<th>Tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MSD</strong></td>
+<td>DSC, NSD</td>
+<td>NSD τ per task: Brain 5, Heart 4, Hippo 1, Liver 7, Lung 2, Prostate 4, Pancreas 5, Colon 4, HepVessel 3, Spleen 3 mm</td>
+<td>Paper: "set to 0 if undefined" [exact both-empty behaviour UNVERIFIED]</td>
+<td>0</td>
+<td>0</td>
+<td>Wilcoxon significance ranking per region, averaged over tasks</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>FLARE21</strong></td>
+<td>DSC, NSD</td>
+<td><strong>1 mm for all organs</strong></td>
+<td>DSC = NSD = 1</td>
+<td>0</td>
+<td><em>Not guarded</em>: falls into the general branch → NaN/inf risk (a bug)</td>
+<td>Mean per organ</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>FLARE22</strong></td>
+<td>DSC, NSD (+ runtime, GPU)</td>
+<td><strong>Per-organ τ</strong>: Liver 5, RK 3, Spleen 3, Pancreas 5, Aorta 2, IVC 2, RAG 2, LAG 2, Gallbladder 2, Esophagus 3, Stomach 5, Duodenum 7, LK 3 mm</td>
+<td>1 / 1</td>
+<td>0 / 0</td>
+<td>0 / 0</td>
+<td>Mean. <strong>NSD is forced to 0 if DSC &lt; 0.2.</strong> Aorta, IVC and esophagus are evaluated only on GT-labelled z-slices <code>[z_min:z_max)</code> (the last slice is excluded, an off-by-one)</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>FLARE23</strong></td>
+<td>DSC, NSD</td>
+<td>FLARE22 τ + <strong>Lesion 2 mm</strong></td>
+<td>1 / 1</td>
+<td>0</td>
+<td>0</td>
+<td>Organ_DSC/NSD = mean over the 13 organs (lesion reported separately)</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>FLARE24 T1</strong></td>
+<td>Lesion DSC, NSD</td>
+<td>2 mm</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td><strong>If the prediction has any value &gt; 1, the score is 0</strong> (binary expected)</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>FLARE24 T2/T3</strong></td>
+<td>Organ DSC, NSD</td>
+<td>FLARE22 τ</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>same as FLARE22</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>AMOS22</strong></td>
+<td>DSC, NSD</td>
+<td>[UNVERIFIED τ]</td>
+<td>[UNVERIFIED]</td>
+<td></td>
+<td></td>
+<td>Rank-then-aggregate</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>KiTS19</strong></td>
+<td>Dice (kidney+tumour, tumour)</td>
+<td>—</td>
+<td>[UNVERIFIED]</td>
+<td></td>
+<td></td>
+<td>Mean composite Dice</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>KiTS21 / 23</strong></td>
+<td>Dice, <strong>Surface Dice</strong> on HECs: kidney+masses (1, 2, 3), masses (2, 3), tumour (2)</td>
+<td><strong>SD τ: 1.0331, 1.1329, 1.1498 mm</strong> respectively (from inter-observer variability)</td>
+<td>Dice = SD = 1</td>
+<td>0</td>
+<td>0</td>
+<td>Mean over cases and HECs, then rank-then-aggregate. KiTS21 test uses <strong>sampled multi-annotator references</strong> (5 groups). KiTS23 compares against <code>segmentation.nii.gz</code></td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>LiTS</strong></td>
+<td>Dice per case (lesion ranking), Dice global, VOE, RVD, ASSD, MSD</td>
+<td>—</td>
+<td>medpy <code>dc</code> → 0</td>
+<td>—</td>
+<td>ASSD = MSD = 0 when either mask is empty (<strong>not</strong> penalised)</td>
+<td>Per-case lesion Dice</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>BraTS 2021</strong></td>
+<td>Dice, HD95 on ET/TC/WT (+ sensitivity, specificity)</td>
+<td>—</td>
+<td>Dice 1, HD95 0 [convention; official code not public]</td>
+<td>Dice 0, HD95 373.13 [UNVERIFIED]</td>
+<td>Dice 0, HD95 373.13</td>
+<td>Per-case rank, then permutation tests</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>BraTS 2023+</strong></td>
+<td><strong>Lesion-wise</strong> Dice and HD95 on WT/TC/ET</td>
+<td>cc3d 26-connectivity; GT dilation (3D, 2-conn struct) × <em>d</em> iterations; lesions with GT volume ≤ <em>v</em> mm³ dropped. <em>(d, v)</em>: GLI (3, 50), SSA (3, 50), PED (3, 50), MEN (1, 50), MET (1, 2)</td>
+<td>0/0 → NaN → <strong>Dice 1, HD95 0</strong></td>
+<td>Each FP component adds 0 to the Dice numerator and <strong>374</strong> to the HD95 numerator (and +1 to the denominator)</td>
+<td>Missed lesion: Dice 0, HD95 inf → <strong>374</strong></td>
+<td>Σ(lesion scores) / (n_GT_lesions + n_FP). FPs are <strong>not</strong> volume-filtered</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>ISLES22</strong></td>
+<td>Dice, absolute volume difference (ml), absolute lesion-count difference, lesion-wise F1</td>
+<td>cc3d 26-connectivity; any 1-voxel overlap counts as a hit</td>
+<td>Dice = 1, F1 = 1 (<code>empty_value</code>)</td>
+<td>Dice 0; F1 = 0</td>
+<td>Dice 0; F1 = 0</td>
+<td>Rank per metric → mean rank</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>autoPET I–III</strong></td>
+<td>Dice, <strong>FP volume</strong> (ml), <strong>FN volume</strong> (ml)</td>
+<td>cc3d <strong>18-connectivity</strong>; FP = pred components with zero GT overlap; FN = GT components with zero pred overlap</td>
+<td>Dice = 0/0 = NaN; <strong>negatives use FPV only</strong></td>
+<td>FPV counted; Dice not used</td>
+<td>Dice 0; FNV = GT volume</td>
+<td>Rank per metric; final = 0.5·rank_Dice + 0.25·rank_FPV + 0.25·rank_FNV (III: per tracer×centre stratum)</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>autoPET IV</strong></td>
+<td>Task 1: DSC@last, AUC-DSC, FPV@last, FNV@last, AUC-FPV, AUC-FNV over 11 click steps (weights 0.25/0.25/0.125×4). Task 2: DSC, FPV, FNV (0.5/0.25/0.25)</td>
+<td>—</td>
+<td>as above</td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>HECKTOR 2021</strong></td>
+<td>DSC (mean), HD95 (median)</td>
+<td>Crop to bbox</td>
+<td>—</td>
+<td>—</td>
+<td>Dice 0, HD95 0 when pred empty (as coded)</td>
+<td>Mean DSC / median HD95</td>
+<td>V-code (per agent)</td>
+</tr>
+<tr>
+<td><strong>HECKTOR 2022</strong></td>
+<td><strong>Aggregated DSC</strong> per class: 2ΣTP / Σ(|G|+|P|) over all test cases</td>
+<td>Spacing must match CT within 1e-6</td>
+<td>Contributes nothing (0/0 avoided by aggregation)</td>
+<td>Adds |P| to the denominator</td>
+<td>Adds |G|</td>
+<td>Mean of GTVp and GTVn DSCagg</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>HECKTOR 2025</strong></td>
+<td>GTVp: mean DSC. GTVn: aggregated DSC + aggregated F1 (lesion match IoU &gt; 0.3)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Borda count</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>TopCoW 2024</strong></td>
+<td>Class-average Dice, clDice (merged binary), Betti-0 error, HD95, Group-2 detection F1 (IoU ≥ 0.25), graph classification, topology match</td>
+<td>HD95 = max(d95(A,B), d95(B,A)); <strong>HD95 upper bound 90 mm</strong></td>
+<td>Class skipped (only the union of labels present in GT ∪ pred is scored)</td>
+<td>Dice 0, HD95 90, b0 error = b0(pred)</td>
+<td>Dice 0, HD95 90</td>
+<td>Equal-weight ranks</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>TopCoW 2023</strong></td>
+<td>Dice, clDice, Betti-0 (not Betti-1)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>ToothFairy2/3</strong></td>
+<td>Dice, HD95 (mean over classes)</td>
+<td><strong>HD95 in voxels</strong> (medpy with no spacing)</td>
+<td>Dice 1, HD95 0</td>
+<td>HD95 = volume diagonal ‖shape‖ in voxels</td>
+<td>same</td>
+<td>Mean</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>ULS23</strong></td>
+<td>0.8·SegPerf (Dice) + 0.05·LAE + 0.05·SAE + 0.1·consistency</td>
+<td>SMAPE for long/short axis</td>
+<td>—</td>
+<td>—</td>
+<td>Missing prediction → max error 1</td>
+<td></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>PI-CAI</strong></td>
+<td>(AUROC + AP)/2</td>
+<td>Hit if IoU ≥ 0.10 with a GT lesion (Hungarian one-to-one matching)</td>
+<td>Benign case: every prediction is an FP</td>
+<td></td>
+<td></td>
+<td>Ranking score</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>LUNA16</strong></td>
+<td>CPM: mean sensitivity at 1/8…8 FP/scan</td>
+<td>Hit if within nodule radius</td>
+<td>—</td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>WORD</strong></td>
+<td>DSC, HD95 (medpy)</td>
+<td>—</td>
+<td><strong>DSC 0, HD95 50</strong> (whenever either mask is empty, including both!)</td>
+<td>0 / 50</td>
+<td>0 / 50</td>
+<td>Classes looped over <code>range(1, gt.max()+1)</code></td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>CHAOS</strong></td>
+<td>DICE, RAVD, ASSD, MSSD, each mapped to 0–100 (thresholds 0.8, 5%, 15 mm, 60 mm)</td>
+<td>—</td>
+<td>No guard (crash/NaN)</td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>ACDC</strong></td>
+<td>Dice, HD (mm), clinical indices</td>
+<td>—</td>
+<td>medpy → 0</td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>SegTHOR</strong></td>
+<td>Dice, <strong>Average Hausdorff</strong> (max of the directed mean distances)</td>
+<td>—</td>
+<td>[UNVERIFIED]</td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>VerSe</strong></td>
+<td>Dice, <strong>full HD</strong>, id.rate (≤ 20 mm), d_mean</td>
+<td>—</td>
+<td>Dice 1</td>
+<td>Missing vertebrae excluded from HD</td>
+<td></td>
+<td></td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>SPIDER</strong></td>
+<td>Dice, ASD per structure, per class group</td>
+<td>Structures matched to predictions by largest overlap</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>LNQ2023</strong></td>
+<td>Dice, ASSD</td>
+<td>—</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Per-patient rank averaging</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>KiPA22</strong></td>
+<td>Dice, HD, AVD</td>
+<td>—</td>
+<td>[UNVERIFIED]</td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>PanTS</strong></td>
+<td>DSC (lesion), (NSD), patient- and tumour-wise sensitivity, specificity, AUC</td>
+<td><strong>τ and the detection rule are not published</strong></td>
+<td>[UNVERIFIED]</td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>TotalSegmentator</strong></td>
+<td>Dice, NSD (paper only)</td>
+<td>[UNVERIFIED]</td>
+<td>—</td>
+<td></td>
+<td></td>
+<td></td>
+<td>V-doc</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-notes-on-the-metric-implementations-surface-metrics">3.2 Notes on the metric implementations (surface metrics)<a class="headerlink" href="#32-notes-on-the-metric-implementations-surface-metrics" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>DeepMind <code>surface-distance</code></strong> is used by FLARE, KiTS, BraTS-2023 and HECKTOR.<ul>
+<li><code>compute_surface_distances(gt, pred, spacing)</code> needs the spacing in <strong>array-axis order</strong>. With SimpleITK arrays (z, y, x) pass <code>GetSpacing()[::-1]</code>; KiTS does exactly this. With nibabel arrays pass <code>header.get_zooms()</code>; FLARE does this.</li>
+<li>An empty mask gives <code>inf</code> distances. NSD is <code>nan</code> when both masks are empty and <code>0</code> when only one is.</li>
+<li>HD95 is surface-area weighted.</li>
+</ul>
+</li>
+<li><strong>MONAI <code>DiceMetric</code></strong> defaults to <code>ignore_empty=True</code>: an empty GT returns NaN <strong>even when the prediction contains false positives</strong>, and <code>nanmean</code> then drops the case. This silently hides FPs.</li>
+<li><strong>MONAI <code>HausdorffDistanceMetric</code></strong>: one mask empty gives inf; both empty give NaN. Without <code>spacing=</code> the result is in voxels.</li>
+<li><strong>MONAI <code>SurfaceDiceMetric</code></strong>: both empty give NaN; one empty gives 0. With <code>use_subvoxels=False</code> it counts edge voxels, which differs from DeepMind's surfel areas.</li>
+<li><strong>Metrics Reloaded</strong>: undefined values come back as NaN. The recommended aggregation is best-value when both masks are empty and worst-value when one is. The worst distance is the image diagonal in mm (<code>calculate_worse_dist</code>).</li>
+<li><strong>nnU-Net <code>evaluate_predictions</code></strong>: if tp+fp+fn == 0, Dice = NaN, and means use <code>np.nanmean</code>.</li>
+</ul>
+<hr />
+<h2 id="4-cross-benchmark-empty-mask-and-tolerance-conventions">4. Cross-benchmark empty-mask and tolerance conventions<a class="headerlink" href="#4-cross-benchmark-empty-mask-and-tolerance-conventions" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Convention</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Both empty → <strong>1</strong> (perfect)</td>
+<td>FLARE21–24, KiTS21/23, ISLES22 (Dice, F1), BraTS 2021 (convention), BraTS 2023 (via NaN→1), ToothFairy2/3, VerSe</td>
+</tr>
+<tr>
+<td>Both empty → <strong>NaN, excluded</strong></td>
+<td>nnU-Net, MONAI DiceMetric (default), DeepMind NSD, autoPET Dice (negatives use FPV only), TopCoW (class skipped)</td>
+</tr>
+<tr>
+<td>Both empty → <strong>0</strong></td>
+<td>WORD (DSC 0, HD95 50), LiTS medpy <code>dc</code>, MSD "undefined → 0" [UNVERIFIED]</td>
+</tr>
+<tr>
+<td>One empty → distance <strong>penalty constant</strong></td>
+<td>BraTS 2023: 374 mm; BraTS 2021: 373.13 mm [UNVERIFIED]; TopCoW: 90 mm; WORD: 50; ToothFairy: volume diagonal (voxels); Metrics Reloaded: image diagonal (mm)</td>
+</tr>
+<tr>
+<td>One empty → distance <strong>0</strong> (lenient)</td>
+<td>LiTS ASSD/MSD; HECKTOR 2021 HD95 when pred empty [per agent reading]</td>
+</tr>
+<tr>
+<td>Aggregated (dataset-level) Dice, so no per-case empties</td>
+<td>HECKTOR 2022/2025 GTVn</td>
+</tr>
+<tr>
+<td>Per-structure NSD tolerance</td>
+<td>MSD (per task), FLARE22+ (per organ), KiTS (per HEC), SAROS (3 mm)</td>
+</tr>
+<tr>
+<td>Single NSD tolerance</td>
+<td>FLARE21 (1 mm), FLARE23/24 lesion (2 mm)</td>
+</tr>
+<tr>
+<td>Connected components</td>
+<td>BraTS 2023 and ISLES: 26-connectivity; autoPET: <strong>18</strong>; TopCoW Betti-0: 26</td>
+</tr>
+<tr>
+<td>Distances in voxels, not mm</td>
+<td>ToothFairy2/3 HD95 (medpy with no spacing)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Implication for SegEvalKit.</strong> The empty-mask policy has to be a first-class, per-benchmark configurable parameter. It has two parts:</p>
+<ul>
+<li><code>both_empty ∈ {1, nan, 0}</code></li>
+<li><code>one_empty_distance ∈ {inf, constant, diagonal_mm, diagonal_vox, 0}</code></li>
+</ul>
+<p>It should be combined with an NSD tolerance map, connectivity, and "NSD := 0 if DSC &lt; x" gating (FLARE). Ship presets that reproduce each official script exactly, including the known quirks: FLARE's z-slab cropping, BraTS FP counting, and WORD's both-empty = 0.</p>
+<hr />
+<h2 id="5-baseline-model-families-and-their-output-conventions">5. Baseline model families and their output conventions<a class="headerlink" href="#5-baseline-model-families-and-their-output-conventions" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Repo</th>
+<th>Output file</th>
+<th>Label ids</th>
+<th>Geometry</th>
+<th>Probabilities</th>
+<th>Notes</th>
+<th>Tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>nnU-Net v2</strong></td>
+<td>MIC-DKFZ/nnUNet</td>
+<td><code>{CASE}.nii.gz</code> (input <code>{CASE}_{XXXX}.nii.gz</code>), ML</td>
+<td>From <code>dataset.json</code> <code>"labels": {"background": 0, "liver": 1, …}</code> (name → int; must be consecutive). Region-based: <code>"whole_tumor": [1, 2, 3]</code> + <code>regions_class_order</code>; output is still an integer map, so rebuild the regions</td>
+<td>Restored to the original spacing, origin and direction</td>
+<td><code>--save_probabilities</code> → <code>{CASE}.npz</code> (key <code>probabilities</code>, shape (C, z, y, x) for SimpleITK) + <code>.pkl</code></td>
+<td><code>ignore</code> label = highest int, never predicted</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>nnU-Net v1</strong></td>
+<td>branch nnunetv1</td>
+<td>same</td>
+<td><code>dataset.json</code> int → name, plus <code>modality</code></td>
+<td>Restored</td>
+<td><code>--save_npz</code> → key <code>softmax</code> (float16)</td>
+<td>—</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>nnU-Net ResEnc M/L/XL</strong></td>
+<td>same (<code>-p nnUNetResEncUNet{M,L,XL}Plans</code>)</td>
+<td>as v2</td>
+<td>as v2</td>
+<td>as v2</td>
+<td>as v2</td>
+<td>"nnU-Net Revisited" (arXiv 2404.09556)</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>MedNeXt</strong></td>
+<td>MIC-DKFZ/MedNeXt</td>
+<td>nnU-Net v1 conventions (custom trainers)</td>
+<td>dataset.json</td>
+<td>Restored</td>
+<td>npz (v1)</td>
+<td>—</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>STU-Net</strong></td>
+<td>uni-medical/STU-Net</td>
+<td>nnU-Net style</td>
+<td>Its own <code>label_orders.json</code>, which <strong>differs from TotalSegmentator ids</strong></td>
+<td>Restored</td>
+<td>—</td>
+<td>—</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>TotalSegmentator</strong></td>
+<td>wasserth/TotalSegmentator</td>
+<td>PS <code>segmentations/&lt;class&gt;.nii.gz</code>, or ML with <code>--ml</code> (names in the NIfTI extension header)</td>
+<td><code>map_to_binary.class_map[task]</code></td>
+<td>Restored (except <code>--save_lowres</code>)</td>
+<td><code>--save_probabilities</code> (some tasks)</td>
+<td><code>--roi_subset</code> produces a subset of files</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>MONAI SwinUNETR / UNETR / SegResNet</strong> (bundles)</td>
+<td>Project-MONAI/model-zoo</td>
+<td><code>out/&lt;name&gt;/&lt;name&gt;_trans.nii.gz</code> (the <code>SaveImage</code> default postfix is <code>trans</code>; only the BraTS bundle uses <code>seg</code>); dtype float32 by default</td>
+<td>Bundle <code>metadata.json</code> <code>channel_def</code></td>
+<td><code>Invertd</code> → original geometry</td>
+<td>Optional</td>
+<td 1_="1," 2_="2," 4="4">BraTS bundle: sigmoid TC/WT/ET → labels</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>VISTA3D</strong></td>
+<td>Project-MONAI/VISTA</td>
+<td>ML <code>_trans.nii.gz</code></td>
+<td>Global ids 0–132 (<code>channel_def</code>); "everything" mode skips some ids. <strong>Label 255 = not processed</strong></td>
+<td>Original</td>
+<td>—</td>
+<td>Point prompts (x, y, z); class prompts</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>SuPreM</strong></td>
+<td>MrGiovanni/SuPreM</td>
+<td>PS <code>&lt;case&gt;/segmentations/&lt;organ&gt;.nii.gz</code> (uint8) + <code>combined_labels.nii.gz</code></td>
+<td>AbdomenAtlas 1.1 classes [UNVERIFIED id order]</td>
+<td>Original affine</td>
+<td>—</td>
+<td>Input <code>&lt;case&gt;/ct.nii.gz</code></td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>CLIP-Driven Universal Model</strong></td>
+<td>ljwztc/CLIP-Driven-Universal-Model</td>
+<td>PS <code>&lt;name&gt;_&lt;Organ&gt;.nii.gz</code> (float32)</td>
+<td>32-class template</td>
+<td>Original</td>
+<td>—</td>
+<td>—</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>MedSAM (v1)</strong></td>
+<td>bowang-lab/MedSAM</td>
+<td>2D PNG per slice</td>
+<td>Binary per box prompt</td>
+<td>Slice-wise; 1024 internal</td>
+<td>—</td>
+<td>Needs stacking to 3D</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>MedSAM2</strong></td>
+<td>bowang-lab/MedSAM2</td>
+<td><code>&lt;img&gt;_k&lt;slice&gt;_mask.nii.gz</code> (CopyInformation) or npz <code>segs</code></td>
+<td>Instance ids</td>
+<td>Original</td>
+<td>—</td>
+<td>Prompted</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>SAM-Med3D</strong></td>
+<td>uni-medical/SAM-Med3D</td>
+<td>ML uint8 with <strong>GT label ids</strong></td>
+<td>Prompts sampled from GT</td>
+<td>Resampled back</td>
+<td>—</td>
+<td><strong>Only classes present in GT are predicted</strong>, so false positives on empty classes are impossible. Beware when comparing against automatic models</td>
+<td>V-code</td>
+</tr>
+<tr>
+<td><strong>MedFormer</strong></td>
+<td>yhygao/CBIM-Medical-Image-Segmentation</td>
+<td>No documented NIfTI writer</td>
+<td>Dataset preprocessing</td>
+<td>[UNVERIFIED]</td>
+<td>—</td>
+<td>PanTS baseline checkpoint on HF</td>
+<td>V-doc</td>
+</tr>
+<tr>
+<td><strong>UniverSeg</strong></td>
+<td>JJGO/UniverSeg</td>
+<td>Tensor logits (B, 1, 128, 128)</td>
+<td>Binary, in-context</td>
+<td>2D, 128² resize</td>
+<td>—</td>
+<td>No writer</td>
+<td>V-code</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-recommendations-for-segevalkit">6. Recommendations for SegEvalKit<a class="headerlink" href="#6-recommendations-for-segevalkit" title="Permanent link">#</a></h2>
+<ol>
+<li>
+<p><strong>Ingestion adapters.</strong> Support three shapes of input:</p>
+<ul>
+<li>(a) an ML NIfTI plus an id→name map (MSD/nnU-Net <code>dataset.json</code>, v1 and v2 schemas);</li>
+<li>(b) a PS folder <code>segmentations/&lt;name&gt;.nii.gz</code> (TotalSegmentator, AbdomenAtlas, PanTS, SuPreM);</li>
+<li>(c) per-instance or per-annotator files (KiTS21/23).</li>
+</ul>
+<p>Also read <code>.mha</code>, <code>.nrrd</code> and <code>.mhd</code> (PI-CAI, SPIDER, ToothFairy, LNQ, LA2018, LUNA16) through SimpleITK.</p>
+</li>
+<li>
+<p><strong>Name-keyed matching.</strong> Map everything to structure names. Ids collide across datasets: ACDC and M&amp;Ms swap LV/RV; TotalSegmentator CT and MR ids differ; BraTS ET is 4 in 2021 and 3 from 2023; MSD Task01 uses 1 = edema.</p>
+</li>
+<li><strong>Overlapping structures.</strong> Never collapse PS masks into ML for evaluation (PanTS pancreas ⊃ head/body/tail; veins overlapping organs). Evaluate each binary mask independently.</li>
+<li><strong>Binarisation.</strong> Use <code>&gt; 0.5</code>, not <code>== 1</code> (PanTS pancreas sub-parts load as 1.0000000591). Cast float label maps (MSD Colon, CT-ORG) with rounding.</li>
+<li><strong>Geometry checks.</strong> Assert shape and affine equality within a tolerance, or resample the prediction onto the GT grid with nearest neighbour (as HECKTOR does). Take spacing in array-axis order.</li>
+<li><strong>Ignore labels.</strong> Honour 255 (SAROS unannotated slices, VISTA3D "not processed") and nnU-Net <code>ignore</code>.</li>
+<li><strong>File hygiene.</strong> Skip <code>._*</code> AppleDouble files (they are in the MSD tars).</li>
+<li><strong>Empty-mask presets.</strong> See Section 4. Report the number of empty-GT cases per structure alongside every mean.</li>
+<li><strong>Region metrics.</strong> Build BraTS WT/TC/ET, KiTS HECs and MSD "liver = 1 ∪ 2" regions from integer maps before scoring.</li>
+</ol>
+<hr />
+<h2 id="7-references">7. References<a class="headerlink" href="#7-references" title="Permanent link">#</a></h2>
+<h3 id="datasets-and-official-repositories">Datasets and official repositories<a class="headerlink" href="#datasets-and-official-repositories" title="Permanent link">#</a></h3>
+<ul>
+<li>PanTS: <a href="https://github.com/MrGiovanni/PanTS">https://github.com/MrGiovanni/PanTS</a> (class map in <code>data/README.md</code>); HF <a href="https://huggingface.co/datasets/BodyMaps/PanTSMini">https://huggingface.co/datasets/BodyMaps/PanTSMini</a>; paper arXiv 2507.01291, <a href="https://www.cs.jhu.edu/~zongwei/publication/li2025pants.pdf">https://www.cs.jhu.edu/~zongwei/publication/li2025pants.pdf</a></li>
+<li>AbdomenAtlas: <a href="https://github.com/MrGiovanni/AbdomenAtlas">https://github.com/MrGiovanni/AbdomenAtlas</a> ; <a href="https://huggingface.co/datasets/BodyMaps/AbdomenAtlas1.0Mini">https://huggingface.co/datasets/BodyMaps/AbdomenAtlas1.0Mini</a> ; RadGPT / AbdomenAtlas 3.0: <a href="https://arxiv.org/abs/2501.04678">https://arxiv.org/abs/2501.04678</a></li>
+<li>Merlin: <a href="https://github.com/StanfordMIMI/Merlin">https://github.com/StanfordMIMI/Merlin</a> (<code>documentation/download.md</code>); <a href="https://stanfordaimi.azurewebsites.net/datasets/60b9c7ff-877b-48ce-96c3-0194c8205c40">https://stanfordaimi.azurewebsites.net/datasets/60b9c7ff-877b-48ce-96c3-0194c8205c40</a></li>
+<li>TotalSegmentator: <a href="https://github.com/wasserth/TotalSegmentator">https://github.com/wasserth/TotalSegmentator</a> ; class maps <a href="https://github.com/wasserth/TotalSegmentator/blob/master/totalsegmentator/map_to_binary.py">https://github.com/wasserth/TotalSegmentator/blob/master/totalsegmentator/map_to_binary.py</a> ; CT <a href="https://zenodo.org/records/6802613">https://zenodo.org/records/6802613</a> (v3), <a href="https://zenodo.org/records/10047292">https://zenodo.org/records/10047292</a> (v2.0.1); MRI <a href="https://zenodo.org/records/11367004">https://zenodo.org/records/11367004</a> (v3), <a href="https://zenodo.org/records/14710732">https://zenodo.org/records/14710732</a> (v2)</li>
+<li>MSD: <a href="http://medicaldecathlon.com">http://medicaldecathlon.com</a> ; tars <a href="https://msd-for-monai.s3-us-west-2.amazonaws.com/TaskXX_Name.tar">https://msd-for-monai.s3-us-west-2.amazonaws.com/TaskXX_Name.tar</a> ; Antonelli et al., Nat Commun 2022, <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9287542/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9287542/</a></li>
+<li>AMOS: <a href="https://zenodo.org/records/7262581">https://zenodo.org/records/7262581</a> ; <a href="https://amos22.grand-challenge.org">https://amos22.grand-challenge.org</a></li>
+<li>BTCV: <a href="https://www.synapse.org/#!Synapse:syn3193805">https://www.synapse.org/#!Synapse:syn3193805</a></li>
+<li>WORD: <a href="https://github.com/HiLab-git/WORD">https://github.com/HiLab-git/WORD</a></li>
+<li>AbdomenCT-1K: <a href="https://github.com/JunMa11/AbdomenCT-1K">https://github.com/JunMa11/AbdomenCT-1K</a></li>
+<li>FLARE (all years, eval code): <a href="https://github.com/JunMa11/FLARE">https://github.com/JunMa11/FLARE</a></li>
+<li>CHAOS: <a href="https://zenodo.org/records/3431873">https://zenodo.org/records/3431873</a> ; <a href="https://github.com/emrekavur/CHAOS-evaluation">https://github.com/emrekavur/CHAOS-evaluation</a></li>
+<li>CT-ORG: <a href="https://www.cancerimagingarchive.net/collection/ct-org/">https://www.cancerimagingarchive.net/collection/ct-org/</a></li>
+<li>SAROS: <a href="https://github.com/UMEssen/saros-dataset">https://github.com/UMEssen/saros-dataset</a> ; Koitka et al., Sci Data 2024 (PMC11087485)</li>
+<li>KiTS19/21/23: <a href="https://github.com/neheller/kits19">https://github.com/neheller/kits19</a> , <a href="https://github.com/neheller/kits21">https://github.com/neheller/kits21</a> , <a href="https://github.com/neheller/kits23">https://github.com/neheller/kits23</a></li>
+<li>LiTS: <a href="https://github.com/PatrickChrist/LITS-CHALLENGE">https://github.com/PatrickChrist/LITS-CHALLENGE</a> ; Bilic et al., MedIA 2023</li>
+<li>ULS23: <a href="https://uls23.grand-challenge.org">https://uls23.grand-challenge.org</a> ; <a href="https://github.com/DIAGNijmegen/ULS23">https://github.com/DIAGNijmegen/ULS23</a> ; arXiv 2406.05231</li>
+<li>KiPA22: <a href="https://kipa22.grand-challenge.org">https://kipa22.grand-challenge.org</a></li>
+<li>BraTS 2021: arXiv 2107.02314. BraTS 2023 lesion-wise metrics: <a href="https://github.com/rachitsaluja/BraTS-2023-Metrics">https://github.com/rachitsaluja/BraTS-2023-Metrics</a>. BraTS 2024: arXiv 2405.18368, 2409.08143; Synapse syn53708249. BraTS 2025: <a href="https://zenodo.org/records/15094823">https://zenodo.org/records/15094823</a></li>
+<li>ISLES 2022: <a href="https://github.com/ezequieldlrosa/isles22">https://github.com/ezequieldlrosa/isles22</a> ; arXiv 2206.06694</li>
+<li>autoPET: <a href="https://github.com/lab-midas/autoPET">https://github.com/lab-midas/autoPET</a> (<code>val_script.py</code>); <a href="https://autopet.grand-challenge.org">https://autopet.grand-challenge.org</a> ; <a href="https://autopet-iii.grand-challenge.org/evaluation-and-ranking/">https://autopet-iii.grand-challenge.org/evaluation-and-ranking/</a> ; <a href="https://autopet-iv.grand-challenge.org/eval/">https://autopet-iv.grand-challenge.org/eval/</a> ; <a href="https://github.com/lab-midas/autoPETCTIV">https://github.com/lab-midas/autoPETCTIV</a></li>
+<li>HECKTOR: <a href="https://github.com/voreille/hecktor">https://github.com/voreille/hecktor</a> ; <a href="https://hecktor25.grand-challenge.org/tasks-and-evaluation/">https://hecktor25.grand-challenge.org/tasks-and-evaluation/</a></li>
+<li>TopCoW: <a href="https://github.com/CoWBenchmark/TopCoW_Eval_Metrics">https://github.com/CoWBenchmark/TopCoW_Eval_Metrics</a> ; <a href="https://topcow23.grand-challenge.org">https://topcow23.grand-challenge.org</a> ; Zenodo 15692630</li>
+<li>ACDC: <a href="https://www.creatis.insa-lyon.fr/Challenge/acdc/">https://www.creatis.insa-lyon.fr/Challenge/acdc/</a> ; M&amp;Ms: doi 10.1109/TMI.2021.3090082 ; LA 2018: arXiv 2004.12314 ; MM-WHS: arXiv 1902.07880 ; SegTHOR: arXiv 1912.05950</li>
+<li>Parse2022: <a href="https://parse2022.grand-challenge.org">https://parse2022.grand-challenge.org</a> ; LNQ2023: <a href="https://lnq2023.grand-challenge.org">https://lnq2023.grand-challenge.org</a> , arXiv 2408.10069</li>
+<li>ToothFairy 1–3: <a href="https://github.com/AImageLab-zip/ToothFairy">https://github.com/AImageLab-zip/ToothFairy</a></li>
+<li>SPIDER: <a href="https://zenodo.org/records/10159290">https://zenodo.org/records/10159290</a> ; Sci Data (PMC10908819)</li>
+<li>VerSe: <a href="https://github.com/anjany/verse">https://github.com/anjany/verse</a> ; arXiv 2001.09193</li>
+<li>PI-CAI: <a href="https://github.com/DIAGNijmegen/picai_eval">https://github.com/DIAGNijmegen/picai_eval</a> ; <a href="https://github.com/DIAGNijmegen/picai_labels">https://github.com/DIAGNijmegen/picai_labels</a> ; Zenodo 6624726</li>
+<li>Duke Breast Cancer MRI: <a href="https://www.cancerimagingarchive.net/collection/duke-breast-cancer-mri/">https://www.cancerimagingarchive.net/collection/duke-breast-cancer-mri/</a></li>
+<li>LIDC-IDRI: <a href="https://www.cancerimagingarchive.net/collection/lidc-idri/">https://www.cancerimagingarchive.net/collection/lidc-idri/</a> ; LUNA16: <a href="https://luna16.grand-challenge.org">https://luna16.grand-challenge.org</a> , arXiv 1612.08012</li>
+</ul>
+<h3 id="methods-and-metric-libraries">Methods and metric libraries<a class="headerlink" href="#methods-and-metric-libraries" title="Permanent link">#</a></h3>
+<ul>
+<li>nnU-Net: <a href="https://github.com/MIC-DKFZ/nnUNet">https://github.com/MIC-DKFZ/nnUNet</a> (ResEnc: <code>documentation/resenc_presets.md</code>, arXiv 2404.09556)</li>
+<li>MedNeXt: <a href="https://github.com/MIC-DKFZ/MedNeXt">https://github.com/MIC-DKFZ/MedNeXt</a> ; STU-Net: <a href="https://github.com/uni-medical/STU-Net">https://github.com/uni-medical/STU-Net</a></li>
+<li>MONAI: <a href="https://github.com/Project-MONAI/MONAI">https://github.com/Project-MONAI/MONAI</a> ; model zoo <a href="https://github.com/Project-MONAI/model-zoo">https://github.com/Project-MONAI/model-zoo</a> ; VISTA3D <a href="https://github.com/Project-MONAI/VISTA">https://github.com/Project-MONAI/VISTA</a></li>
+<li>SuPreM: <a href="https://github.com/MrGiovanni/SuPreM">https://github.com/MrGiovanni/SuPreM</a> ; CLIP-Driven Universal Model: <a href="https://github.com/ljwztc/CLIP-Driven-Universal-Model">https://github.com/ljwztc/CLIP-Driven-Universal-Model</a></li>
+<li>MedSAM: <a href="https://github.com/bowang-lab/MedSAM">https://github.com/bowang-lab/MedSAM</a> ; MedSAM2: <a href="https://github.com/bowang-lab/MedSAM2">https://github.com/bowang-lab/MedSAM2</a> ; SAM-Med3D: <a href="https://github.com/uni-medical/SAM-Med3D">https://github.com/uni-medical/SAM-Med3D</a></li>
+<li>MedFormer: <a href="https://github.com/yhygao/CBIM-Medical-Image-Segmentation">https://github.com/yhygao/CBIM-Medical-Image-Segmentation</a> ; UniverSeg: <a href="https://github.com/JJGO/UniverSeg">https://github.com/JJGO/UniverSeg</a></li>
+<li>DeepMind surface-distance: <a href="https://github.com/google-deepmind/surface-distance">https://github.com/google-deepmind/surface-distance</a> ; Metrics Reloaded: <a href="https://github.com/Project-MONAI/MetricsReloaded">https://github.com/Project-MONAI/MetricsReloaded</a> (Maier-Hein et al., Nat Methods 2024)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../metrics-literature-review/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Metrics literature review">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Metrics literature review
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../developer/" class="md-footer__link md-footer__link--next" aria-label="Next: Developer guide">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Developer guide
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Abhijit Das · Apache-2.0
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "navigation.instant", "navigation.tracking", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/figsize.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 15.4 48 33.2" role="img" aria-label="SegEvalKit">
+  <defs>
+    <linearGradient id="sk-lens" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9a72ee"/>
+      <stop offset="1" stop-color="#472594"/>
+    </linearGradient>
+  </defs>
+  <circle cx="25" cy="32" r="15" fill="none" stroke="#472594" stroke-width="3.2"/>
+  <circle cx="39" cy="32" r="15" fill="none" stroke="#b89cf5" stroke-width="3.2"/>
+  <path d="M32 18.73 A15 15 0 0 1 32 45.27 A15 15 0 0 1 32 18.73 Z" fill="url(#sk-lens)"/>
+</svg>

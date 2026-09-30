@@ -1,0 +1,3746 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Evaluation of volumetric (CT/MR) medical image segmentation: 56 metrics with explicit, tested conventions, statistics, plots and reports.">
+      
+      
+      
+        <link rel="canonical" href="https://aj-das-research.github.io/SegEvalKit/guide/pitfalls/">
+      
+      
+        <link rel="prev" href="../choosing/">
+      
+      
+        <link rel="next" href="../conventions/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/icon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Pitfalls - SegEvalKit</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/segevalkit.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/compact.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#metric-pitfalls" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SegEvalKit" class="md-header__button md-logo" aria-label="SegEvalKit" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SegEvalKit
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Pitfalls
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aj-das-research/SegEvalKit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aj-das-research/SegEvalKit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../metrics/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Metrics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Choosing metrics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../analysis/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Analysis
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../datasets/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Datasets & benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../research/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developer/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Developer guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../about/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SegEvalKit" class="md-nav__button md-logo" aria-label="SegEvalKit" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    SegEvalKit
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aj-das-research/SegEvalKit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aj-das-research/SegEvalKit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../getting-started/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What you need
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/data-format/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data & output format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/gpu-hpc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU & HPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../metrics/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Metrics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/overlap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overlap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/volume/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Volume
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/distance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distance & boundary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/topology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Detection & instances
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/calibration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/agreement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agreement & information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metrics/catalogue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full catalogue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing metrics
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Choosing metrics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../choosing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decision guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pitfalls
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pitfalls
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#size-bias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Size and small-structure bias
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#class-imbalance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class imbalance and TN-based metrics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boundary-volume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boundary, volume and topology blindness
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#outliers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Outlier sensitivity of the Hausdorff distance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty references
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anisotropic-spacing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anisotropic spacing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connectivity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connectivity and lesion definition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nsd-tolerance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tolerance choice for NSD
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ranking instability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calibration-background" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calibration in background-dominated volumes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Convention mismatches between tools
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#annotation-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Annotation conventions of the reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#header-mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreliable label headers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conventions & conformance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sensitivity-study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensitivity study
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../analysis/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analysis
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Analysis
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/levels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation levels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/plots/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantitative plots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/qualitative/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qualitative visualisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTML report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/viewer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interactive viewer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../datasets/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets & benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Datasets & benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/presets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset presets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/pants-benchmark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PanTS benchmark
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../api/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluator & results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I/O
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/plotting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/synthetic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Synthetic perturbations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../research/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/metrics-literature-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics literature review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/datasets-survey/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets survey
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../developer/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer guide
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/adding-a-metric/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a metric
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/adding-a-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a dataset preset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/plots-and-themes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plots, themes & visualisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing & conformance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/releasing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releasing & maintenance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../about/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/citation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#size-bias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Size and small-structure bias
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#class-imbalance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class imbalance and TN-based metrics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boundary-volume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boundary, volume and topology blindness
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#outliers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Outlier sensitivity of the Hausdorff distance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty references
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anisotropic-spacing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anisotropic spacing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connectivity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connectivity and lesion definition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nsd-tolerance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tolerance choice for NSD
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ranking instability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calibration-background" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calibration in background-dominated volumes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Convention mismatches between tools
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#annotation-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Annotation conventions of the reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#header-mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreliable label headers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="metric-pitfalls">Metric pitfalls<a class="headerlink" href="#metric-pitfalls" title="Permanent link">#</a></h1>
+<p>A metric value means little without the task, the data and the way it was computed and aggregated. This page
+lists the fourteen pitfalls that most often distort 3D segmentation results, following the taxonomy of
+Reinke et al. (2024): poor metric <em>selection</em> (P2) and poor metric <em>application</em> (P3). Each worked example was
+computed with SegEvalKit on 1 mm isotropic voxels unless stated otherwise.</p>
+<table>
+<thead>
+<tr>
+<th>Pitfall</th>
+<th>What goes wrong</th>
+<th>Remedy in SegEvalKit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#size-bias">Size bias</a></td>
+<td>Same boundary error costs small structures far more Dice</td>
+<td>Per-structure <a href="../../metrics/overlap/#dice">Dice</a>, <code>stats.stratify</code>, add <a href="../../metrics/distance/#nsd">NSD</a></td>
+</tr>
+<tr>
+<td><a href="#class-imbalance">Class imbalance</a></td>
+<td>TN-based metrics are ≈ 1 for almost any prediction</td>
+<td>TN-free <a href="../../metrics/overlap/">overlap</a> metrics, <a href="../../metrics/calibration/#auprc">AUPRC</a></td>
+</tr>
+<tr>
+<td><a href="#boundary-volume">Single-aspect blindness</a></td>
+<td>Each family misses position, boundary or topology errors</td>
+<td><code>default</code> set; add <a href="../../metrics/volume/">volume</a>, <a href="../../metrics/topology/">topology</a>, <a href="../../metrics/detection/">detection</a></td>
+</tr>
+<tr>
+<td><a href="#outliers">HD outliers</a></td>
+<td>One stray voxel sets the Hausdorff distance</td>
+<td><a href="../../metrics/distance/#hd95">HD95</a> or <a href="../../metrics/distance/#nsd">NSD</a> as endpoint</td>
+</tr>
+<tr>
+<td><a href="#empty-references">Empty references</a></td>
+<td>0/0 cases handled differently by every tool</td>
+<td>Explicit <a href="../../metrics/#empty-masks"><code>EmptyPolicy</code></a>, <code>stats.presence_detection</code></td>
+</tr>
+<tr>
+<td><a href="#aggregation">Aggregation</a></td>
+<td>Means hide failures, NaN exclusion and sign cancellation</td>
+<td>Per-case results, median/IQR, <a href="../../analysis/statistics/">bootstrap CIs</a></td>
+</tr>
+<tr>
+<td><a href="#anisotropic-spacing">Anisotropic spacing</a></td>
+<td>Distances reported in voxels, not mm</td>
+<td>Pass <code>spacing</code>; <code>alignment="strict"</code> in the <code>Evaluator</code></td>
+</tr>
+<tr>
+<td><a href="#connectivity">Lesion definition</a></td>
+<td>Detection scores depend on connectivity, size and matching</td>
+<td>Set <code>connectivity</code>, <code>min_lesion_voxels</code>; <a href="../../metrics/detection/#merge_count">split/merge counts</a></td>
+</tr>
+<tr>
+<td><a href="#nsd-tolerance">NSD tolerance</a></td>
+<td><span class="arithmatex">\(\tau\)</span> chosen after the fact flatters any method</td>
+<td>Fix <span class="arithmatex">\(\tau\)</span> per structure in advance (<a href="../../metrics/distance/#nsd">NSD</a>)</td>
+</tr>
+<tr>
+<td><a href="#ranking">Ranking instability</a></td>
+<td>Winner changes with aggregation or scheme</td>
+<td><code>stats.rank_methods</code>, <code>stats.ranking_stability</code></td>
+</tr>
+<tr>
+<td><a href="#calibration-background">Background-dominated calibration</a></td>
+<td>Easy background makes ECE, Brier, NLL look good</td>
+<td><code>roi="band"</code> for <a href="../../metrics/calibration/">calibration</a> metrics</td>
+</tr>
+<tr>
+<td><a href="#conventions">Convention mismatches</a></td>
+<td>Same name, different formula across libraries</td>
+<td>Unambiguous keys; <a href="../conventions/">conventions page</a></td>
+</tr>
+<tr>
+<td><a href="#annotation-conventions">Annotation conventions</a></td>
+<td>The reference defines a structure differently from the model</td>
+<td>Evaluate a region both sides agree on (<code>ref_file="a+b"</code>)</td>
+</tr>
+<tr>
+<td><a href="#header-mismatch">Unreliable label headers</a></td>
+<td>A label file's affine disagrees with its image although the voxels align</td>
+<td><code>segevalkit audit</code>; then <code>alignment="ignore"</code> when shapes match</td>
+</tr>
+</tbody>
+</table>
+<h2 id="size-bias">Size and small-structure bias<a class="headerlink" href="#size-bias" title="Permanent link">#</a></h2>
+<p>Overlap metrics normalise by structure size, so the same boundary error costs a small structure far more than a
+large one. A mean Dice over structures of different size mixes quality with size. Report Dice per structure,
+stratify by volume (<code>segevalkit.stats.stratify(result, "dice", by="ref_volume_ml")</code>) and add a size-independent
+boundary metric in mm (<a href="../../metrics/distance/#nsd">NSD</a>, <a href="../../metrics/distance/#hd95">HD95</a>).</p>
+<details class="example">
+<summary>Worked example</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">segevalkit.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_metrics</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">30</span><span class="p">):</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="nb">bool</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">ref</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">5</span> <span class="o">+</span> <span class="n">edge</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="mi">5</span> <span class="o">+</span> <span class="n">edge</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="mi">5</span> <span class="o">+</span> <span class="n">edge</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>                  <span class="c1"># one-voxel shift</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">s</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="p">[</span><span class="s2">"dice"</span><span class="p">,</span> <span class="s2">"hd95"</span><span class="p">,</span> <span class="s2">"nsd"</span><span class="p">],</span> <span class="n">spacing</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                        <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">"nsd"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"tolerance_mm"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}})</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>3 {'dice': 0.667, 'hd95': 1.0, 'nsd': 1.0}
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>6 {'dice': 0.833, 'hd95': 1.0, 'nsd': 1.0}
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>30 {'dice': 0.967, 'hd95': 1.0, 'nsd': 1.0}
+</code></pre></div>
+<p>The error is identical (1 mm everywhere), yet Dice ranges from 0.667 to 0.967. RVD behaves the same way:
+3 extra voxels on a 2-voxel lesion give RVD = +1.5. For small lesions prefer
+<a href="../../metrics/volume/#absolute_volume_difference">AVD</a> in mL and <a href="../../metrics/detection/">lesion-wise metrics</a>.</p>
+</details>
+<h2 id="class-imbalance">Class imbalance and TN-based metrics<a class="headerlink" href="#class-imbalance" title="Permanent link">#</a></h2>
+<p>In 3D the background outnumbers the foreground by <span class="arithmatex">\(10^3\)</span>–<span class="arithmatex">\(10^6\)</span>, so metrics that use true negatives
+(accuracy, specificity, voxel-wise AUROC, kappa, MCC, ARI, MI, GCE) are dominated by them and change when the image
+is cropped. Use TN-free metrics (Dice, IoU, precision, recall, distances) as endpoints and prefer
+<a href="../../metrics/calibration/#auprc">AUPRC</a> to AUROC.</p>
+<details class="example">
+<summary>Worked example</summary>
+<p>A <span class="arithmatex">\(64^3\)</span> volume; a 64-voxel lesion is missed entirely and a 64-voxel false positive appears elsewhere.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../metrics/overlap/#dice">Dice</a></td>
+<td>0.0000</td>
+</tr>
+<tr>
+<td><a href="../../metrics/overlap/#accuracy">Accuracy</a></td>
+<td>0.9995</td>
+</tr>
+<tr>
+<td><a href="../../metrics/overlap/#specificity">Specificity</a></td>
+<td>0.9998</td>
+</tr>
+<tr>
+<td><a href="../../metrics/overlap/#balanced_accuracy">Balanced accuracy</a></td>
+<td>0.4999</td>
+</tr>
+<tr>
+<td><a href="../../metrics/agreement/#mcc">MCC</a></td>
+<td>−0.0002</td>
+</tr>
+</tbody>
+</table>
+<p>A <em>perfect</em> prediction of the same lesion has <a href="../../metrics/agreement/#mutual_information">mutual information</a>
+0.0023 nats, against 0.693 nats for a perfect prediction of a structure filling half the volume.</p>
+</details>
+<h2 id="boundary-volume">Boundary, volume and topology blindness<a class="headerlink" href="#boundary-volume" title="Permanent link">#</a></h2>
+<p>Each metric family sees one aspect of the error. Report at least one <a href="../../metrics/overlap/">overlap</a> and one
+<a href="../../metrics/distance/">boundary</a> metric (the <code>default</code> set does), and add volume, topology or detection metrics
+when the task calls for them; the <a href="../choosing/">decision guide</a> maps task properties to metric sets.</p>
+<details class="example">
+<summary>Worked example</summary>
+<ul>
+<li><strong>Volume is blind to position.</strong> Two equal, non-touching cubes: <a href="../../metrics/volume/#volumetric_similarity">VS</a> = 1,
+  <a href="../../metrics/volume/#relative_volume_difference">RVD</a> = 0, <a href="../../metrics/volume/#absolute_volume_difference">AVD</a> = 0 mL, Dice = 0.</li>
+<li>
+<p><strong>Overlap is blind to where the error is.</strong> Two predictions of a 4096-voxel cube:</p>
+<table>
+<thead>
+<tr>
+<th>Prediction</th>
+<th>Dice</th>
+<th>HD95 (mm)</th>
+<th>ASSD (mm)</th>
+<th>NSD (τ = 2 mm)</th>
+<th>Lesion precision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shifted by 2 voxels</td>
+<td>0.875</td>
+<td>2.0</td>
+<td>0.675</td>
+<td>1.000</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>2 slices missing + 512-voxel blob ≈ 22 mm away</td>
+<td>0.875</td>
+<td>30.8</td>
+<td>3.279</td>
+<td>0.897</td>
+<td>0.5</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p><strong>Overlap and distance are blind to topology.</strong> A 2-voxel gap in a 56-voxel vessel: Dice 0.982, HD95 0 mm,
+  NSD 1.0, clDice 0.982, but <a href="../../metrics/topology/#betti0_error">β₀ error</a> = 1. Filling the lumen of a ring
+  gives Dice 0.80 and <a href="../../metrics/topology/#betti1_error">β₁ error</a> = 1.</p>
+</li>
+</ul>
+</details>
+<h2 id="outliers">Outlier sensitivity of the Hausdorff distance<a class="headerlink" href="#outliers" title="Permanent link">#</a></h2>
+<p><a href="../../metrics/distance/#hd">HD</a> is a maximum, so one stray voxel sets its value, and noisy references inflate it
+for every method. Use <a href="../../metrics/distance/#hd95">HD95</a> or <a href="../../metrics/distance/#nsd">NSD</a> as the endpoint and
+keep HD only where a worst-case bound is the clinical question, reported next to a robust metric.</p>
+<details class="example">
+<summary>Worked example</summary>
+<p>A perfect prediction of a 20 mm cube plus one false-positive voxel ≈ 54 mm away:</p>
+<table>
+<thead>
+<tr>
+<th>Dice</th>
+<th>HD</th>
+<th>HD95</th>
+<th>ASSD</th>
+<th>NSD (τ = 2 mm)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.9999</td>
+<td>53.69 mm</td>
+<td>0.00 mm</td>
+<td>0.012 mm</td>
+<td>0.9998</td>
+</tr>
+</tbody>
+</table>
+<p>One voxel out of 8,001 moves HD from 0 to 53.7 mm. (<code>min_component_voxels</code> affects detection metrics, not HD.)</p>
+</details>
+<h2 id="empty-references">Empty references<a class="headerlink" href="#empty-references" title="Permanent link">#</a></h2>
+<p>When a structure is absent from the reference, Dice is 0/0 or 0 and HD is undefined; tools silently return NaN,
+<code>inf</code>, 1 or a penalty, and the choice can dominate the mean. Choose an
+<a href="../../metrics/#empty-masks"><code>EmptyPolicy</code></a> before evaluation and report it, count NaN values (<code>n_nan</code> in
+<code>EvaluationResult.summary()</code>), and evaluate case-level presence with <code>segevalkit.stats.presence_detection</code>.</p>
+<details class="example">
+<summary>Worked example</summary>
+<p>Cases A (Dice 0.90, HD95 3 mm) and B (0.85, 5 mm); C, structure correctly absent; D, absent but a false
+positive is predicted. CT of <span class="arithmatex">\(512\times512\times100\)</span> at <span class="arithmatex">\(0.8\times0.8\times2.5\)</span> mm (diagonal 630.9 mm):</p>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Dice C</th>
+<th>Dice D</th>
+<th>Mean Dice</th>
+<th>HD95 C</th>
+<th>HD95 D</th>
+<th>Mean HD95</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>segevalkit</code> (best / image diagonal)</td>
+<td>1</td>
+<td>0</td>
+<td>0.688</td>
+<td>0</td>
+<td>630.9</td>
+<td>159.7 mm</td>
+</tr>
+<tr>
+<td><code>nan</code> (exclude undefined)</td>
+<td>NaN</td>
+<td>0</td>
+<td>0.583</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>4.0 mm</td>
+</tr>
+</tbody>
+</table>
+<p>Under <code>"nan"</code> the hallucination in D does not affect mean HD95, and the correct call in C vanishes from both
+means. <code>EmptyPolicy.preset("brats2023")</code> reproduces the 374 mm BraTS penalty; every case carries
+<code>_ref_empty</code> and <code>_pred_empty</code> flags.</p>
+</details>
+<h2 id="aggregation">Aggregation<a class="headerlink" href="#aggregation" title="Permanent link">#</a></h2>
+<p>How per-case values become one number can change the conclusion. Compute metrics per case and per structure
+first (as <code>EvaluationResult</code> does), report median and IQR next to the mean, report absolute values for signed
+metrics, and use bootstrap CIs and paired tests (<a href="../../analysis/statistics/">Statistics &amp; ranking</a>).</p>
+<details class="example">
+<summary>Worked example</summary>
+<ul>
+<li><strong>Mean over structures.</strong> Liver Dice 0.96 (1.5 M voxels) and tumour Dice 0.40 (10 k voxels): the mean is
+  0.68; a pooled "global" Dice is 0.956 and hides the failing tumour completely.</li>
+<li><strong>NaN exclusion.</strong> In <a href="#empty-references">empty references</a>, mean HD95 drops from 159.7 to 4.0 mm by
+  exclusion alone.</li>
+<li><strong>Signed errors cancel.</strong> <a href="../../metrics/volume/#relative_volume_difference">RVD</a> of +0.2 on half the cases
+  and −0.2 on the rest averages to 0.</li>
+<li><strong>Pooled vs per-case.</strong> Pooling voxels over the dataset weights large patients more; it is a different
+  quantity.</li>
+<li><strong>Hierarchy.</strong> Scans of one patient are not independent; bootstrap at the patient level.</li>
+</ul>
+</details>
+<h2 id="anisotropic-spacing">Anisotropic spacing<a class="headerlink" href="#anisotropic-spacing" title="Permanent link">#</a></h2>
+<p>Distances and volumes are physical: on a <span class="arithmatex">\(0.8\times0.8\times5\)</span> mm MR a one-slice error is 5 mm, not "1". Always
+pass <code>spacing</code> to <code>compute_metrics</code>; the <code>Evaluator</code> reads it from the header and, with <code>alignment="strict"</code>
+(default), refuses pairs on different grids. Report the spacing, and resample thin tubes to isotropic spacing before
+<a href="../../metrics/topology/#cldice">clDice</a> if the skeleton matters.</p>
+<details class="example">
+<summary>Worked example</summary>
+<p>A <span class="arithmatex">\(16\times16\times8\)</span> box shifted by one slice through-plane:</p>
+<table>
+<thead>
+<tr>
+<th>Spacing (mm)</th>
+<th>Dice</th>
+<th>HD95</th>
+<th>ASSD</th>
+<th>NSD (τ = 2 mm)</th>
+<th>AVD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None (treated as 1 × 1 × 1)</td>
+<td>0.875</td>
+<td>1.0 mm</td>
+<td>0.518 mm</td>
+<td>1.000</td>
+<td>0 mL</td>
+</tr>
+<tr>
+<td>0.8 × 0.8 × 5.0</td>
+<td>0.875</td>
+<td>5.0 mm</td>
+<td>1.979 mm</td>
+<td>0.592</td>
+<td>0 mL</td>
+</tr>
+</tbody>
+</table>
+<p>Dice is unchanged; every distance changes several-fold. State <a href="../../metrics/distance/#boundary_iou">Boundary IoU</a>
+band widths together with the spacing.</p>
+</details>
+<h2 id="connectivity">Connectivity and lesion definition<a class="headerlink" href="#connectivity" title="Permanent link">#</a></h2>
+<p>Detection metrics count connected components, so they depend on connectivity, minimum lesion size and the matching
+rule. Fix all three from the clinical lesion definition before evaluation, report them, and show
+<a href="../../metrics/detection/#split_count">split</a> and <a href="../../metrics/detection/#merge_count">merge</a> counts next to lesion
+F1. Topology metrics always use (26, 6) connectivity.</p>
+<details class="example">
+<summary>Worked example</summary>
+<p>Two <span class="arithmatex">\(4^3\)</span> reference lesions touch at one corner; the model segments one of them perfectly:</p>
+<table>
+<thead>
+<tr>
+<th>Connectivity</th>
+<th>Reference lesions</th>
+<th><a href="../../metrics/detection/#lesion_recall">Lesion recall</a></th>
+<th><a href="../../metrics/detection/#lesion_count_difference">Count difference</a></th>
+<th><a href="../../metrics/detection/#lesionwise_dice">Lesion-wise Dice</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>26 (default)</td>
+<td>1</td>
+<td>1.0</td>
+<td>0</td>
+<td>0.667</td>
+</tr>
+<tr>
+<td>18 or 6</td>
+<td>2</td>
+<td>0.5</td>
+<td>1</td>
+<td>0.500</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Minimum size.</strong> In the <a href="../../metrics/detection/#code">detection example</a> lesion recall is 0.25;
+  <code>min_component_voxels=30</code> removes the four 27-voxel components and yields lesion F1 = 1.0.</li>
+<li><strong>Matching rule.</strong> A blob bridging two reference lesions scores lesion F1 = 1.0 under the default "overlap"
+  criterion, but <a href="../../metrics/detection/#panoptic_quality">panoptic quality</a> 0 and one merge.</li>
+</ul>
+</details>
+<h2 id="nsd-tolerance">Tolerance choice for NSD<a class="headerlink" href="#nsd-tolerance" title="Permanent link">#</a></h2>
+<p><a href="../../metrics/distance/#nsd">NSD</a> depends strongly on its tolerance <span class="arithmatex">\(\tau\)</span>, and errors beyond <span class="arithmatex">\(\tau\)</span> are not
+graded. Set <span class="arithmatex">\(\tau\)</span> per structure from inter-rater variability before evaluation (Nikolov et al. 2021), report it
+(default 2 mm), and pair NSD with <a href="../../metrics/distance/#hd95">HD95</a>.</p>
+<details class="example">
+<summary>Worked example</summary>
+<p>A <span class="arithmatex">\(24^3\)</span> cube shifted by 2 voxels:</p>
+<table>
+<thead>
+<tr>
+<th><span class="arithmatex">\(\tau\)</span> (mm)</th>
+<th>0.5</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NSD</td>
+<td>0.637</td>
+<td>0.693</td>
+<td>1.000</td>
+<td>1.000</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h2 id="ranking">Ranking instability<a class="headerlink" href="#ranking" title="Permanent link">#</a></h2>
+<p>Rankings depend on the metric, aggregation, ranking scheme and test cases (Maier-Hein et al. 2018). Fix the scheme
+in advance, quantify uncertainty with <code>segevalkit.stats.ranking_stability</code>, and use paired tests with multiplicity
+correction (<code>segevalkit.stats.compare</code>) before claiming a winner.</p>
+<details class="example">
+<summary>Worked example</summary>
+<p>Method A is excellent on four cases and fails on one; method B is uniformly mediocre.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">segevalkit.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">rank_methods</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">table</span><span class="p">(</span><span class="n">vals</span><span class="p">):</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"case_id"</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"c</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)],</span> <span class="s2">"label"</span><span class="p">:</span> <span class="s2">"tumour"</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>                         <span class="s2">"metric"</span><span class="p">:</span> <span class="s2">"dice"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="n">vals</span><span class="p">})</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">res</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"A"</span><span class="p">:</span> <span class="n">table</span><span class="p">([</span><span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">]),</span> <span class="s2">"B"</span><span class="p">:</span> <span class="n">table</span><span class="p">([</span><span class="mf">0.80</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)}</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">rank_methods</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s2">"dice"</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">"aggregate-then-rank"</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">))</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="nb">print</span><span class="p">(</span><span class="n">rank_methods</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s2">"dice"</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">"aggregate-then-rank"</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="s2">"median"</span><span class="p">))</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">rank_methods</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s2">"dice"</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">"rank-then-aggregate"</span><span class="p">))</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>  method  mean  rank
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>0      B  0.80   1.0
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>1      A  0.74   2.0
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  method  median  rank
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>0      A     0.9   1.0
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>1      B     0.8   2.0
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  method  mean_rank  rank
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>0      A        1.2   1.0
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>1      B        1.8   2.0
+</code></pre></div>
+<p>The mean ranks B first; the median and rank-then-aggregate rank A first.</p>
+</details>
+<h2 id="calibration-background">Calibration in background-dominated volumes<a class="headerlink" href="#calibration-background" title="Permanent link">#</a></h2>
+<p>Over a whole volume nearly all voxels are easy background with <span class="arithmatex">\(p \approx 0\)</span>, so ECE, Brier and NLL look
+excellent even when the model is over-confident at the boundary. Use <code>roi="band"</code> with a stated <code>margin_mm</code>
+(Mehrtash et al. 2020), pair ECE with Brier or NLL, and keep discrimination (AUROC, AUPRC) separate from calibration.</p>
+<details class="example">
+<summary>Worked example</summary>
+<p>Correct everywhere except a 2-voxel shell outside the object where <span class="arithmatex">\(p = 0.6\)</span>
+(the <a href="../../metrics/calibration/#code">calibration example</a>):</p>
+<table>
+<thead>
+<tr>
+<th>Region</th>
+<th><a href="../../metrics/calibration/#ece">ECE</a></th>
+<th><a href="../../metrics/calibration/#brier">Brier</a></th>
+<th><a href="../../metrics/calibration/#nll">NLL</a></th>
+<th><a href="../../metrics/calibration/#auroc">AUROC</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Whole image (<code>roi="all"</code>)</td>
+<td>0.022</td>
+<td>0.011</td>
+<td>0.032</td>
+<td>1.000</td>
+</tr>
+<tr>
+<td>5 mm band (<code>roi="band"</code>)</td>
+<td>0.111</td>
+<td>0.057</td>
+<td>0.160</td>
+<td>1.000</td>
+</tr>
+</tbody>
+</table>
+<p>The whole-image ECE is five times smaller only because of 89,120 trivially correct background voxels.</p>
+</details>
+<h2 id="conventions">Convention mismatches between tools<a class="headerlink" href="#conventions" title="Permanent link">#</a></h2>
+<p>Metrics with the same name are computed differently by different libraries. Name the exact variant: SegEvalKit
+keys are unambiguous (<a href="../../metrics/distance/#assd"><code>assd</code></a> vs <a href="../../metrics/distance/#masd"><code>masd</code></a>;
+<a href="../../metrics/distance/#hd95"><code>hd95</code></a> <code>mode="directed"</code> by default, <code>"pooled"</code> for MedPy). Report the empty-mask
+policy and all parameters; the <a href="../conventions/">conventions page</a> lists conformance with other libraries.</p>
+<details class="example">
+<summary>Worked example</summary>
+<p>A 10-voxel cube predicted inside a 20-voxel reference cube:</p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Convention A</th>
+<th>Convention B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HD95</td>
+<td>Directed max, 7.14 mm (MetricsReloaded, MONAI, DeepMind, BraTS)</td>
+<td>Pooled, 7.07 mm (MedPy)</td>
+</tr>
+<tr>
+<td>Average surface distance</td>
+<td>Pooled mean ASSD, 5.63 mm (MONAI, MedPy ≥ 0.5.2)</td>
+<td>Mean of directed means MASD, 5.39 mm (MetricsReloaded, MedPy ≤ 0.5.1 "assd")</td>
+</tr>
+</tbody>
+</table>
+<p>NSD also differs between voxel counting (MONAI, SegEvalKit) and surface-area weighting (DeepMind), and BraTS
+2023 lesion-wise Dice dilates reference lesions before matching; SegEvalKit's
+<a href="../../metrics/detection/#lesionwise_dice">lesion-wise Dice</a> does not.</p>
+</details>
+<h2 id="annotation-conventions">Annotation conventions of the reference<a class="headerlink" href="#annotation-conventions" title="Permanent link">#</a></h2>
+<p>A dataset's masks encode choices: whether a tumour belongs to the organ, whether vessels are cut out, where an
+organ ends. A model trained elsewhere follows its own choices, and the mismatch is scored as error. PanTS annotates
+the pancreatic lesion inconsistently relative to the pancreas mask (sometimes inside it, sometimes outside), so a
+correct pancreas prediction loses Dice wherever the lesion was left out of the reference. Evaluate the region both
+conventions agree on, pancreas ∪ lesion, and state it with the results (the <a href="../../datasets/presets/#pants">PanTS preset</a>
+notes say the same).</p>
+<details class="example">
+<summary>Worked example</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">ev</span> <span class="o">=</span> <span class="n">sek</span><span class="o">.</span><span class="n">Evaluator</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="c1"># reference: union of two per-structure files; prediction: union of ids</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">"pancreas"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ref_file"</span><span class="p">:</span> <span class="s2">"pancreas.nii.gz+pancreatic_lesion.nii.gz"</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>                 <span class="s2">"pred"</span><span class="p">:</span> <span class="p">[</span><span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">28</span><span class="p">]},</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="s2">"pancreatic_lesion"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ref_file"</span><span class="p">:</span> <span class="s2">"pancreatic_lesion.nii.gz"</span><span class="p">,</span> <span class="s2">"pred"</span><span class="p">:</span> <span class="mi">28</span><span class="p">},</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">})</span>
+</code></pre></div>
+<p>All pancreas results in the <a href="../../getting-started/quickstart/">quickstart walkthrough</a> use this union
+(the top row of the three-model comparison shows it on one slice).</p>
+</details>
+<h2 id="header-mismatch">Unreliable label headers<a class="headerlink" href="#header-mismatch" title="Permanent link">#</a></h2>
+<p>Label files are sometimes written with an orientation or origin that disagrees with their own image, while the
+voxel data is aligned with the image. Resampling "by the header" then moves a correct prediction into the wrong
+place and a good model scores zero. In the PanTS test set, 227 of 901 cases have at least one such label file (the
+aorta in 218). Audit a dataset once before evaluating, and use voxel correspondence when shapes match.</p>
+<details class="example">
+<summary>Worked example</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="gp">$ </span>segevalkit<span class="w"> </span>audit<span class="w"> </span>--ref<span class="w"> </span>PanTS/LabelTe<span class="w"> </span>--images<span class="w"> </span>PanTS/ImageTe
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="go">⚠ 227 of 901 cases have reference files whose header differs from the image</span>
+</code></pre></div>
+<p>TotalSegmentator's aorta on these cases: mean Dice 0.67 with 71 empty predictions under
+<code>alignment="resample"</code> (trusting the broken headers), versus 0.88 mean / 0.92 median and no empty prediction
+under <code>alignment="ignore"</code> (voxel correspondence), on the same 521 predictions.</p>
+</details>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">#</a></h2>
+<ul>
+<li>Reinke A, et al. Understanding metric-related pitfalls in image analysis validation. <em>Nat Methods</em> 21, 182–194
+  (2024). <a href="https://doi.org/10.1038/s41592-023-02150-0">doi:10.1038/s41592-023-02150-0</a></li>
+<li>Maier-Hein L, et al. Metrics reloaded: recommendations for image analysis validation. <em>Nat Methods</em> 21, 195–212
+  (2024). <a href="https://doi.org/10.1038/s41592-023-02151-z">doi:10.1038/s41592-023-02151-z</a></li>
+<li>Maier-Hein L, et al. Why rankings of biomedical image analysis competitions should be interpreted with care.
+  <em>Nat Commun</em> 9, 5217 (2018). <a href="https://doi.org/10.1038/s41467-018-07619-7">doi:10.1038/s41467-018-07619-7</a></li>
+<li>Wiesenfarth M, et al. Methods and open-source toolkit for analyzing and visualizing challenge results.
+  <em>Sci Rep</em> 11, 2369 (2021). <a href="https://doi.org/10.1038/s41598-021-82017-6">doi:10.1038/s41598-021-82017-6</a></li>
+<li>Taha AA, Hanbury A. Metrics for evaluating 3D medical image segmentation: analysis, selection, and tool.
+  <em>BMC Med Imaging</em> 15, 29 (2015). <a href="https://doi.org/10.1186/s12880-015-0068-x">doi:10.1186/s12880-015-0068-x</a></li>
+<li>Nikolov S, et al. Clinically applicable segmentation of head and neck anatomy for radiotherapy. <em>J Med Internet
+  Res</em> 23(7), e26151 (2021). <a href="https://doi.org/10.2196/26151">doi:10.2196/26151</a></li>
+<li>Mehrtash A, et al. Confidence calibration and predictive uncertainty estimation for deep medical image
+  segmentation. <em>IEEE TMI</em> 39(12), 3868–3878 (2020). <a href="https://doi.org/10.1109/TMI.2020.3006437">doi:10.1109/TMI.2020.3006437</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../choosing/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Decision guide">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Decision guide
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../conventions/" class="md-footer__link md-footer__link--next" aria-label="Next: Conventions &amp; conformance">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Conventions & conformance
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Abhijit Das · Apache-2.0
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "navigation.instant", "navigation.tracking", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/figsize.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
