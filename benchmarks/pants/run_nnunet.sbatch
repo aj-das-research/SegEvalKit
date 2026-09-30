@@ -20,6 +20,8 @@ export OMP_NUM_THREADS=4 MPLCONFIGDIR=$TMPDIR/mpl
 OUT=$STORE/outputs/predictions/nnunet_pants_regions
 mkdir -p "$OUT"
 N=${NGPU:-4}   # one SLURM step per allocated GPU
+# Export workers hold a full-resolution multi-region probability map each; 3 per step ran out of
+# 58 GB on large PanTS CTs (OOM kills, job 287454), so default to 2 preprocessing / 1 export worker.
 # predict_from_modelfolder has no -num_parts: shard the (symlinked) inputs into N folders instead.
 for i in $(seq 0 $((N-1))); do
   mkdir -p "$STORE/data/pants_nnunet/shard$i"
@@ -34,7 +36,7 @@ run_part() {  # relaunch a crashed step up to 5 times; every pipeline skips fini
     srun --exact -n1 --gres=gpu:1 --cpus-per-task=8 --mem=58G \
     "$ENV/bin/nnUNetv2_predict_from_modelfolder" -m "$STORE/checkpoints/nnunet_pants_regions" \
       -i "$STORE/data/pants_nnunet/shard$i" -o "$OUT" -f all -chk checkpoint_best.pth \
-      -npp 3 -nps 3 --disable_progress_bar --continue_prediction \
+      -npp ${NPP:-2} -nps ${NPS:-1} --disable_progress_bar --continue_prediction \
       > "$STORE/logs/nnunet-part$i-$SLURM_JOB_ID-try$k.log" 2>&1 && return 0
     echo "part $i attempt $k failed; relaunching" >&2
   done
