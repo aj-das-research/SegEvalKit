@@ -6,11 +6,11 @@ metrics count what shape *is*: connected pieces, tunnels and cavities.
 
 For a 3D binary object the Betti numbers are
 
-* :math:`\beta_0`: number of connected components (26-connected foreground),
-* :math:`\beta_1`: number of independent tunnels / handles (loops),
-* :math:`\beta_2`: number of enclosed cavities (6-connected background pockets),
+* \(\beta_0\): number of connected components (26-connected foreground),
+* \(\beta_1\): number of independent tunnels / handles (loops),
+* \(\beta_2\): number of enclosed cavities (6-connected background pockets),
 
-related by the Euler characteristic :math:`\chi = \beta_0 - \beta_1 + \beta_2`.
+related by the Euler characteristic \(\chi = \beta_0 - \beta_1 + \beta_2\).
 The (26, 6) adjacency pair is the standard well-composed choice for 3D digital
 topology (Kong & Rosenfeld 1989).
 """
@@ -109,10 +109,10 @@ def euler_error(ctx: PairContext) -> float:
     reference="Shit et al. 2021, CVPR (clDice)",
 )
 def cldice(ctx: PairContext) -> float:
-    r"""$$\mathrm{clDice} = 2\,\frac{T_{prec}\,T_{sens}}{T_{prec}+T_{sens}},\quad
-    T_{prec} = \frac{|S_P\cap G|}{|S_P|},\; T_{sens} = \frac{|S_G\cap P|}{|S_G|}$$
+    r"""$$\mathrm{clDice} = 2\,\frac{T_{\mathrm{prec}}\,T_{\mathrm{sens}}}{T_{\mathrm{prec}}+T_{\mathrm{sens}}},\quad
+    T_{\mathrm{prec}} = \frac{|S_P\cap G|}{|S_P|},\; T_{\mathrm{sens}} = \frac{|S_G\cap P|}{|S_G|}$$
 
-    :math:`S_X` is the topological skeleton of *X*.
+    \(S_X\) is the topological skeleton of *X*.
     """
     if ctx.both_empty:
         return ctx.best_or_nan(1.0)

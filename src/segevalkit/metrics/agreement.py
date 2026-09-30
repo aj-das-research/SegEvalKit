@@ -7,8 +7,8 @@ are reported mostly for completeness and comparability with Taha & Hanbury
 (2015); for segmentation quality they are strongly correlated with Dice but
 are affected by the size of the background.
 
-With :math:`N` voxels and the 2x2 contingency table
-:math:`n_{11}=TP, n_{10}=FN, n_{01}=FP, n_{00}=TN` (rows: reference).
+With \(N\) voxels and the 2x2 contingency table
+\(n_{11}=TP, n_{10}=FN, n_{01}=FP, n_{00}=TN\) (rows: reference).
 """
 
 from __future__ import annotations
@@ -98,9 +98,9 @@ def global_consistency_error(ctx: PairContext) -> float:
     \tfrac{2\,TP\cdot FP}{TP+FP} + \tfrac{2\,TN\cdot FN}{TN+FN}\Big\}$$
 
     Derived directly from Martin et al.'s local refinement error
-    :math:`E(S_1,S_2,x) = |R(S_1,x)\setminus R(S_2,x)|/|R(S_1,x)|` summed over
+    \(E(S_1,S_2,x) = |R(S_1,x)\setminus R(S_2,x)|/|R(S_1,x)|\) summed over
     the four confusion classes. The closed form printed in Taha & Hanbury
-    (2015, Eq. 11) does not reproduce Martin's definition (it is non-zero for
+    (2015) does not reproduce Martin's definition (it is non-zero for
     an empty prediction against an empty reference, for example); SegEvalKit
     follows the original definition, verified by brute force in the tests.
     """

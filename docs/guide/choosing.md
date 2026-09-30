@@ -28,27 +28,46 @@ SegEvalKit follows the **problem fingerprint** idea of Metrics Reloaded (Maier-H
     ...
     ```
 
-The recommended metrics feed straight into an evaluation:
+The recommendation feeds straight into an evaluation:
 
 ```python
+import segevalkit as sek
+
 ev = sek.Evaluator(labels=..., metrics=rec.metrics, params=rec.params,
                    empty=sek.EmptyPolicy.preset(rec.empty_policy))
 ```
 
 ## Fingerprint items
 
-| Item | Values | Why it matters |
-|---|---|---|
-| `structure` | `large_organ`, `small_structure`, `small_lesion`, `large_lesion`, `tubular`, `hollow` | Size decides whether overlap metrics are stable; shape decides whether topology matters. |
-| `multi_instance` | bool | If objects are counted, the lesion (not the voxel) is the unit of analysis. |
-| `boundary_critical` | bool | Radiotherapy and surgery care about worst-case boundary error. |
-| `volumetry` | bool | If volume is the endpoint, report it directly (mL, bias, limits of agreement). |
-| `empty_references` | bool | Dice and HD are undefined for absent structures; presence detection must be reported separately. |
-| `probabilistic` | bool | Probabilities shown to users need calibration metrics. |
-| `fp_fn_asymmetric` | bool | Missing tissue can cost more than adding it: F-beta with β > 1. |
-| `noisy_reference` | bool | Imprecise references call for tolerance-based metrics. |
-| `tolerance_mm` | float | Acceptable boundary deviation, ideally from inter-rater variability. |
-| `ranking` | bool | Rankings need paired tests and a stability analysis. |
+`structure` (str)
+:   `large_organ`, `small_structure`, `small_lesion`, `large_lesion`, `tubular` or `hollow`. Size decides whether overlap metrics are stable; shape decides whether topology matters.
+
+`multi_instance` (bool)
+:   If objects are counted, the lesion (not the voxel) is the unit of analysis.
+
+`boundary_critical` (bool)
+:   Radiotherapy and surgery care about worst-case boundary error.
+
+`volumetry` (bool)
+:   If volume is the endpoint, report it directly (mL, bias, limits of agreement).
+
+`empty_references` (bool)
+:   Dice and HD are undefined for absent structures; presence detection must be reported separately.
+
+`probabilistic` (bool)
+:   Probabilities shown to users need calibration metrics.
+
+`fp_fn_asymmetric` (bool)
+:   Missing tissue can cost more than adding it: F-beta with β > 1.
+
+`noisy_reference` (bool)
+:   Imprecise references call for tolerance-based metrics.
+
+`tolerance_mm` (float)
+:   Acceptable boundary deviation, ideally from inter-rater variability.
+
+`ranking` (bool)
+:   Rankings need paired tests and a stability analysis.
 
 ## Decision table
 
@@ -75,8 +94,3 @@ ev = sek.Evaluator(labels=..., metrics=rec.metrics, params=rec.params,
 | [HD](../metrics/distance.md#hd) alone | Set by one outlier voxel. |
 | [GCE](../metrics/agreement.md#global_consistency_error), [ARI](../metrics/agreement.md#adjusted_rand_index) | Weak interpretation for binary tasks; they track Dice. |
 | Mean Dice across structures of very different sizes | Not comparable; report per structure. |
-
-## Evidence
-
-The [sensitivity study](sensitivity-study.md) shows these recommendations on real anatomy: for each kind of
-error it shows which metrics react and by how much.

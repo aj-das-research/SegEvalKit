@@ -58,35 +58,40 @@ The two families give numerically different ASSD, HD95 and NSD, particularly on 
 
 - **Aliases:** Dice, Sørensen–Dice, F1 score at voxel level, "Dice overlap".
 - **Equation:**
-$$
-\mathrm{DSC}(G,P) = \frac{2\,\lvert G\cap P\rvert}{\lvert G\rvert + \lvert P\rvert} = \frac{2\,TP}{2\,TP + FP + FN}
-$$
+
+    $$
+    \mathrm{DSC}(G,P) = \frac{2\,\lvert G\cap P\rvert}{\lvert G\rvert + \lvert P\rvert} = \frac{2\,TP}{2\,TP + FP + FN}
+    $$
+
 - **Range / direction / units:** $[0,1]$, higher is better, unitless.
 - **Edge cases:** If $G = P = \emptyset$ the expression is $0/0$. Conventions differ:
-  - MetricsReloaded returns NaN and recommends setting it to 1 during aggregation.
-  - MONAI `DiceMetric(ignore_empty=True)` returns NaN when the reference is empty, and it is excluded from the mean.
-  - BraTS 2023 scores 1.0 when both are empty.
+    - MetricsReloaded returns NaN and recommends setting it to 1 during aggregation.
+    - MONAI `DiceMetric(ignore_empty=True)` returns NaN when the reference is empty, and it is excluded from the mean.
+    - BraTS 2023 scores 1.0 when both are empty.
 
-  If exactly one mask is empty, DSC = 0.
+    If exactly one mask is empty, DSC = 0.
+
 - **Plain English:** The fraction of voxels the two segmentations share, measured relative to their average size. 1 means identical and 0 means no overlap.
 - **Good for:** A default measure of overall volumetric agreement for medium or large structures (organs). Metrics Reloaded recommends DSC (or IoU) as the default overlap metric for semantic segmentation.
 - **Pitfalls (Reinke et al., 2024):**
-  - It is size-dependent. A one-voxel boundary error costs a small lesion far more DSC than a liver, so mean DSC across structures of different sizes is not comparable.
-  - It is insensitive to boundary shape and to where errors lie. Two very different error patterns can give the same DSC.
-  - It is undefined for empty references.
-  - It saturates at 0 for any non-overlapping prediction, however near or far the prediction is.
-  - It ignores topology (holes and disconnections).
-  - Mean DSC hides catastrophic failures, so report distributions.
+    - It is size-dependent. A one-voxel boundary error costs a small lesion far more DSC than a liver, so mean DSC across structures of different sizes is not comparable.
+    - It is insensitive to boundary shape and to where errors lie. Two very different error patterns can give the same DSC.
+    - It is undefined for empty references.
+    - It saturates at 0 for any non-overlapping prediction, however near or far the prediction is.
+    - It ignores topology (holes and disconnections).
+    - Mean DSC hides catastrophic failures, so report distributions.
 - **References:** Dice (1945); Sørensen (1948); Maier-Hein et al. (2024); Taha & Hanbury (2015).
 
 ### 1.2 Jaccard index / Intersection over Union (IoU)
 
 - **Aliases:** Jaccard similarity coefficient (JAC), Tanimoto coefficient (for binary sets), IoU. **Volumetric overlap error** $\mathrm{VOE} = 1 - \mathrm{IoU}$ (Heimann et al., 2009).
 - **Equation:**
-$$
-\mathrm{IoU}(G,P)=\frac{\lvert G\cap P\rvert}{\lvert G\cup P\rvert}=\frac{TP}{TP+FP+FN},\qquad
-\mathrm{IoU}=\frac{\mathrm{DSC}}{2-\mathrm{DSC}},\quad \mathrm{DSC}=\frac{2\,\mathrm{IoU}}{1+\mathrm{IoU}}
-$$
+
+    $$
+    \mathrm{IoU}(G,P)=\frac{\lvert G\cap P\rvert}{\lvert G\cup P\rvert}=\frac{TP}{TP+FP+FN},\qquad
+    \mathrm{IoU}=\frac{\mathrm{DSC}}{2-\mathrm{DSC}},\quad \mathrm{DSC}=\frac{2\,\mathrm{IoU}}{1+\mathrm{IoU}}
+    $$
+
 - **Range / direction / units:** $[0,1]$, higher is better (VOE: lower is better, often in %). Unitless.
 - **Edge cases:** The same as DSC. MetricsReloaded returns NaN when both masks are empty.
 - **Plain English:** Shared volume divided by the combined volume.
@@ -98,10 +103,13 @@ $$
 
 - **Aliases:** GDS, Generalized Dice Score (not to be confused with the generalized Dice *loss*).
 - **Equation** (Crum et al., 2006; weighted form popularized by Sudre et al., 2017). With classes $c$ and weights $w_c$, for example $w_c = 1/(\sum_i g_{ic})^2$:
-$$
-\mathrm{GDS} = \frac{2\sum_{c} w_c \sum_i g_{ic}\,p_{ic}}{\sum_c w_c \sum_i (g_{ic} + p_{ic})}
-$$
-  Here $g_{ic},p_{ic}\in\{0,1\}$ (or $[0,1]$ for soft versions) indicate membership of voxel $i$ in class $c$.
+
+    $$
+    \mathrm{GDS} = \frac{2\sum_{c} w_c \sum_i g_{ic}\,p_{ic}}{\sum_c w_c \sum_i (g_{ic} + p_{ic})}
+    $$
+
+    Here $g_{ic},p_{ic}\in\{0,1\}$ (or $[0,1]$ for soft versions) indicate membership of voxel $i$ in class $c$.
+
 - **Range / direction:** $[0,1]$, higher is better.
 - **Edge cases:** $w_c$ is infinite when class $c$ is absent from the reference, so implementations clip or zero the weight.
 - **Plain English:** A single Dice-like score for all labels at once, with rare (small) labels weighted up so large structures do not dominate.
@@ -113,11 +121,14 @@ $$
 
 - **Aliases:** Tversky similarity; Fβ-score (Metrics Reloaded "FβScore").
 - **Equations:**
-$$
-\mathrm{TI}_{\alpha,\beta}(G,P) = \frac{TP}{TP + \alpha\,FP + \beta\,FN},\qquad
-F_\beta = \frac{(1+\beta^2)\,TP}{(1+\beta^2)\,TP + \beta^2 FN + FP}
-$$
-  $\alpha=\beta=0.5$ gives DSC and $\alpha=\beta=1$ gives IoU. $F_\beta$ equals $\mathrm{TI}$ with $\alpha = 1/(1+\beta^2)$, $\beta_{\mathrm{TI}} = \beta^2/(1+\beta^2)$. $\beta>1$ weights recall more.
+
+    $$
+    \mathrm{TI}_{\alpha,\beta}(G,P) = \frac{TP}{TP + \alpha\,FP + \beta\,FN},\qquad
+    F_\beta = \frac{(1+\beta^2)\,TP}{(1+\beta^2)\,TP + \beta^2 FN + FP}
+    $$
+
+    $\alpha=\beta=0.5$ gives DSC and $\alpha=\beta=1$ gives IoU. $F_\beta$ equals $\mathrm{TI}$ with $\alpha = 1/(1+\beta^2)$, $\beta_{\mathrm{TI}} = \beta^2/(1+\beta^2)$. $\beta>1$ weights recall more.
+
 - **Range / direction:** $[0,1]$, higher is better.
 - **Plain English:** A Dice-like score where you choose whether missing tissue (FN) or extra tissue (FP) is worse.
 - **Good for:** Asymmetric clinical costs. Examples: tumour-margin coverage in radiotherapy, where missing tumour is worse, or avoiding false alarms. Metrics Reloaded selects $F_\beta$ over DSC when false positives and false negatives should be penalized unequally.
@@ -127,9 +138,11 @@ $$
 ### 1.5 Sensitivity (recall, TPR) and false-negative rate (FNR)
 
 - **Equations:**
-$$
-\mathrm{TPR} = \frac{TP}{TP+FN}=\frac{\lvert G\cap P\rvert}{\lvert G\rvert},\qquad \mathrm{FNR} = 1-\mathrm{TPR}=\frac{FN}{TP+FN}
-$$
+
+    $$
+    \mathrm{TPR} = \frac{TP}{TP+FN}=\frac{\lvert G\cap P\rvert}{\lvert G\rvert},\qquad \mathrm{FNR} = 1-\mathrm{TPR}=\frac{FN}{TP+FN}
+    $$
+
 - **Range / direction:** $[0,1]$. TPR: higher is better. FNR: lower is better.
 - **Edge cases:** Undefined when $G=\emptyset$ (MetricsReloaded warns and returns NaN).
 - **Plain English:** The fraction of the true structure that the algorithm captured.
@@ -140,9 +153,11 @@ $$
 ### 1.6 Precision (PPV) and false discovery rate (FDR)
 
 - **Equations:**
-$$
-\mathrm{PPV} = \frac{TP}{TP+FP}=\frac{\lvert G\cap P\rvert}{\lvert P\rvert},\qquad \mathrm{FDR}=1-\mathrm{PPV}
-$$
+
+    $$
+    \mathrm{PPV} = \frac{TP}{TP+FP}=\frac{\lvert G\cap P\rvert}{\lvert P\rvert},\qquad \mathrm{FDR}=1-\mathrm{PPV}
+    $$
+
 - **Range / direction:** $[0,1]$. PPV: higher is better.
 - **Edge cases:** Undefined when $P=\emptyset$.
 - **Plain English:** The fraction of what the algorithm marked that is actually correct.
@@ -152,9 +167,11 @@ $$
 ### 1.7 Specificity (TNR), false-positive rate (FPR, "fallout") and accuracy
 
 - **Equations:**
-$$
-\mathrm{TNR}=\frac{TN}{TN+FP},\quad \mathrm{FPR}=1-\mathrm{TNR}=\frac{FP}{FP+TN},\quad \mathrm{Acc}=\frac{TP+TN}{N},\quad \mathrm{BA}=\tfrac12(\mathrm{TPR}+\mathrm{TNR})
-$$
+
+    $$
+    \mathrm{TNR}=\frac{TN}{TN+FP},\quad \mathrm{FPR}=1-\mathrm{TNR}=\frac{FP}{FP+TN},\quad \mathrm{Acc}=\frac{TP+TN}{N},\quad \mathrm{BA}=\tfrac12(\mathrm{TPR}+\mathrm{TNR})
+    $$
+
 - **Range / direction:** $[0,1]$. TNR, Acc and balanced accuracy (BA): higher is better. FPR: lower is better.
 - **Plain English:** Specificity is how much of the background was correctly left unlabelled.
 - **Good for:** Rarely informative for 3D segmentation. They are useful mainly as sanity checks or in image-level classification.
@@ -165,9 +182,11 @@ $$
 
 - **Aliases:** Phi coefficient.
 - **Equation:**
-$$
-\mathrm{MCC} = \frac{TP\cdot TN - FP\cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}
-$$
+
+    $$
+    \mathrm{MCC} = \frac{TP\cdot TN - FP\cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}
+    $$
+
 - **Range / direction:** $[-1,1]$, higher is better. 0 means chance level.
 - **Edge cases:** Undefined when any marginal is 0, for example an empty reference or empty prediction.
 - **Plain English:** A correlation between the predicted and true masks that accounts for all four confusion-matrix cells.
@@ -178,10 +197,13 @@ $$
 ### 1.9 Cohen's kappa (KAP)
 
 - **Equation** (as in Taha & Hanbury, 2015, Eqs. 45–46):
-$$
-\kappa=\frac{f_a - f_c}{N - f_c},\quad f_a = TP+TN,\quad f_c = \frac{(TN+FN)(TN+FP) + (FP+TP)(FN+TP)}{N}
-$$
-  Equivalently $\kappa=(p_o-p_e)/(1-p_e)$, with observed agreement $p_o=f_a/N$ and chance agreement $p_e=f_c/N$.
+
+    $$
+    \kappa=\frac{f_a - f_c}{N - f_c},\quad f_a = TP+TN,\quad f_c = \frac{(TN+FN)(TN+FP) + (FP+TP)(FN+TP)}{N}
+    $$
+
+    Equivalently $\kappa=(p_o-p_e)/(1-p_e)$, with observed agreement $p_o=f_a/N$ and chance agreement $p_e=f_c/N$.
+
 - **Range / direction:** $[-1,1]$, higher is better.
 - **Plain English:** How much better than chance the two segmentations agree.
 - **Good for:** Inter-rater agreement studies, especially multi-class tissue maps.
@@ -191,10 +213,13 @@ $$
 ### 1.10 Single-threshold AUC (balanced accuracy)
 
 - **Equation** (Taha & Hanbury, 2015, Eq. 47), for a binary (thresholded) prediction:
-$$
-\mathrm{AUC}_{\text{binary}} = 1-\frac{\mathrm{FPR}+\mathrm{FNR}}{2} = 1-\frac12\left(\frac{FP}{FP+TN}+\frac{FN}{FN+TP}\right)
-$$
-  This equals balanced accuracy, the area under the one-point ROC "curve". For *probabilistic* output the proper voxel-wise ROC-AUC is $\Pr(p_i > p_j \mid y_i=1, y_j=0)$, computed with the Mann–Whitney statistic.
+
+    $$
+    \mathrm{AUC}_{\text{binary}} = 1-\frac{\mathrm{FPR}+\mathrm{FNR}}{2} = 1-\frac12\left(\frac{FP}{FP+TN}+\frac{FN}{FN+TP}\right)
+    $$
+
+    This equals balanced accuracy, the area under the one-point ROC "curve". For *probabilistic* output the proper voxel-wise ROC-AUC is $\Pr(p_i > p_j \mid y_i=1, y_j=0)$, computed with the Mann–Whitney statistic.
+
 - **Range / direction:** $[0,1]$, higher is better. 0.5 is chance.
 - **Plain English:** The average of sensitivity and specificity.
 - **Pitfalls:** It is TN-dominated. Voxel-wise ROC-AUC is ≈1 for nearly any reasonable model in 3D and mostly measures separability of the easy background. Precision–recall summaries are more informative under imbalance (Reinke et al., 2024).
@@ -207,9 +232,11 @@ $$
 ### 2.1 Volumetric similarity (VS)
 
 - **Equation** (Taha & Hanbury, 2015, Eq. 21; Cárdenes et al., 2009):
-$$
-\mathrm{VS} = 1-\frac{\lvert FN-FP\rvert}{2TP+FP+FN} = 1-\frac{\big\lvert\,\lvert G\rvert-\lvert P\rvert\,\big\rvert}{\lvert G\rvert+\lvert P\rvert}
-$$
+
+    $$
+    \mathrm{VS} = 1-\frac{\lvert FN-FP\rvert}{2TP+FP+FN} = 1-\frac{\big\lvert\,\lvert G\rvert-\lvert P\rvert\,\big\rvert}{\lvert G\rvert+\lvert P\rvert}
+    $$
+
 - **Range / direction:** $[0,1]$, higher is better.
 - **Edge cases:** $0/0$ when both masks are empty (conventionally 1).
 - **Plain English:** How similar the two volumes are in size, ignoring where they are.
@@ -220,15 +247,17 @@ $$
 ### 2.2 Relative volume difference (RVD) and absolute volume difference (AVD)
 
 - **Aliases:**
-  - Relative absolute volume difference (RAVD, MedPy `ravd`; Heimann et al., 2009, report the signed RVD in %).
-  - Absolute volume difference in mL (MONAI `AbsoluteVolumeDifference`).
-  - Volume error.
+    - Relative absolute volume difference (RAVD, MedPy `ravd`; Heimann et al., 2009, report the signed RVD in %).
+    - Absolute volume difference in mL (MONAI `AbsoluteVolumeDifference`).
+    - Volume error.
 - **Equations:**
-$$
-\mathrm{RVD} = \frac{\lvert P\rvert-\lvert G\rvert}{\lvert G\rvert}\ (\times 100\%),\qquad
-\mathrm{AVD}_{\mathrm{mL}} = \frac{v\,\big\lvert\,\lvert P\rvert-\lvert G\rvert\,\big\rvert}{1000},\qquad
-\mathrm{AVD}_{\%}=\frac{\big\lvert\,\lvert P\rvert-\lvert G\rvert\,\big\rvert}{\lvert G\rvert}\times100
-$$
+
+    $$
+    \mathrm{RVD} = \frac{\lvert P\rvert-\lvert G\rvert}{\lvert G\rvert}\ (\times 100\%),\qquad
+    \mathrm{AVD}_{\mathrm{mL}} = \frac{v\,\big\lvert\,\lvert P\rvert-\lvert G\rvert\,\big\rvert}{1000},\qquad
+    \mathrm{AVD}_{\%}=\frac{\big\lvert\,\lvert P\rvert-\lvert G\rvert\,\big\rvert}{\lvert G\rvert}\times100
+    $$
+
 - **Range / direction:** RVD is in $[-1,\infty)$ (as a fraction). 0 is best, positive means over-segmentation and negative means under-segmentation. AVD is $\ge 0$, lower is better, in mL (or %).
 - **Edge cases:** RVD is undefined when $G=\emptyset$. For AVD in mL, report the absolute predicted volume as the error in that case.
 - **Spacing:** AVD in mL requires the voxel volume $v$ from the NIfTI header.
@@ -241,10 +270,12 @@ $$
 
 - **Aliases:** ICC(2,1) (two-way random, absolute agreement, single rater) and ICC(3,1) (two-way mixed, consistency). Taha & Hanbury (2015) also define a voxel-wise ICC between two masks (pymia `InterclassCorrelation`).
 - **Equations** (Shrout & Fleiss, 1979). For $n$ subjects and $k$ raters or methods (here $k=2$: algorithm vs reference), with between-subject mean square $\mathrm{BMS}$, between-rater mean square $\mathrm{JMS}$ and residual mean square $\mathrm{EMS}$:
-$$
-\mathrm{ICC}(2,1)=\frac{\mathrm{BMS}-\mathrm{EMS}}{\mathrm{BMS}+(k-1)\mathrm{EMS}+\frac{k}{n}(\mathrm{JMS}-\mathrm{EMS})},\qquad
-\mathrm{ICC}(3,1)=\frac{\mathrm{BMS}-\mathrm{EMS}}{\mathrm{BMS}+(k-1)\mathrm{EMS}}
-$$
+
+    $$
+    \mathrm{ICC}(2,1)=\frac{\mathrm{BMS}-\mathrm{EMS}}{\mathrm{BMS}+(k-1)\mathrm{EMS}+\frac{k}{n}(\mathrm{JMS}-\mathrm{EMS})},\qquad
+    \mathrm{ICC}(3,1)=\frac{\mathrm{BMS}-\mathrm{EMS}}{\mathrm{BMS}+(k-1)\mathrm{EMS}}
+    $$
+
 - **Range / direction:** $(-1, 1]$ in practice, higher is better. Koo & Li (2016) suggest <0.5 poor, 0.5–0.75 moderate, 0.75–0.9 good and >0.9 excellent.
 - **Plain English:** How well the algorithm's volumes agree with the reference volumes across patients, relative to how much volumes vary between patients.
 - **Good for:** Population-level volumetry validation and method-comparison studies. It is computed over a *dataset*, not per case.
@@ -254,10 +285,13 @@ $$
 ### 2.4 Bland–Altman analysis (bias and limits of agreement)
 
 - **Equations.** For subject $j$, $\delta_j = V_{P,j}-V_{G,j}$ (or percentage difference relative to the mean volume $\bar V_j=(V_{P,j}+V_{G,j})/2$):
-$$
-\bar\delta=\frac1n\sum_j\delta_j,\qquad s_\delta=\sqrt{\tfrac{1}{n-1}\sum_j(\delta_j-\bar\delta)^2},\qquad \mathrm{LoA}=\bar\delta\pm1.96\,s_\delta
-$$
-  Plot $\delta_j$ against $\bar V_j$.
+
+    $$
+    \bar\delta=\frac1n\sum_j\delta_j,\qquad s_\delta=\sqrt{\tfrac{1}{n-1}\sum_j(\delta_j-\bar\delta)^2},\qquad \mathrm{LoA}=\bar\delta\pm1.96\,s_\delta
+    $$
+
+    Plot $\delta_j$ against $\bar V_j$.
+
 - **Units:** mL (or %). A bias near 0 and narrow LoA are better.
 - **Plain English:** On average, how much does the algorithm over- or under-estimate volume, and within what range do 95% of individual errors fall?
 - **Good for:** Clinical acceptability of volumetry. Compare the LoA against a clinically acceptable difference or against inter-rater LoA.
@@ -282,65 +316,76 @@ A common, reproducible alternative is to penalize with the image diagonal in mm 
 
 - **Aliases:** Maximum symmetric surface distance (MSSD), HD100.
 - **Equations.** Directed distance, then the symmetric maximum:
-$$
-\vec h(A,B)=\max_{a\in A} d(a,B),\qquad \mathrm{HD}(G,P)=\max\{\vec h(\partial G,\partial P),\ \vec h(\partial P,\partial G)\}
-$$
+
+    $$
+    \vec h(A,B)=\max_{a\in A} d(a,B),\qquad \mathrm{HD}(G,P)=\max\{\vec h(\partial G,\partial P),\ \vec h(\partial P,\partial G)\}
+    $$
+
 - **Range / direction / units:** $[0,\infty)$ mm, lower is better.
 - **Symmetric vs directed:** The symmetric form is standard. The directed form ($\vec h(\partial P,\partial G)$, "how far the prediction strays") is available in MONAI with `directed=True`.
 - **Plain English:** The single worst boundary error, meaning the largest distance from any point on one contour to the nearest point on the other.
 - **Good for:** Worst-case safety analysis, such as radiotherapy organs at risk, where a single far-off error matters.
 - **Pitfalls:**
-  - It is extremely sensitive to outliers. One stray false-positive voxel far away sets HD. Reinke et al. (2024) recommend percentile HD instead.
-  - It is undefined for empty masks.
-  - It depends on resolution and spacing.
-  - It is not comparable across structures of different sizes.
+    - It is extremely sensitive to outliers. One stray false-positive voxel far away sets HD. Reinke et al. (2024) recommend percentile HD instead.
+    - It is undefined for empty masks.
+    - It depends on resolution and spacing.
+    - It is not comparable across structures of different sizes.
 - **References:** Huttenlocher, Klanderman & Rucklidge (1993).
 
 ### 3.2 Percentile Hausdorff distance (HD95, HDk)
 
 - **Aliases:** Robust Hausdorff, 95% HD, HD95.
 - **Equation.** Let $P_k$ denote the $k$-th percentile.
-  - **Directed-max convention** (MetricsReloaded, MONAI, DeepMind `compute_robust_hausdorff`, BraTS):
-$$
-\mathrm{HD}_k(G,P)=\max\Big\{P_k\big(\{d(g,\partial P)\}_{g\in\partial G}\big),\ P_k\big(\{d(p,\partial G)\}_{p\in\partial P}\big)\Big\}
-$$
-  - **Pooled convention** (MedPy `hd95`):
-$$
-\mathrm{HD}_k^{\text{pooled}}=P_k\big(\{d(g,\partial P)\}_{g\in\partial G}\ \cup\ \{d(p,\partial G)\}_{p\in\partial P}\big)
-$$
-  DeepMind weights each distance by its surfel area. MONAI and MetricsReloaded weight each border voxel equally.
+    - **Directed-max convention** (MetricsReloaded, MONAI, DeepMind `compute_robust_hausdorff`, BraTS):
+
+        $$
+        \mathrm{HD}_k(G,P)=\max\Big\{P_k\big(\{d(g,\partial P)\}_{g\in\partial G}\big),\ P_k\big(\{d(p,\partial G)\}_{p\in\partial P}\big)\Big\}
+        $$
+
+    - **Pooled convention** (MedPy `hd95`):
+
+        $$
+        \mathrm{HD}_k^{\text{pooled}}=P_k\big(\{d(g,\partial P)\}_{g\in\partial G}\ \cup\ \{d(p,\partial G)\}_{p\in\partial P}\big)
+        $$
+
+    DeepMind weights each distance by its surfel area. MONAI and MetricsReloaded weight each border voxel equally.
+
 - **Range / direction / units:** $[0,\infty)$ mm, lower is better.
 - **Plain English:** A "nearly worst-case" boundary error. 95% of boundary points are within this distance of the other contour.
 - **Good for:** Robust boundary quality. It is widely used in BraTS, KiTS and radiotherapy auto-contouring. Metrics Reloaded lists HD95 among the boundary-based options for when errors should be penalized according to their distance.
 - **Pitfalls:**
-  - The two conventions give different numbers. SegEvalKit should expose `mode={"max_directed","pooled"}` and `weighting={"voxel","surfel"}`.
-  - The percentile $k$ must be reported.
-  - It is still undefined for empty masks.
-  - For small structures with few boundary points, HD95 approaches HD.
+    - The two conventions give different numbers. SegEvalKit should expose `mode={"max_directed","pooled"}` and `weighting={"voxel","surfel"}`.
+    - The percentile $k$ must be reported.
+    - It is still undefined for empty masks.
+    - For small structures with few boundary points, HD95 approaches HD.
 - **References:** Huttenlocher et al. (1993); Maier-Hein et al. (2024); Nikolov et al. (2021) (DeepMind implementation).
 
 ### 3.3 Average symmetric surface distance (ASSD)
 
 - **Aliases:** ASD (ambiguous), average surface distance, mean symmetric surface distance.
 - **Equation** (Heimann et al., 2009; MetricsReloaded `measured_average_distance`). The average is pooled over *all* boundary points of both surfaces:
-$$
-\mathrm{ASSD}(G,P)=\frac{\sum_{g\in\partial G} d(g,\partial P)+\sum_{p\in\partial P} d(p,\partial G)}{\lvert\partial G\rvert+\lvert\partial P\rvert}
-$$
+
+    $$
+    \mathrm{ASSD}(G,P)=\frac{\sum_{g\in\partial G} d(g,\partial P)+\sum_{p\in\partial P} d(p,\partial G)}{\lvert\partial G\rvert+\lvert\partial P\rvert}
+    $$
+
 - **Range / direction / units:** $[0,\infty)$ mm, lower is better.
 - **Plain English:** On average, how far the two contours are apart, in millimetres.
 - **Good for:** Typical boundary accuracy. Classic liver-segmentation benchmarks (SLIVER07) use it.
 - **Pitfalls:**
-  - Averaging hides localized large errors.
-  - The larger surface dominates (compare MASD).
-  - Naming is inconsistent across papers and tools. MedPy `asd` is the *directed* mean, while MedPy `assd` is the mean of the two directed means (that is, MASD-style). Always state the formula. See Yeghiazaryan & Voiculescu (2018) for a taxonomy.
+    - Averaging hides localized large errors.
+    - The larger surface dominates (compare MASD).
+    - Naming is inconsistent across papers and tools. MedPy `asd` is the *directed* mean, while MedPy `assd` is the mean of the two directed means (that is, MASD-style). Always state the formula. See Yeghiazaryan & Voiculescu (2018) for a taxonomy.
 - **References:** Heimann et al. (2009); Yeghiazaryan & Voiculescu (2018); Maier-Hein et al. (2024).
 
 ### 3.4 Mean average surface distance (MASD)
 
 - **Equation** (Beneš & Zitová, 2015; MetricsReloaded `measured_masd`). This is the mean of the two directed means:
-$$
-\mathrm{MASD}(G,P)=\frac12\left(\frac{\sum_{g\in\partial G} d(g,\partial P)}{\lvert\partial G\rvert}+\frac{\sum_{p\in\partial P} d(p,\partial G)}{\lvert\partial P\rvert}\right)
-$$
+
+    $$
+    \mathrm{MASD}(G,P)=\frac12\left(\frac{\sum_{g\in\partial G} d(g,\partial P)}{\lvert\partial G\rvert}+\frac{\sum_{p\in\partial P} d(p,\partial G)}{\lvert\partial P\rvert}\right)
+    $$
+
 - **Range / direction / units:** $[0,\infty)$ mm, lower is better.
 - **Plain English:** Like ASSD, but each contour gets equal weight regardless of its size.
 - **Good for:** Symmetric typical boundary error. Metrics Reloaded offers it alongside ASSD, HD95 and Boundary IoU.
@@ -350,11 +395,14 @@ $$
 ### 3.5 Directed average surface distance and average Hausdorff distance
 
 - **Equations:**
-$$
-\vec{d}_{\text{avg}}(A,B)=\frac{1}{\lvert A\rvert}\sum_{a\in A} d(a,B),\qquad
-\mathrm{AVD}_{\text{Taha}}(G,P)=\max\{\vec d_{\text{avg}}(G,P),\ \vec d_{\text{avg}}(P,G)\}
-$$
-  The second is the "average Hausdorff distance", Taha & Hanbury (2015) Eqs. 50–51. It is computed over voxel *sets*, not only surfaces, in EvaluateSegmentation.
+
+    $$
+    \vec{d}_{\text{avg}}(A,B)=\frac{1}{\lvert A\rvert}\sum_{a\in A} d(a,B),\qquad
+    \mathrm{AVD}_{\text{Taha}}(G,P)=\max\{\vec d_{\text{avg}}(G,P),\ \vec d_{\text{avg}}(P,G)\}
+    $$
+
+    The second is the "average Hausdorff distance", Taha & Hanbury (2015) Eqs. 50–51. It is computed over voxel *sets*, not only surfaces, in EvaluateSegmentation.
+
 - **Range / direction / units:** mm, lower is better.
 - **Plain English:** The average distance from one segmentation to the other, in one direction or taking the worse direction.
 - **Good for:** Diagnosing whether error comes from over-segmentation ($P\to G$ large) or under-segmentation ($G\to P$ large). DeepMind `compute_average_surface_distance` returns both directed values as a tuple.
@@ -365,27 +413,31 @@ $$
 
 - **Aliases:** Surface Dice at tolerance τ, surface DSC, normalized surface distance (Metrics Reloaded).
 - **Equation** (Nikolov et al., 2021). Let $\mathcal B_A^{(\tau)}=\{x: d(x,\partial A)\le\tau\}$ be the border region of tolerance $\tau$ (mm) around surface $\partial A$, with $\lvert\cdot\rvert$ denoting surface *area*:
-$$
-\mathrm{NSD}^{(\tau)}(G,P)=\frac{\lvert\partial P\cap\mathcal B_G^{(\tau)}\rvert+\lvert\partial G\cap\mathcal B_P^{(\tau)}\rvert}{\lvert\partial P\rvert+\lvert\partial G\rvert}
-$$
+
+    $$
+    \mathrm{NSD}^{(\tau)}(G,P)=\frac{\lvert\partial P\cap\mathcal B_G^{(\tau)}\rvert+\lvert\partial G\cap\mathcal B_P^{(\tau)}\rvert}{\lvert\partial P\rvert+\lvert\partial G\rvert}
+    $$
+
 - **Range / direction:** $[0,1]$, higher is better.
 - **Parameters:** $\tau$ in mm. Nikolov et al. set organ-specific $\tau$ from inter-observer variability. The Medical Segmentation Decathlon also reports NSD (Antonelli et al., 2022).
 - **Edge cases:** If both masks are empty, MetricsReloaded returns NaN and advises the best value at aggregation. If exactly one is empty the result is 0 (DeepMind), or NaN in some tools.
 - **Plain English:** The fraction of the contour that is "close enough", within a clinically acceptable tolerance, so it would not need manual correction.
 - **Good for:** Boundary-critical tasks, especially radiotherapy contouring (estimating correction effort). Metrics Reloaded makes NSD the default boundary metric when annotation imprecision should be compensated, and recommends pairing it with DSC.
 - **Pitfalls:**
-  - It depends on $\tau$, so always report $\tau$ and justify it (inter-rater variability or a clinical margin).
-  - It gives no information about error magnitude beyond $\tau$.
-  - Surfel-area weighting (DeepMind) and border-voxel counting (MetricsReloaded, MONAI default) disagree, particularly on anisotropic grids.
+    - It depends on $\tau$, so always report $\tau$ and justify it (inter-rater variability or a clinical margin).
+    - It gives no information about error magnitude beyond $\tau$.
+    - Surfel-area weighting (DeepMind) and border-voxel counting (MetricsReloaded, MONAI default) disagree, particularly on anisotropic grids.
 - **References:** Nikolov et al. (2021); Maier-Hein et al. (2024); Antonelli et al. (2022).
 
 ### 3.7 Surface overlap at tolerance (directed)
 
 - **Equation** (DeepMind `compute_surface_overlap_at_tolerance`; pymia `SurfaceOverlap`):
-$$
-\mathrm{SO}_{G\to P}^{(\tau)}=\frac{\lvert\partial G\cap\mathcal B_P^{(\tau)}\rvert}{\lvert\partial G\rvert},\qquad
-\mathrm{SO}_{P\to G}^{(\tau)}=\frac{\lvert\partial P\cap\mathcal B_G^{(\tau)}\rvert}{\lvert\partial P\rvert}
-$$
+
+    $$
+    \mathrm{SO}_{G\to P}^{(\tau)}=\frac{\lvert\partial G\cap\mathcal B_P^{(\tau)}\rvert}{\lvert\partial G\rvert},\qquad
+    \mathrm{SO}_{P\to G}^{(\tau)}=\frac{\lvert\partial P\cap\mathcal B_G^{(\tau)}\rvert}{\lvert\partial P\rvert}
+    $$
+
 - **Range / direction:** $[0,1]$ each, higher is better. They are a boundary "recall" and "precision".
 - **Plain English:** How much of the true contour the prediction reproduces within tolerance, and how much of the predicted contour is correct within tolerance.
 - **Good for:** Separating under-contouring from over-contouring in radiotherapy QA. NSD combines the two.
@@ -394,9 +446,11 @@ $$
 ### 3.8 Boundary IoU (BIoU)
 
 - **Equation** (Cheng et al., 2021). Let $G_d=\{x\in G: d(x,\partial G)\le d\}$ be the inner boundary band of width $d$, and likewise $P_d$:
-$$
-\mathrm{BIoU}(G,P)=\frac{\lvert G_d\cap P_d\rvert}{\lvert G_d\cup P_d\rvert}
-$$
+
+    $$
+    \mathrm{BIoU}(G,P)=\frac{\lvert G_d\cap P_d\rvert}{\lvert G_d\cup P_d\rvert}
+    $$
+
 - **Range / direction:** $[0,1]$, higher is better.
 - **Parameters:** Band width $d$. The original 2D paper uses 2% of the image diagonal. For 3D medical images, specify $d$ in mm. MetricsReloaded defaults to 1 voxel.
 - **Edge cases:** If both masks are empty, NaN (MetricsReloaded, set to best at aggregation).
@@ -417,10 +471,13 @@ $$
 ### 3.10 Mahalanobis distance (MHD)
 
 - **Equation** (Taha & Hanbury, 2015, Eqs. 53–54). Voxel coordinates of $G$ and $P$ are treated as point clouds with means $\boldsymbol\mu_G,\boldsymbol\mu_P$, covariances $S_G,S_P$ and sizes $n_G=\lvert G\rvert$, $n_P=\lvert P\rvert$:
-$$
-\mathrm{MHD}(G,P)=\sqrt{(\boldsymbol\mu_G-\boldsymbol\mu_P)^\top S^{-1}(\boldsymbol\mu_G-\boldsymbol\mu_P)},\qquad S=\frac{n_G S_G+n_P S_P}{n_G+n_P}
-$$
-  Taha & Hanbury print the squared form without the square root. State which one is used.
+
+    $$
+    \mathrm{MHD}(G,P)=\sqrt{(\boldsymbol\mu_G-\boldsymbol\mu_P)^\top S^{-1}(\boldsymbol\mu_G-\boldsymbol\mu_P)},\qquad S=\frac{n_G S_G+n_P S_P}{n_G+n_P}
+    $$
+
+    Taha & Hanbury print the squared form without the square root. State which one is used.
+
 - **Range / direction:** $[0,\infty)$, unitless (normalized by covariance), lower is better.
 - **Plain English:** How far apart the two shapes' centres are, measured relative to the shapes' spread and orientation.
 - **Good for:** "General shape and alignment", ignoring boundary detail (Taha & Hanbury, 2015).
@@ -434,28 +491,33 @@ $$
 ### 4.1 Centerline Dice (clDice)
 
 - **Equation** (Shit et al., 2021). Let $S_G=\mathrm{skel}(G)$ and $S_P=\mathrm{skel}(P)$ be morphological skeletons:
-$$
-T_{\mathrm{prec}}(S_P,G)=\frac{\lvert S_P\cap G\rvert}{\lvert S_P\rvert},\quad
-T_{\mathrm{sens}}(S_G,P)=\frac{\lvert S_G\cap P\rvert}{\lvert S_G\rvert},\quad
-\mathrm{clDice}=\frac{2\,T_{\mathrm{prec}}\,T_{\mathrm{sens}}}{T_{\mathrm{prec}}+T_{\mathrm{sens}}}
-$$
+
+    $$
+    T_{\mathrm{prec}}(S_P,G)=\frac{\lvert S_P\cap G\rvert}{\lvert S_P\rvert},\quad
+    T_{\mathrm{sens}}(S_G,P)=\frac{\lvert S_G\cap P\rvert}{\lvert S_G\rvert},\quad
+    \mathrm{clDice}=\frac{2\,T_{\mathrm{prec}}\,T_{\mathrm{sens}}}{T_{\mathrm{prec}}+T_{\mathrm{sens}}}
+    $$
+
 - **Range / direction:** $[0,1]$, higher is better.
 - **Edge cases:** Undefined for empty skeletons. MetricsReloaded returns NaN when both are empty and advises the max at aggregation.
 - **Plain English:** Checks whether the *centre lines* of vessels or ducts are captured and whether the predicted centre lines stay inside the true structure. It rewards connected, unbroken tubes.
 - **Good for:** Tubular structures such as vessels, airways, nerves and ducts. Metrics Reloaded recommends clDice as the overlap metric when the fingerprint indicates tubular structures and topology matters.
 - **Pitfalls:**
-  - The result depends on the skeletonization algorithm (3D thinning, e.g. Lee et al. 1994 in scikit-image) and on voxel anisotropy. Resample to isotropic spacing, or document the choice.
-  - It is insensitive to vessel radius errors.
-  - Skeletons of blobby, non-tubular structures are unstable.
+    - The result depends on the skeletonization algorithm (3D thinning, e.g. Lee et al. 1994 in scikit-image) and on voxel anisotropy. Resample to isotropic spacing, or document the choice.
+    - It is insensitive to vessel radius errors.
+    - Skeletons of blobby, non-tubular structures are unstable.
 - **References:** Shit et al. (2021); Maier-Hein et al. (2024).
 
 ### 4.2 Betti number error
 
 - **Equation.** $\beta_0$, $\beta_1$ and $\beta_2$ count, respectively, connected components, independent loops (tunnels or handles) and enclosed cavities of a 3D binary object:
-$$
-\mathrm{BE}_k=\lvert\beta_k(P)-\beta_k(G)\rvert,\qquad \mathrm{BE}=\sum_{k=0}^{2}\mathrm{BE}_k
-$$
-  It can be computed globally or averaged over random patches (Hu et al., 2019).
+
+    $$
+    \mathrm{BE}_k=\lvert\beta_k(P)-\beta_k(G)\rvert,\qquad \mathrm{BE}=\sum_{k=0}^{2}\mathrm{BE}_k
+    $$
+
+    It can be computed globally or averaged over random patches (Hu et al., 2019).
+
 - **Range / direction:** Non-negative integers, lower is better. 0 means the same topology.
 - **Conventions:** The connectivity pair must be declared, such as 26-connectivity for foreground with 6 for background, or vice versa. $\beta$ values depend on it.
 - **Plain English:** Counts how many extra or missing pieces, loops and holes the prediction has compared with the truth.
@@ -475,10 +537,13 @@ $$
 ### 4.4 Euler characteristic error
 
 - **Equation:**
-$$
-\chi(X)=\beta_0-\beta_1+\beta_2,\qquad \mathrm{ECE}_\chi=\lvert\chi(P)-\chi(G)\rvert
-$$
-  $\chi$ can be computed locally from voxel/edge/face/cube counts of the cubical complex ($\chi=V-E+F-C$), for example `skimage.measure.euler_number`.
+
+    $$
+    \chi(X)=\beta_0-\beta_1+\beta_2,\qquad \mathrm{ECE}_\chi=\lvert\chi(P)-\chi(G)\rvert
+    $$
+
+    $\chi$ can be computed locally from voxel/edge/face/cube counts of the cubical complex ($\chi=V-E+F-C$), for example `skimage.measure.euler_number`.
+
 - **Range / direction:** Non-negative integers, lower is better.
 - **Plain English:** A quick single-number topology check that combines counts of pieces, loops and cavities.
 - **Good for:** Cheap topology screening (for example cortical-surface genus: a sphere-like cortex has $\chi=2$).
@@ -494,55 +559,64 @@ $$
 ### 5.1 Lesion-wise sensitivity, precision and F1
 
 - **Aliases:**
-  - Lesion true-positive rate (LTPR) and lesion false-positive rate (LFPR) (Carass et al., 2017).
-  - Detection F1.
-  - Object-level TPR/FPR (MedPy `obj_tpr`, `obj_fpr`).
+    - Lesion true-positive rate (LTPR) and lesion false-positive rate (LFPR) (Carass et al., 2017).
+    - Detection F1.
+    - Object-level TPR/FPR (MedPy `obj_tpr`, `obj_fpr`).
 - **Equations.** With $\mathrm{TP}_\ell$, $\mathrm{FP}_\ell$ and $\mathrm{FN}_\ell$ as *counts of lesions* after matching:
-$$
-\mathrm{LTPR}=\frac{\mathrm{TP}_\ell}{\mathrm{TP}_\ell+\mathrm{FN}_\ell},\quad
-\mathrm{LFPR}=\frac{\mathrm{FP}_\ell}{\mathrm{TP}_\ell+\mathrm{FP}_\ell},\quad
-\mathrm{F1}_\ell=\frac{2\,\mathrm{TP}_\ell}{2\,\mathrm{TP}_\ell+\mathrm{FP}_\ell+\mathrm{FN}_\ell}
-$$
-  In LTPR and LFPR, the TP count is taken with respect to the reference and the prediction respectively, since one-to-many matches can make them differ.
+
+    $$
+    \mathrm{LTPR}=\frac{\mathrm{TP}_\ell}{\mathrm{TP}_\ell+\mathrm{FN}_\ell},\quad
+    \mathrm{LFPR}=\frac{\mathrm{FP}_\ell}{\mathrm{TP}_\ell+\mathrm{FP}_\ell},\quad
+    \mathrm{F1}_\ell=\frac{2\,\mathrm{TP}_\ell}{2\,\mathrm{TP}_\ell+\mathrm{FP}_\ell+\mathrm{FN}_\ell}
+    $$
+
+    In LTPR and LFPR, the TP count is taken with respect to the reference and the prediction respectively, since one-to-many matches can make them differ.
+
 - **Range / direction:** $[0,1]$. LTPR and F1: higher is better. LFPR: lower is better.
 - **Plain English:** Of all true lesions, how many were found, and of all flagged lesions, how many were real?
 - **Good for:** Multi-lesion diseases such as MS, brain metastases and lung nodules, where counting lesions matters clinically.
 - **Pitfalls:**
-  - The results depend heavily on the matching rule (overlap threshold, dilation, minimum lesion size) and on CCL connectivity.
-  - Confluent lesions merge or split under CCL.
-  - Very small reference lesions are often excluded by volume thresholds, and these must be reported.
+    - The results depend heavily on the matching rule (overlap threshold, dilation, minimum lesion size) and on CCL connectivity.
+    - Confluent lesions merge or split under CCL.
+    - Very small reference lesions are often excluded by volume thresholds, and these must be reported.
 - **References:** Carass et al. (2017); Commowick et al. (2018); Maier-Hein et al. (2024).
 
 ### 5.2 Lesion-wise Dice and lesion-wise HD95 (BraTS 2023 protocol)
 
 - **Protocol** (BraTS 2023 evaluation code, `rachitsaluja/BraTS-2023-Metrics`; described in Moawad et al., 2023 and Kazerooni et al., 2024):
-  1. For each tumour sub-region (WT, TC, ET), label the reference components (26-connectivity).
-  2. For each reference lesion $g_i$, dilate it by $k$ iterations of a 3×3×3 18-connected structuring element ($k=3$ for GLI/SSA/PED and $k=1$ for MEN/MET). Every predicted component intersecting the dilated region is assigned to $g_i$.
-  3. Compute Dice and HD95 (DeepMind implementation, spacing-aware) between $g_i$ and the union of its assigned predicted components.
-  4. Predicted components assigned to no lesion are FP lesions.
-  5. Reference lesions with volume ≤ θ are excluded (θ = 50 mm³, or 2 mm³ for METS).
+    1. For each tumour sub-region (WT, TC, ET), label the reference components (26-connectivity).
+    2. For each reference lesion $g_i$, dilate it by $k$ iterations of a 3×3×3 18-connected structuring element ($k=3$ for GLI/SSA/PED and $k=1$ for MEN/MET). Every predicted component intersecting the dilated region is assigned to $g_i$.
+    3. Compute Dice and HD95 (DeepMind implementation, spacing-aware) between $g_i$ and the union of its assigned predicted components.
+    4. Predicted components assigned to no lesion are FP lesions.
+    5. Reference lesions with volume ≤ θ are excluded (θ = 50 mm³, or 2 mm³ for METS).
 - **Equations.** $\mathcal G$ is the set of retained reference lesions and $\mathcal F$ the set of FP predicted components:
-$$
-\mathrm{LesionDice}=\frac{\sum_{i\in\mathcal G}\mathrm{DSC}(g_i,\hat p_i)}{\lvert\mathcal G\rvert+\lvert\mathcal F\rvert},\qquad
-\mathrm{LesionHD95}=\frac{\sum_{i\in\mathcal G}\mathrm{HD95}(g_i,\hat p_i)+374\,\lvert\mathcal F\rvert}{\lvert\mathcal G\rvert+\lvert\mathcal F\rvert}
-$$
-  Missed lesions (FN) contribute DSC = 0 and HD95 = ∞, replaced by 374 mm. FP lesions contribute 0 and 374. If both reference and prediction are empty (0/0), the code sets LesionDice = 1 and LesionHD95 = 0.
+
+    $$
+    \mathrm{LesionDice}=\frac{\sum_{i\in\mathcal G}\mathrm{DSC}(g_i,\hat p_i)}{\lvert\mathcal G\rvert+\lvert\mathcal F\rvert},\qquad
+    \mathrm{LesionHD95}=\frac{\sum_{i\in\mathcal G}\mathrm{HD95}(g_i,\hat p_i)+374\,\lvert\mathcal F\rvert}{\lvert\mathcal G\rvert+\lvert\mathcal F\rvert}
+    $$
+
+    Missed lesions (FN) contribute DSC = 0 and HD95 = ∞, replaced by 374 mm. FP lesions contribute 0 and 374. If both reference and prediction are empty (0/0), the code sets LesionDice = 1 and LesionHD95 = 0.
+
 - **Range / direction / units:** Dice in $[0,1]$, higher is better. HD95 in $[0,374]$ mm, lower is better.
 - **Plain English:** Scores each tumour focus separately and averages, so a missed small metastasis counts as much as a well-segmented large one.
 - **Good for:** Multi-focal disease, where whole-volume Dice is dominated by the largest lesion.
 - **Pitfalls:**
-  - The dilation-based matching can merge nearby lesions.
-  - The 374 mm penalty is specific to the atlas space. For other fields of view, use the image diagonal and document it.
-  - The volume threshold removes tiny lesions from the denominator.
+    - The dilation-based matching can merge nearby lesions.
+    - The 374 mm penalty is specific to the atlas space. For other fields of view, use the image diagonal and document it.
+    - The volume threshold removes tiny lesions from the denominator.
 - **References:** BraTS 2023 metrics code; Moawad et al. (2023) (BraTS-METS); Kazerooni et al. (2024) (BraTS-PEDs).
 
 ### 5.3 Free-response ROC (FROC), FPs per scan and CPM
 
 - **Definition.** Sweep a detection-confidence threshold $t$. At each $t$ plot lesion sensitivity $\mathrm{LTPR}(t)$ against the mean number of false positives per image $\overline{\mathrm{FP}}(t)$. The LUNA16 *competition performance metric* (CPM) is the mean sensitivity at 7 predefined FP rates:
-$$
-\mathrm{CPM}=\frac17\sum_{f\in\{\frac18,\frac14,\frac12,1,2,4,8\}}\mathrm{LTPR}\big(\overline{\mathrm{FP}}=f\big)
-$$
-  Related measures are JAFROC (Chakraborty & Berbaum, 2004) and partial area under the FROC curve up to a maximum number of FPs per scan.
+
+    $$
+    \mathrm{CPM}=\frac17\sum_{f\in\{\frac18,\frac14,\frac12,1,2,4,8\}}\mathrm{LTPR}\big(\overline{\mathrm{FP}}=f\big)
+    $$
+
+    Related measures are JAFROC (Chakraborty & Berbaum, 2004) and partial area under the FROC curve up to a maximum number of FPs per scan.
+
 - **Range / direction:** Sensitivity in $[0,1]$ at a given FP/scan, higher is better.
 - **Plain English:** "How many real lesions does the algorithm find if we tolerate *x* false alarms per scan?"
 - **Good for:** Screening and detection tasks (nodules, metastases, microbleeds) with lesion-level confidence scores. Metrics Reloaded lists FROC as a multi-threshold detection metric.
@@ -552,31 +626,36 @@ $$
 ### 5.4 Panoptic Quality (PQ), segmentation quality (SQ) and recognition quality (RQ)
 
 - **Equation** (Kirillov et al., 2019). Predicted instance $p$ matches reference instance $g$ if $\mathrm{IoU}(p,g)>0.5$. This guarantees a unique matching. Then:
-$$
-\mathrm{PQ}=\frac{\sum_{(p,g)\in\mathrm{TP}}\mathrm{IoU}(p,g)}{\lvert\mathrm{TP}\rvert+\frac12\lvert\mathrm{FP}\rvert+\frac12\lvert\mathrm{FN}\rvert}
-=\underbrace{\frac{\sum_{(p,g)\in\mathrm{TP}}\mathrm{IoU}(p,g)}{\lvert\mathrm{TP}\rvert}}_{\mathrm{SQ}}\times\underbrace{\frac{\lvert\mathrm{TP}\rvert}{\lvert\mathrm{TP}\rvert+\frac12\lvert\mathrm{FP}\rvert+\frac12\lvert\mathrm{FN}\rvert}}_{\mathrm{RQ}}
-$$
+
+    $$
+    \mathrm{PQ}=\frac{\sum_{(p,g)\in\mathrm{TP}}\mathrm{IoU}(p,g)}{\lvert\mathrm{TP}\rvert+\frac12\lvert\mathrm{FP}\rvert+\frac12\lvert\mathrm{FN}\rvert}
+    =\underbrace{\frac{\sum_{(p,g)\in\mathrm{TP}}\mathrm{IoU}(p,g)}{\lvert\mathrm{TP}\rvert}}_{\mathrm{SQ}}\times\underbrace{\frac{\lvert\mathrm{TP}\rvert}{\lvert\mathrm{TP}\rvert+\frac12\lvert\mathrm{FP}\rvert+\frac12\lvert\mathrm{FN}\rvert}}_{\mathrm{RQ}}
+    $$
+
 - **Range / direction:** $[0,1]$, higher is better. RQ is the detection F1, and SQ is the mean IoU of matched pairs.
 - **Edge cases:** Undefined when there are no instances in either mask (0/0). Conventions set it to 1 or NaN.
 - **Plain English:** One number combining "did we find each lesion?" (RQ) with "how well did we outline the ones we found?" (SQ).
 - **Good for:** Instance segmentation (multiple lesions, cells, vertebrae). Metrics Reloaded recommends PQ as especially suited to instance segmentation. Variants in `panoptica` replace IoU with DSC or ASSD inside SQ and allow a lower matching threshold with Hungarian assignment (MONAI uses Munkres for thresholds < 0.5).
 - **Pitfalls:**
-  - With IoU > 0.5, small lesions whose IoU falls just below 0.5 count as both a FN *and* a FP.
-  - It is sensitive to instance-split and instance-merge errors.
-  - Pooling over a dataset vs averaging per image gives different results.
+    - With IoU > 0.5, small lesions whose IoU falls just below 0.5 count as both a FN *and* a FP.
+    - It is sensitive to instance-split and instance-merge errors.
+    - Pooling over a dataset vs averaging per image gives different results.
 - **References:** Kirillov et al. (2019); Kofler et al. (2023, panoptica); Maier-Hein et al. (2024).
 
 ### 5.5 Connected-component split/merge errors and lesion count error
 
 - **Definitions.** Build the bipartite overlap graph between reference components $\{g_i\}$ and predicted components $\{p_j\}$, with an edge where $\lvert g_i\cap p_j\rvert>0$ (or above a threshold):
-  - **Split error:** a reference component overlapped by ≥ 2 predicted components. The count is $\sum_i \max(0,\deg(g_i)-1)$.
-  - **Merge error:** a predicted component overlapping ≥ 2 reference components. The count is $\sum_j \max(0,\deg(p_j)-1)$.
-  - **Lesion count error:** $\lvert\, \#\{p_j\}-\#\{g_i\}\,\rvert$, or signed.
-  - The information-theoretic counterpart is *split/merge variation of information* (Nunez-Iglesias et al., 2013; Arganda-Carreras et al., 2015):
-$$
-\mathrm{VI}_{\text{split}}=H(P\mid G),\qquad \mathrm{VI}_{\text{merge}}=H(G\mid P),\qquad \mathrm{VI}=\mathrm{VI}_{\text{split}}+\mathrm{VI}_{\text{merge}}
-$$
-  These are computed on the joint label distribution of the two instance labelings. In the connectomics convention, $H(P\mid G)$ is labelled the split term and $H(G\mid P)$ the merge term.
+    - **Split error:** a reference component overlapped by ≥ 2 predicted components. The count is $\sum_i \max(0,\deg(g_i)-1)$.
+    - **Merge error:** a predicted component overlapping ≥ 2 reference components. The count is $\sum_j \max(0,\deg(p_j)-1)$.
+    - **Lesion count error:** $\lvert\, \#\{p_j\}-\#\{g_i\}\,\rvert$, or signed.
+    - The information-theoretic counterpart is *split/merge variation of information* (Nunez-Iglesias et al., 2013; Arganda-Carreras et al., 2015):
+
+        $$
+        \mathrm{VI}_{\text{split}}=H(P\mid G),\qquad \mathrm{VI}_{\text{merge}}=H(G\mid P),\qquad \mathrm{VI}=\mathrm{VI}_{\text{split}}+\mathrm{VI}_{\text{merge}}
+        $$
+
+    These are computed on the joint label distribution of the two instance labelings. In the connectomics convention, $H(P\mid G)$ is labelled the split term and $H(G\mid P)$ the merge term.
+
 - **Range / direction:** Counts and VI are $\ge0$, lower is better.
 - **Plain English:** Did the algorithm break one lesion into several, or fuse several lesions into one?
 - **Good for:** Lesion counting (MS lesion load, metastasis count), vertebra and tooth instance labelling, and neuron or vessel reconstruction.
@@ -592,27 +671,32 @@ These metrics apply to *soft* outputs ($p_i\in[0,1]$, or softmax vectors $\mathb
 ### 6.1 Expected calibration error (ECE) and maximum calibration error (MCE)
 
 - **Equation** (Naeini et al., 2015; Guo et al., 2017). Partition voxels into $M$ equal-width confidence bins $B_m$:
-$$
-\mathrm{ECE}=\sum_{m=1}^{M}\frac{\lvert B_m\rvert}{n}\,\big\lvert\mathrm{acc}(B_m)-\mathrm{conf}(B_m)\big\rvert,\qquad \mathrm{MCE}=\max_m\big\lvert\mathrm{acc}(B_m)-\mathrm{conf}(B_m)\big\rvert
-$$
-  $\mathrm{conf}(B_m)$ is the mean predicted confidence in the bin and $\mathrm{acc}(B_m)$ the fraction correct. For binary foreground calibration, use $\mathrm{conf}=\bar p$ and $\mathrm{acc}=\bar y$ in each bin (reliability diagram). Variants:
-  - Class-wise ECE (Kull et al., 2019).
-  - Adaptive / equal-mass binning (Nixon et al., 2019).
+
+    $$
+    \mathrm{ECE}=\sum_{m=1}^{M}\frac{\lvert B_m\rvert}{n}\,\big\lvert\mathrm{acc}(B_m)-\mathrm{conf}(B_m)\big\rvert,\qquad \mathrm{MCE}=\max_m\big\lvert\mathrm{acc}(B_m)-\mathrm{conf}(B_m)\big\rvert
+    $$
+
+    $\mathrm{conf}(B_m)$ is the mean predicted confidence in the bin and $\mathrm{acc}(B_m)$ the fraction correct. For binary foreground calibration, use $\mathrm{conf}=\bar p$ and $\mathrm{acc}=\bar y$ in each bin (reliability diagram). Variants:
+
+    - Class-wise ECE (Kull et al., 2019).
+    - Adaptive / equal-mass binning (Nixon et al., 2019).
 - **Range / direction:** $[0,1]$, lower is better.
 - **Plain English:** When the model says "80% sure this voxel is tumour", is it right about 80% of the time?
 - **Good for:** Checking whether probability maps can be trusted for uncertainty-aware decisions, thresholding or active learning. Mehrtash et al. (2020) show that Dice-loss-trained segmentation CNNs are poorly calibrated and that ensembling improves calibration.
 - **Pitfalls:**
-  - Whole-volume ECE is dominated by trivially correct background voxels with $p\approx0$, which makes it look excellent. Common practice is to restrict computation to a region of interest (for example a dilated union of $G$ and $P$) and to report that region.
-  - The number of bins $M$ and the binning scheme change the value.
-  - It is not a proper scoring rule, so a model can have low ECE and poor discrimination.
+    - Whole-volume ECE is dominated by trivially correct background voxels with $p\approx0$, which makes it look excellent. Common practice is to restrict computation to a region of interest (for example a dilated union of $G$ and $P$) and to report that region.
+    - The number of bins $M$ and the binning scheme change the value.
+    - It is not a proper scoring rule, so a model can have low ECE and poor discrimination.
 - **References:** Naeini et al. (2015); Guo et al. (2017); Mehrtash et al. (2020); Kull et al. (2019); Nixon et al. (2019).
 
 ### 6.2 Brier score
 
 - **Equation** (Brier, 1950):
-$$
-\mathrm{BS}=\frac1n\sum_{i=1}^n (p_i-y_i)^2\quad\text{(binary)},\qquad \mathrm{BS}=\frac1n\sum_{i=1}^n\sum_{c=1}^{C}(p_{ic}-y_{ic})^2\quad\text{(multi-class)}
-$$
+
+    $$
+    \mathrm{BS}=\frac1n\sum_{i=1}^n (p_i-y_i)^2\quad\text{(binary)},\qquad \mathrm{BS}=\frac1n\sum_{i=1}^n\sum_{c=1}^{C}(p_{ic}-y_{ic})^2\quad\text{(multi-class)}
+    $$
+
 - **Range / direction:** $[0,1]$ binary ($[0,2]$ multi-class), lower is better.
 - **Plain English:** The mean squared difference between predicted probabilities and the true 0/1 labels.
 - **Good for:** A proper scoring rule combining calibration and discrimination. Mehrtash et al. (2020) use it for segmentation.
@@ -631,10 +715,13 @@ $$
 ### 6.4 Probabilistic distance (PBD)
 
 - **Equation** (Gerig et al., 2001; Taha & Hanbury, 2015, Eq. 43). $f_G$ and $f_P$ are (fuzzy or probabilistic) membership maps:
-$$
-\mathrm{PBD}(G,P)=\frac{\sum_x\lvert f_G(x)-f_P(x)\rvert}{2\sum_x f_G(x)\,f_P(x)}
-$$
-  *Verification caveat:* in the machine-extracted text of Taha & Hanbury's Eq. 43 we could not tell whether the "2" is a squared exponent on the numerator or a factor in the denominator. The form above ($L_1$ difference over twice the joint probability) follows Gerig et al.'s VALMET definition as we understand it. SegEvalKit should confirm it against the typeset PDF and test against EvaluateSegmentation's output before release.
+
+    $$
+    \mathrm{PBD}(G,P)=\frac{\sum_x\lvert f_G(x)-f_P(x)\rvert}{2\sum_x f_G(x)\,f_P(x)}
+    $$
+
+    *Verification caveat:* in the machine-extracted text of Taha & Hanbury's Eq. 43 we could not tell whether the "2" is a squared exponent on the numerator or a factor in the denominator. The form above ($L_1$ difference over twice the joint probability) follows Gerig et al.'s VALMET definition as we understand it. SegEvalKit should confirm it against the typeset PDF and test against EvaluateSegmentation's output before release.
+
 - **Range / direction:** $[0,\infty)$, lower is better. It is undefined when $\sum f_Gf_P=0$ (no overlap).
 - **Plain English:** Compares probability maps directly, without thresholding them.
 - **Good for:** Fuzzy or probabilistic references (for example STAPLE maps and multi-rater averages).
@@ -644,10 +731,13 @@ $$
 ### 6.5 Uncertainty–error overlap (UEO)
 
 - **Equation** (Jungo & Reyes, 2019). With a voxel error map $E=G\,\triangle\,P$ and a thresholded uncertainty map $U_t=\{i: u_i>t\}$:
-$$
-\mathrm{UEO}=\max_t\ \mathrm{DSC}(U_t, E)
-$$
-  The value at a fixed $t$ may also be reported.
+
+    $$
+    \mathrm{UEO}=\max_t\ \mathrm{DSC}(U_t, E)
+    $$
+
+    The value at a fixed $t$ may also be reported.
+
 - **Range / direction:** $[0,1]$, higher is better.
 - **Plain English:** Does the model's uncertainty map highlight the regions where it actually made mistakes?
 - **Good for:** Evaluating voxel-wise uncertainty estimates (MC dropout, ensembles, test-time augmentation) for human-in-the-loop correction.
@@ -663,9 +753,11 @@ These treat the two segmentations as partitions (clusterings) of $\Omega$. Taha 
 ### 7.1 Mutual information (MI)
 
 - **Equation** (Taha & Hanbury, 2015, Eq. 38):
-$$
-\mathrm{MI}(G,P)=H(G)+H(P)-H(G,P),\quad H(G)=-\sum_j p_{j\cdot}\log p_{j\cdot},\quad H(G,P)=-\sum_{j,k}p_{jk}\log p_{jk}
-$$
+
+    $$
+    \mathrm{MI}(G,P)=H(G)+H(P)-H(G,P),\quad H(G)=-\sum_j p_{j\cdot}\log p_{j\cdot},\quad H(G,P)=-\sum_{j,k}p_{jk}\log p_{jk}
+    $$
+
 - **Range / direction:** $[0,\min(H(G),H(P))]$ (in bits or nats), higher is better. Normalized variants (NMI) map to $[0,1]$.
 - **Plain English:** How much knowing one segmentation tells you about the other.
 - **Good for:** Taha & Hanbury (2015) note that it rewards recall. It also applies to multi-class partitions.
@@ -675,9 +767,11 @@ $$
 ### 7.2 Variation of information (VOI)
 
 - **Equation** (Meilă, 2007; Taha & Hanbury, 2015, Eq. 39):
-$$
-\mathrm{VOI}(G,P)=H(G)+H(P)-2\,\mathrm{MI}(G,P)=H(G\mid P)+H(P\mid G)
-$$
+
+    $$
+    \mathrm{VOI}(G,P)=H(G)+H(P)-2\,\mathrm{MI}(G,P)=H(G\mid P)+H(P\mid G)
+    $$
+
 - **Range / direction:** $[0,\log N]$, lower is better. It is a true metric on partitions.
 - **Plain English:** How much information is lost and gained when switching from one segmentation to the other.
 - **Good for:** Multi-label and instance partitions (it decomposes into split and merge terms, §5.5) and topology-aware benchmarks (Hu et al., 2019).
@@ -687,10 +781,13 @@ $$
 ### 7.3 Global consistency error (GCE)
 
 - **Equation** (Martin et al., 2001). Taha & Hanbury (2015, Eq. 19) give the binary form:
-$$
-\mathrm{GCE}=\frac1N\min\left\{\frac{FN(FN+2TP)}{TP+FN}+\frac{FP(FP+2TN)}{TN+FP},\ \frac{FP(FP+2TP)}{TP+FP}+\frac{FN(FN+2TN)}{TN+FN}\right\}
-$$
-  This comes from the local refinement error $E(S_1,S_2,x)=\frac{\lvert R(S_1,x)\setminus R(S_2,x)\rvert}{\lvert R(S_1,x)\rvert}$, where $R(S,x)$ is the region of $S$ containing voxel $x$.
+
+    $$
+    \mathrm{GCE}=\frac1N\min\left\{\frac{FN(FN+2TP)}{TP+FN}+\frac{FP(FP+2TN)}{TN+FP},\ \frac{FP(FP+2TP)}{TP+FP}+\frac{FN(FN+2TN)}{TN+FN}\right\}
+    $$
+
+    This comes from the local refinement error $E(S_1,S_2,x)=\frac{\lvert R(S_1,x)\setminus R(S_2,x)\rvert}{\lvert R(S_1,x)\rvert}$, where $R(S,x)$ is the region of $S$ containing voxel $x$.
+
 - **Range / direction:** $[0,1]$, lower is better.
 - **Plain English:** Measures how far one segmentation is from being a refinement of the other. It forgives one segmentation being a finer version of the other.
 - **Pitfalls:** The refinement tolerance means trivial segmentations (everything one region, or every voxel its own region) score 0. It is rarely appropriate for binary medical segmentation. Include it only for completeness and comparability with EvaluateSegmentation and pymia.
@@ -699,10 +796,13 @@ $$
 ### 7.4 Rand index (RI) and adjusted Rand index (ARI)
 
 - **Equation.** Contingency-table form (Hubert & Arabie, 1985). With $n_{jk}$ the joint counts, marginals $a_j=\sum_k n_{jk}$ and $b_k=\sum_j n_{jk}$, and $\binom{\cdot}{2}$ pair counts:
-$$
-\mathrm{ARI}=\frac{\sum_{jk}\binom{n_{jk}}{2}-\Big[\sum_j\binom{a_j}{2}\sum_k\binom{b_k}{2}\Big]\Big/\binom{N}{2}}{\frac12\Big[\sum_j\binom{a_j}{2}+\sum_k\binom{b_k}{2}\Big]-\Big[\sum_j\binom{a_j}{2}\sum_k\binom{b_k}{2}\Big]\Big/\binom{N}{2}}
-$$
-  Taha & Hanbury (2015, Eq. 32) express this with pair-agreement counts $a,b,c,d$ as $\mathrm{ARI}=\frac{2(ad-bc)}{c^2+b^2+2ad+(a+d)(c+b)}$. The Rand index is $\mathrm{RI}=(a+d)/(a+b+c+d)$ (Rand, 1971).
+
+    $$
+    \mathrm{ARI}=\frac{\sum_{jk}\binom{n_{jk}}{2}-\Big[\sum_j\binom{a_j}{2}\sum_k\binom{b_k}{2}\Big]\Big/\binom{N}{2}}{\frac12\Big[\sum_j\binom{a_j}{2}+\sum_k\binom{b_k}{2}\Big]-\Big[\sum_j\binom{a_j}{2}\sum_k\binom{b_k}{2}\Big]\Big/\binom{N}{2}}
+    $$
+
+    Taha & Hanbury (2015, Eq. 32) express this with pair-agreement counts $a,b,c,d$ as $\mathrm{ARI}=\frac{2(ad-bc)}{c^2+b^2+2ad+(a+d)(c+b)}$. The Rand index is $\mathrm{RI}=(a+d)/(a+b+c+d)$ (Rand, 1971).
+
 - **Range / direction:** RI is in $[0,1]$. ARI is in $[-1,1]$ with 0 at chance. Higher is better.
 - **Plain English:** Of all pairs of voxels, how often the two segmentations agree on whether the pair belongs together, corrected for chance (ARI).
 - **Good for:** Instance or cluster partitions (cell and neuron segmentation) and topology benchmarks. For binary 3D masks it is TN-dominated.
@@ -718,9 +818,9 @@ This section covers how per-case metric values become study-level conclusions. M
 ### 8.1 Per-case aggregation and reporting
 
 - **Recommended statistics:**
-  - Mean ± SD *and* median with interquartile range (IQR).
-  - The full distribution (box, violin or strip plots).
-  - The number of failures or undefined cases, reported explicitly.
+    - Mean ± SD *and* median with interquartile range (IQR).
+    - The full distribution (box, violin or strip plots).
+    - The number of failures or undefined cases, reported explicitly.
 - **Empty and undefined values:** NaN must not be silently dropped. The handling (dropping vs. substituting worst or best values) must be stated. MetricsReloaded's code comments say, for example, "set to worst case in aggregation" for HD with one empty mask, and "set to 1" for DSC with both empty.
 - **Multi-class:** Report per class. Class-averaged scores hide failures on small classes (Maier-Hein et al., 2024).
 - **Pitfall:** Pooling voxels across the dataset before computing DSC ("global Dice") weights big patients more and differs from mean per-case DSC. State which one is reported.
@@ -734,22 +834,25 @@ This section covers how per-case metric values become study-level conclusions. M
 ### 8.3 Paired hypothesis tests (Wilcoxon signed-rank) and multiplicity
 
 - **Wilcoxon signed-rank test** (Wilcoxon, 1945). With per-case differences $\delta_j=m_A(j)-m_B(j)$, rank $\lvert\delta_j\rvert$ (dropping zeros) and compute
-$$
-W^+=\sum_{j:\delta_j>0}\mathrm{rank}(\lvert\delta_j\rvert)
-$$
-  Compare $W^+$ with its null distribution (exact, or normal approximation with tie correction). This is the default for paired, non-normal, bounded metrics such as DSC.
+
+    $$
+    W^+=\sum_{j:\delta_j>0}\mathrm{rank}(\lvert\delta_j\rvert)
+    $$
+
+    Compare $W^+$ with its null distribution (exact, or normal approximation with tie correction). This is the default for paired, non-normal, bounded metrics such as DSC.
+
 - **Multiple comparisons:** Use Holm (1979) step-down or Benjamini–Hochberg when comparing several methods, metrics or classes. For more than 2 methods across many cases, use a Friedman test with post-hoc Nemenyi (Demšar, 2006).
 - **Pitfalls:**
-  - Statistical significance is not clinical relevance, so report effect sizes (median difference with bootstrap CI).
-  - Metric saturation near 1 compresses differences.
+    - Statistical significance is not clinical relevance, so report effect sizes (median difference with bootstrap CI).
+    - Metric saturation near 1 compresses differences.
 - **References:** Wilcoxon (1945); Holm (1979); Demšar (2006).
 
 ### 8.4 Ranking schemes and ranking robustness
 
 - **Schemes** (Maier-Hein et al., 2018; Wiesenfarth et al., 2021):
-  - *Aggregate-then-rank*: rank methods by mean or median metric.
-  - *Rank-then-aggregate*: rank methods per case, then average the ranks.
-  - *Test-based (significance) ranking*: count significant pairwise wins, for example one-sided Wilcoxon with Holm adjustment.
+    - *Aggregate-then-rank*: rank methods by mean or median metric.
+    - *Rank-then-aggregate*: rank methods per case, then average the ranks.
+    - *Test-based (significance) ranking*: count significant pairwise wins, for example one-sided Wilcoxon with Holm adjustment.
 - **Robustness.** Bootstrap the test cases and recompute rankings. Summarize with Kendall's $\tau$ between the full-data ranking and bootstrap rankings, and visualize with blob plots or ranking heatmaps (challengeR).
 - **Key finding:** Maier-Hein et al. (2018) showed that challenge rankings are often *not robust* to the choice of test data, ranking scheme, metric, aggregation operator and annotator. Winners can change with these choices, so rankings must be accompanied by uncertainty analysis.
 - **Missing values:** Rankings must define how failed or missing predictions are treated (usually worst rank or worst metric value).
@@ -771,10 +874,10 @@ This table summarizes each library's native behaviour, from source code inspecte
 
 1. Return a structured result (`value`, `defined: bool`, `reason`), never a silent NaN.
 2. Provide named policies:
-   - `"nan"` (default for per-case output).
-   - `"metrics_reloaded"` (best or worst as above).
-   - `"brats2023"` (DSC 1/0, HD95 0/374).
-   - `"penalty=image_diagonal_mm"`.
+    - `"nan"` (default for per-case output).
+    - `"metrics_reloaded"` (best or worst as above).
+    - `"brats2023"` (DSC 1/0, HD95 0/374).
+    - `"penalty=image_diagonal_mm"`.
 3. Always report counts of undefined cases per metric.
 
 ---
@@ -836,10 +939,10 @@ The general rule is to **combine one overlap-based metric with one boundary-base
 
 1. **One NIfTI-native pipeline.** It would read image pairs (or folders and CSV manifests), check that affines and shapes match, handle multi-label maps, and compute every family in this document with one configuration. No single existing Python tool covers overlap, surface, topology, instance, calibration and statistics together.
 2. **Explicit, switchable conventions**, with a reference test suite that pins them down:
-   - Empty-mask policies (NaN, Metrics Reloaded, BraTS 2023, image-diagonal penalty).
-   - HD-percentile mode (directed-max vs pooled).
-   - Boundary weighting (voxel vs surfel area).
-   - CCL connectivity.
+    - Empty-mask policies (NaN, Metrics Reloaded, BraTS 2023, image-diagonal penalty).
+    - HD-percentile mode (directed-max vs pooled).
+    - Boundary weighting (voxel vs surfel area).
+    - CCL connectivity.
 3. **Cross-library conformance tests.** Numerical agreement with MetricsReloaded, MONAI, DeepMind, MedPy and BraTS 2023 under each convention, with documented differences. This is a real gap, since users currently get different HD95 and NSD values from different tools without knowing why.
 4. **Lesion-wise evaluation.** Configurable matching (IoU, dilated overlap as in BraTS, centroid distance, Boundary IoU; greedy or Hungarian; minimum lesion volume in mm³). Outputs would include PQ, SQ, RQ, lesion F1, split and merge counts, lesion-count error, LesionDice and LesionHD95, and FROC/CPM when lesion confidences are available.
 5. **Topology metrics for 3D.** clDice with isotropic resampling option, Betti numbers (β0/β1/β2) and errors, Euler-characteristic error, and optional Betti matching through the authors' implementation.

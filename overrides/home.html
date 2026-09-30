@@ -5,7 +5,7 @@
 <section class="sk-hero">
   <div class="sk-wrap sk-hero__inner">
     <img class="sk-hero__logo" src="{{ 'assets/logo.svg' | url }}" alt="SegEvalKit logo">
-    <h1 class="sk-hero__title">SegEvalKit</h1>
+    <h1 id="segevalkit" class="sk-hero__title">SegEvalKit</h1>
     <p class="sk-hero__tagline">Evaluation of volumetric medical image segmentation,<br>done carefully.</p>
     <p class="sk-hero__lede">Fifty-three metrics with written definitions and tested conventions, a standard
       input&nbsp;/&nbsp;output format, statistics you can defend, and figures you can publish. For CT and MR, in Python.</p>
@@ -40,8 +40,8 @@
       <div class="sk-feature">
         <div class="sk-feature__icon">{% include ".icons/material/compass-outline.svg" %}</div>
         <h3>Knows which metric to use</h3>
-        <p>A Metrics Reloaded-style recommender, a pitfalls catalogue, and a sensitivity study on real CT anatomy
-          that shows what each metric sees.</p>
+        <p>A Metrics Reloaded-style recommender that derives a metric set from your problem, and a catalogue of
+          metric pitfalls with worked numeric examples.</p>
       </div>
       <div class="sk-feature">
         <div class="sk-feature__icon">{% include ".icons/material/folder-table-outline.svg" %}</div>
@@ -99,9 +99,12 @@ res.summary()   <span class="c"># mean, IQR, 95% CI</span></pre>{% endfilter %}<
         <p>Compare methods with paired tests, draw the figures, and write a single-file HTML report.</p>
 <div class="sk-code">{% filter trim %}
 <pre><span class="k">from</span> segevalkit.stats <span class="k">import</span> compare
-compare(res_a, res_b, metrics=[<span class="s">"dice"</span>, <span class="s">"hd95"</span>])
-sek.plotting.metric_distribution(res, <span class="s">"dice"</span>)
-sek.report.build_report(res, <span class="s">"report.html"</span>)</pre>{% endfilter %}</div>
+compare(res_a, res_b,
+        metrics=[<span class="s">"dice"</span>, <span class="s">"hd95"</span>])
+sek.plotting.metric_distribution(
+    res, <span class="s">"dice"</span>)
+sek.report.build_report(
+    res, <span class="s">"report.html"</span>)</pre>{% endfilter %}</div>
       </div>
     </div>
   </div>

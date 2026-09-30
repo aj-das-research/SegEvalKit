@@ -283,7 +283,7 @@ def case_gallery(items: Sequence[Dict], *, view: str = "axial", window="abdomen"
     ``items``: dicts with keys ``image`` (optional), ``pred``, ``ref``,
     ``affine`` (optional) and ``title`` (e.g. ``"case_012 · DSC 0.41"``).
     Typical use is the *k* worst cases from
-    :meth:`~segevalkit.results.EvaluationResult.worst_cases`.
+    `worst_cases`.
     """
     import matplotlib.pyplot as plt
 

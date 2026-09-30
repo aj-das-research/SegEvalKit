@@ -2,7 +2,7 @@
 
 Most segmentation metrics share expensive intermediates: the confusion counts,
 the two boundary surfaces, the two sets of directed surface distances, the
-connected components, the skeletons. :class:`PairContext` computes each of
+connected components, the skeletons. `PairContext` computes each of
 these lazily, once, and caches it, so asking for twenty metrics costs little
 more than asking for the most expensive one.
 
@@ -13,7 +13,7 @@ It also fixes the conventions that differ silently between existing tools:
 * **Directed surface distances** are exact Euclidean distances, in millimetres,
   from every surface voxel of one mask to the nearest surface voxel of the
   other, computed with the physical voxel spacing.
-* **Empty masks** follow an explicit, configurable :class:`EmptyPolicy`
+* **Empty masks** follow an explicit, configurable `EmptyPolicy`
   instead of whatever falls out of a division by zero.
 """
 
@@ -132,7 +132,7 @@ class PairContext:
         device: ``"cpu"`` or a torch device string such as ``"cuda"`` /
             ``"cuda:1"``. On a GPU device, confusion counts and surface
             distances run in PyTorch; everything else stays on the CPU.
-        empty: The :class:`EmptyPolicy`.
+        empty: The `EmptyPolicy`.
         connectivity: Connectivity used to define connected components
             (lesions / instances): 6, 18 or 26.
         min_component_voxels: Components smaller than this are ignored for
@@ -232,7 +232,7 @@ class PairContext:
         return self.pred_empty != self.ref_empty
 
     def best_or_nan(self, best: float) -> float:
-        """Value to return when both masks are empty, per the :class:`EmptyPolicy`."""
+        """Value to return when both masks are empty, per the `EmptyPolicy`."""
         return float(best) if self.empty.both_empty == "best" else float("nan")
 
     @cached_property
@@ -241,7 +241,7 @@ class PairContext:
         return float(np.sqrt(sum((n * s) ** 2 for n, s in zip(self.ref.shape, self.spacing))))
 
     def distance_penalty(self) -> float:
-        """Distance value for the one-mask-empty case, per the :class:`EmptyPolicy`."""
+        """Distance value for the one-mask-empty case, per the `EmptyPolicy`."""
         p = self.empty.one_empty_distance
         if p == "worst":
             return self.diagonal_mm

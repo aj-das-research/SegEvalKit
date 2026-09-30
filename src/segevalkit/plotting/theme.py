@@ -2,12 +2,12 @@
 
 Colour is assigned by the *job* it does:
 
-* **Categorical** (identity of a method / label): :data:`CATEGORICAL`, used in
+* **Categorical** (identity of a method / label): `CATEGORICAL`, used in
   fixed order and never cycled. Violet leads. The order was validated for
   adjacent-pair separation under protan/deutan/tritan simulation (ΔE ≥ 11) and
   the first three slots also pass the stricter all-pairs check, so scatter
   plots with ≤ 3 series are safe.
-* **Sequential** (magnitude): one purple ramp, light to dark (:data:`SEQUENTIAL`).
+* **Sequential** (magnitude): one purple ramp, light to dark (`SEQUENTIAL`).
 * **Diverging** (signed values, correlations): orange ↔ grey ↔ purple.
 * **Segmentation errors**: true positive = violet, false negative (missed) =
   orange, false positive (spurious) = teal, the all-pairs-safe first three slots.

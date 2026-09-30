@@ -1,0 +1,35 @@
+/* Compact metric cards: equation first, three short rows, details folded away. */
+.md-typeset .sek-metric { padding: .8rem 1.1rem .5rem; margin: 1.1rem 0; }
+.md-typeset .sek-metric > h3 { margin: .1em 0 .35em !important; font-size: 1.05em; }
+.md-typeset .sek-metric .arithmatex { margin: .3em 0 .5em; }
+.md-typeset .sek-metric > p { margin: .3em 0; line-height: 1.58; }
+.md-typeset .sek-metric > p > strong:first-child { display: inline-block; min-width: 6.4em; font-variant: small-caps;
+  letter-spacing: .03em; font-weight: 600; color: var(--sk-muted); }
+.md-typeset .sek-metric details, .md-typeset .sek-metric > details[class] { margin: .5em 0 .3em; border: 0;
+  border-top: 1px solid var(--sk-border); border-radius: 0;
+  background: transparent; font-size: .9em; }
+.md-typeset .sek-metric details > summary { padding-left: 1.6em; font-weight: 500; color: var(--sk-muted); }
+.md-typeset .sek-metric details > summary::before { left: 0; }
+.md-typeset .sek-metric details > summary::after { right: 0; }
+/* Compact tables of contents for long reference pages */
+.md-typeset .sek-lead { font-size: 1.02em; color: var(--md-default-fg-color--light); margin-bottom: 1.4em; }
+/* hanging indent: wrapped lines of a labelled row stay in the text column */
+/* the label is taken out of the flow so the first line and the wrapped lines share one left edge */
+.md-typeset .sek-metric > p:has(> strong:first-child) { position: relative; padding-left: 6.4em; }
+.md-typeset .sek-metric > p:has(> strong:first-child) > strong:first-child { position: absolute; left: 0;
+  width: 6.2em; min-width: 0; white-space: nowrap; }
+.md-typeset .sek-metric details > summary::after { background-color: var(--sk-500) !important; }
+/* generated metric catalogue: the one-sentence summary gets the room, short columns stay narrow */
+.md-typeset .sek-catalogue td:first-child { min-width: 9.5em; }
+.md-typeset .sek-catalogue td:last-child { min-width: 15em; }
+.md-typeset .sek-catalogue td:nth-child(2), .md-typeset .sek-catalogue td:nth-child(3) { white-space: nowrap; }
+/* phones: labels sit above their text, cards and tables tighten, display maths shrinks slightly */
+@media screen and (max-width: 30em) {
+  .md-typeset .sek-metric { padding: .7rem .8rem .4rem; }
+  .md-typeset .sek-metric > p:has(> strong:first-child) { padding-left: 0; }
+  .md-typeset .sek-metric > p:has(> strong:first-child) > strong:first-child { position: static; display: block;
+    width: auto; margin-bottom: .05em; }
+  .md-typeset .sek-metric .arithmatex { font-size: .88em; }
+  .md-typeset table:not([class]) { font-size: .68rem; }
+  .md-typeset table:not([class]) :is(th, td) { padding: .55em .6em; }
+}

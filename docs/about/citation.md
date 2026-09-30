@@ -11,8 +11,8 @@ If SegEvalKit helps your work, please cite it:
 }
 ```
 
-Please also cite the original papers of the metrics you report (each [metric page](../metrics/index.md) lists them)
-and the recommendations that shaped the library:
+Please also cite the papers of the metrics you report (listed on each [metric page](../metrics/index.md)) and the
+recommendations behind the library:
 
 - Maier-Hein L, Reinke A, Godau P, et al. Metrics reloaded: recommendations for image analysis validation.
   *Nature Methods* 21, 195–212 (2024).

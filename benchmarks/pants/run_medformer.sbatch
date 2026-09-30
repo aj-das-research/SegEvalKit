@@ -16,14 +16,17 @@ ENV=/nfs-stor/$USER/envs/sek-medformer
 CK=$STORE/checkpoints/medformer_pants
 OUT=$STORE/outputs/predictions/medformer_pants
 export TMPDIR=$STORE/tmp/$SLURM_JOB_ID; mkdir -p "$TMPDIR" "$OUT"
-export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=4 MPLCONFIGDIR=$TMPDIR/mpl
 cd "$STORE/third_party/R-Super/rsuper_train"
+# The official script needs an ids CSV (BDMAP_ID column) to read <case>/ct.nii.gz folders.
+IDS=$STORE/data/pants_test_ids.csv
+{ echo BDMAP_ID; ls "$STORE/data/raw/PanTS/ImageTe" | sort; } > "$IDS"
 N=4
 for i in $(seq 0 $((N-1))); do
   srun --exact -n1 --gres=gpu:1 --cpus-per-task=8 --mem=58G \
     "$ENV/bin/python" predict_abdomenatlas.py --load "$CK/pants_pancreas_release/fold_0_latest.pth" \
       --img_path "$STORE/data/raw/PanTS/ImageTe" --class_list "$CK/labels_pants.yaml" \
-      --save_path "$OUT" --organ_mask_on_lesion --save_probabilities_lesions \
+      --save_path "$OUT" --ids "$IDS" --organ_mask_on_lesion --save_probabilities_lesions --organs_with_tumor pancreas \
       --parts $N --current_part $i --gpu 0 \
       > "$STORE/logs/medformer-part$i-$SLURM_JOB_ID.log" 2>&1 &
 done

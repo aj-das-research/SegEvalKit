@@ -1,7 +1,7 @@
 """Qualitative visualisation of segmentation errors.
 
 Numbers say *how much* is wrong; pictures say *what* is wrong. All views use
-the same error encoding (see :data:`segevalkit.plotting.theme.ERROR_COLORS`):
+the same error encoding (see `segevalkit.plotting.theme.ERROR_COLORS`):
 
 * **violet**: true positive (agreement),
 * **orange**: false negative (reference tissue the model missed),

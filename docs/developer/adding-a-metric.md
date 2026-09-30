@@ -1,8 +1,8 @@
 # Adding a metric
 
-A metric is a plain Python function `fn(ctx, **params) -> float` registered with metadata. This page adds a real
-metric end to end: **surface recall at tolerance**, the fraction of the reference surface that lies within τ mm of
-the prediction (the reference-side half of NSD, useful when missing boundary is costlier than extra boundary).
+A metric is a function `fn(ctx, **params) -> float` registered with metadata. This page adds **surface recall at
+tolerance** end to end: the fraction of the reference surface within τ mm of the prediction (the reference-side half
+of NSD, for when missing boundary costs more than extra boundary).
 
 ## 1. Implement and register
 
@@ -12,36 +12,38 @@ from segevalkit import register_metric, compute_metrics, PairContext
 
 
 @register_metric(
-    "surface_recall",                                   # registry key (snake_case, unique)
-    display="Surface recall at tolerance",              # human-readable name
-    abbr="SR",                                          # short label for plots and tables
-    family="distance",                                  # one of FAMILIES
-    better="higher",                                    # higher | lower | zero | none
+    "surface_recall",                        # registry key (snake_case, unique)
+    display="Surface recall at tolerance",   # human-readable name
+    abbr="SR",                               # short label for plots and tables
+    family="distance",                       # one of FAMILIES
+    better="higher",                         # higher | lower | zero | none
     value_range=(0.0, 1.0),
-    requires=("spacing",),                              # the value depends on voxel size
-    summary="Fraction of the reference surface lying within tau mm of the predicted surface.",
-    reference="Nikolov et al. 2021, J Med Internet Res 23(7):e26151 (surface overlap)",
+    requires=("spacing",),                   # the value depends on voxel size
+    summary="Fraction of the reference surface lying within tau mm "
+            "of the predicted surface.",
+    reference="Nikolov et al. 2021, J Med Internet Res 23(7):e26151 "
+              "(surface overlap)",
     defaults={"tolerance_mm": 2.0},
 )
 def surface_recall(ctx: PairContext, tolerance_mm: float = 2.0) -> float:
     r"""$$\mathrm{SR}_\tau = \frac{|\{d \in D_{G\to P} : d \le \tau\}|}{|\partial G|}$$"""
-    if ctx.both_empty:                                  # structure correctly absent
-        return ctx.best_or_nan(1.0)                     # 1.0 or NaN, per the EmptyPolicy
+    if ctx.both_empty:                       # structure correctly absent
+        return ctx.best_or_nan(1.0)          # 1.0 or NaN, per the EmptyPolicy
     if ctx.one_empty:
         return 0.0
-    _, d_ref_to_pred = ctx.surface_distances            # cached, shared with HD95 / NSD / ASSD
+    _, d_ref_to_pred = ctx.surface_distances  # cached, shared with HD95/NSD/ASSD
     return float(np.mean(d_ref_to_pred <= tolerance_mm))
 ```
 
-The decorator validates the family and direction, stores a `MetricInfo`, and makes the metric available everywhere:
-`compute_metrics`, `Evaluator`, the CLI (`--metrics surface_recall`), plot axis labels (`SR ↑`), the HTML report
-glossary and the generated [catalogue](../metrics/catalogue.md).
+The decorator validates family and direction, stores a `MetricInfo`, and exposes the metric to `compute_metrics`,
+`Evaluator`, the CLI (`--metrics surface_recall`), plot labels (`SR ↑`), the report glossary and the
+[catalogue](../metrics/catalogue.md).
 
 ## 2. Use it
 
 ```python
 g = np.zeros((48, 48, 48), bool); g[12:36, 12:36, 12:36] = True
-p = np.zeros_like(g);             p[15:36, 12:36, 12:36] = True      # 3 voxels missing on one face
+p = np.zeros_like(g);             p[15:36, 12:36, 12:36] = True  # 3 voxels off one face
 
 compute_metrics(p, g, ["surface_recall", "nsd", "hd95"], spacing=(1, 1, 1),
                 params={"surface_recall": {"tolerance_mm": 2.0}})
@@ -51,14 +53,13 @@ compute_metrics(p, g, ["surface_recall", "nsd", "hd95"], spacing=(1, 1, 1),
 {'surface_recall': 0.818639798488665, 'nsd': 0.8518762343647136, 'hd95': 3.0}
 ```
 
-Surface recall is lower than NSD here because the missing face lies on the *reference* side: the metric does what it
-was designed to do.
+Surface recall is below NSD because the missing face lies on the *reference* side, as intended.
 
-## 3. Rules for a good metric implementation
+## 3. Implementation rules
 
 | Rule | How |
 |---|---|
-| **Reuse cached intermediates** | `ctx.counts`, `ctx.surface_distances`, `ctx.pred_components`, `ctx.pred_skeleton`, `ctx.pred_cropped`... never recompute an EDT. |
+| **Reuse cached intermediates** | `ctx.counts`, `ctx.surface_distances`, `ctx.pred_components`, `ctx.pred_skeleton`, `ctx.pred_cropped`, ... never recompute an EDT. |
 | **Cache your own** | `ctx.memo(("my_key", param), lambda: expensive(ctx))` shares work between your metrics. |
 | **Decide empty masks explicitly** | `ctx.both_empty` → `ctx.best_or_nan(best)`; one-empty distance → `ctx.distance_penalty()`; undefined ratios → `float("nan")`. |
 | **Physical units** | use `ctx.spacing` (mm) and `ctx.voxel_volume_mm3`; declare `requires=("spacing",)` and the `unit`. |
@@ -68,7 +69,7 @@ was designed to do.
 
 ## 4. Test it
 
-Test with inputs whose answer you can compute by hand, the empty cases, and invariances:
+Use inputs with hand-computable answers, the empty cases and invariances:
 
 ```python title="tests/test_surface_recall.py"
 import numpy as np
@@ -82,18 +83,20 @@ def test_identical_is_one():
 def test_empty_cases():
     z = np.zeros((10, 10, 10), bool); g = z.copy(); g[2:5, 2:5, 2:5] = True
     assert compute_metrics(z, g, ["surface_recall"])["surface_recall"] == 0.0
-    assert np.isnan(compute_metrics(z, z, ["surface_recall"], empty=EmptyPolicy("nan"))["surface_recall"])
+    nan_policy = EmptyPolicy("nan")
+    assert np.isnan(compute_metrics(z, z, ["surface_recall"], empty=nan_policy)["surface_recall"])
 
 def test_tolerance_monotone():
     g = np.zeros((30, 30, 30), bool); g[5:25, 5:25, 5:25] = True
     p = np.roll(g, 3, 0)
-    vals = [compute_metrics(p, g, ["surface_recall"], params={"surface_recall": {"tolerance_mm": t}})["surface_recall"]
+    vals = [compute_metrics(p, g, ["surface_recall"],
+                            params={"surface_recall": {"tolerance_mm": t}})["surface_recall"]
             for t in (0, 1, 2, 3)]
     assert vals == sorted(vals) and vals[-1] == 1.0
 ```
 
-If a reference implementation exists (MONAI, MedPy, DeepMind...), add a conformance test to
-`tests/test_reference_implementations.py` and document any convention difference in
+If a reference implementation exists (MONAI, MedPy, DeepMind, ...), add a conformance test to
+`tests/test_reference_implementations.py` and document convention differences in
 [Conventions](../guide/conventions.md).
 
 ## 5. Contribute it to the library
@@ -106,5 +109,5 @@ If a reference implementation exists (MONAI, MedPy, DeepMind...), add a conforma
 6. Add an entry to the [changelog](../about/changelog.md).
 
 !!! tip "Keeping it local"
-    A metric registered in your own module (imported before evaluation) works exactly like a built-in one.
-    You do not need to fork SegEvalKit to evaluate with a custom metric.
+    A metric registered in your own module (imported before evaluation) behaves exactly like a built-in one; no
+    fork is needed.

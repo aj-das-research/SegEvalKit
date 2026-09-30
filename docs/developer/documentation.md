@@ -1,6 +1,6 @@
 # Documentation
 
-This site is built with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) and published to GitHub Pages.
+Built with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) and published to GitHub Pages.
 
 ```console
 $ pip install -e ".[docs]"
@@ -13,7 +13,7 @@ $ mkdocs gh-deploy             # publish to the gh-pages branch
 
 | Source | Content |
 |---|---|
-| `docs/*.md` | hand-written pages |
+| `docs/**/*.md` | hand-written pages |
 | `docs/gen_pages.py` | generates `metrics/catalogue.md` and `datasets/presets.md` from the registries at build time |
 | `docs/api/*.md` | `::: module` directives rendered by mkdocstrings from the docstrings |
 | `research/*.md` | the literature review and dataset survey, included verbatim with snippets |
@@ -22,8 +22,9 @@ $ mkdocs gh-deploy             # publish to the gh-pages branch
 
 ## Writing style
 
-* Lead with the question a page answers; keep the first paragraph short.
-* Every metric statement matches the implementation. If code and docs disagree, fix one of them in the same change.
+* Lead with the question the page answers; keep the first paragraph short.
+* Metric statements match the implementation; if code and docs disagree, fix one in the same change.
 * Equations use `\[ ... \]` (display) and `\( ... \)` (inline).
-* Every number shown in the docs comes from a script in `benchmarks/`; regenerate figures rather than editing them.
-* Prefer tables for comparisons and admonitions only for things a reader must not miss.
+* Numbers come from scripts in `benchmarks/`; regenerate figures, never edit them.
+* Tables for comparisons; admonitions only for what a reader must not miss.
+* Headings in sentence case.

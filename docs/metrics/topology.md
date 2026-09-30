@@ -1,133 +1,104 @@
 # Topology & centreline metrics
 
-Overlap and distance metrics can be excellent for a vessel tree broken into ten pieces, or for a hollow organ
-whose lumen has been filled in. Topological metrics count what the shape **is**: connected pieces, tunnels and
-enclosed cavities. They matter whenever connectivity carries clinical meaning: vessels, airways, ducts, the
-circle of Willis, cortical surfaces and thin-walled organs.
-
-They are also blind to much of what the other families measure. A Betti error of 0 says nothing about overlap,
-and errors in different places can cancel. Report them next to an overlap metric, never instead of one.
-
-## Notation
-
-For a 3D binary object \(X\) the Betti numbers are
-
-| Symbol | Counts | Computed as |
-|---|---|---|
-| \(\beta_0(X)\) | connected components | 26-connected foreground components |
-| \(\beta_1(X)\) | independent tunnels / handles (loops) | \(\beta_0 + \beta_2 - \chi\) |
-| \(\beta_2(X)\) | enclosed cavities | 6-connected background components minus the outside one |
-| \(\chi(X)\) | Euler characteristic | \(\beta_0 - \beta_1 + \beta_2\), from `skimage.measure.euler_number` (26-connectivity) |
-
-The (26, 6) foreground/background adjacency pair is the standard well-composed choice for 3D digital topology
-(Kong & Rosenfeld 1989). The mask is padded with background, so exactly one background component (the outside)
-is unbounded. These conventions are fixed: the `connectivity` argument of `PairContext` / `Evaluator`
-affects lesion components for [detection metrics](detection.md), not Betti numbers.
-
-A solid ball has \((\beta_0,\beta_1,\beta_2) = (1, 0, 0)\), a ring (torus) \((1, 1, 0)\) and a hollow shell
-\((1, 0, 1)\). `segevalkit.metrics.betti_numbers(mask)` returns the triple for any mask.
-
-\(S_X\) denotes the topological skeleton of \(X\): 3D thinning of Lee et al. (1994) as implemented in
-scikit-image, with one safeguard: a non-empty component whose skeleton vanishes under thinning (for example a
-bar with an even, symmetric cross-section) keeps its most interior voxel.
+A vessel tree broken into ten pieces, or a hollow organ with its lumen filled in, can score excellent overlap and
+distance. Topological metrics count what the shape **is**: components, tunnels and cavities. Use them when
+connectivity matters (vessels, airways, ducts, circle of Willis, cortex, thin walls), always next to an overlap
+metric: they say nothing about overlap, and errors in different places cancel.
 
 ## At a glance
 
 | Metric | Key | Detects | Misses |
 |---|---|---|---|
-| [β₀ error](#betti0_error) | `betti0_error` | fragmentation, spurious islands | where the break is; matching of pieces |
-| [β₁ error](#betti1_error) | `betti1_error` | opened or falsely closed loops | location; a lost and a gained loop cancel |
-| [β₂ error](#betti2_error) | `betti2_error` | filled-in lumens, spurious voids | location |
-| [Euler error](#euler_error) | `euler_error` | any net topology change | errors of different kind cancel |
-| [clDice](#cldice) | `cldice` | incomplete / leaking centrelines | radius errors; short gaps barely move it |
+| [β₀ error](#betti0_error) | `betti0_error` | fragmentation, spurious islands | where the break is |
+| [β₁ error](#betti1_error) | `betti1_error` | opened or falsely closed loops | location; lost + gained loop cancel |
+| [β₂ error](#betti2_error) | `betti2_error` | filled lumens, spurious voids | location |
+| [Euler error](#euler_error) | `euler_error` | any net topology change | different error kinds cancel |
+| [clDice](#cldice) | `cldice` | incomplete / leaking centrelines | radius errors; short gaps |
+
+## Notation
+
+| Symbol | Counts | Computed as |
+|---|---|---|
+| \(\beta_0\) | connected components | 26-connected foreground components |
+| \(\beta_1\) | tunnels / loops | \(\beta_0 + \beta_2 - \chi\) |
+| \(\beta_2\) | enclosed cavities | 6-connected background components minus the outside |
+| \(\chi\) | Euler characteristic | `skimage.measure.euler_number` (26-connectivity) |
+| \(S_X\) | skeleton of \(X\) | Lee et al. (1994) 3D thinning (scikit-image) |
+
+The (26, 6) adjacency is the standard well-composed 3D choice (Kong & Rosenfeld 1989); masks are padded with
+background, and the `connectivity` argument affects only [detection](detection.md), not Betti numbers. A ball is
+\((1,0,0)\), a torus \((1,1,0)\), a hollow shell \((1,0,1)\); `segevalkit.metrics.betti_numbers(mask)` returns the
+triple. A component whose skeleton vanishes under thinning keeps its most interior voxel. An empty mask has
+\(\beta = (0,0,0)\). None of these metrics takes parameters.
 
 ## Metrics
 
 <div class="sek-metric" markdown>
 
-### Betti-0 error (components) (β₀ err) {#betti0_error}
+### Betti-0 error (β₀ err; components) {#betti0_error}
 
-<div class="sek-meta"><span class="sek-chip">key: <code>betti0_error</code></span><span class="sek-chip">range [0, ∞)</span><span class="sek-chip teal">lower is better</span><span class="sek-chip orange">count</span></div>
+<div class="sek-meta"><span class="sek-chip">betti0_error</span><span class="sek-chip">[0, ∞)</span><span class="sek-chip teal">↓ lower is better</span><span class="sek-chip orange">count</span></div>
 
 \[
 \varepsilon_{\beta_0} = \lvert\beta_0(P) - \beta_0(G)\rvert
 \]
 
-**In plain words:** the difference in the number of connected pieces. It counts fragmentation (one vessel broken
-into two) and spurious islands.
+**In words** The difference in the number of connected pieces: fragmentation and spurious islands.
 
-**Use it when:** connectivity matters: vessel trees, airways, tubular organs, or any structure that should be a
-single piece. A 2-voxel gap in a 56-voxel vessel leaves Dice at 0.98 and HD95 at 0 mm, but gives
-\(\varepsilon_{\beta_0} = 1\) (see the [example](#code)).
+**Use when** The structure should be one piece (vessels, airways); a 2-voxel gap leaves Dice at 0.98 but gives 1 ([example](#code)).
 
-**Watch out for:** it compares counts only: one missing piece and one spurious piece elsewhere give 0. It is
-sensitive to single-voxel noise; a tiny false-positive speck counts as much as a severed artery.
+**Watch out** Compares counts only (a missing and a spurious piece cancel), and a noise speck counts as much as a severed artery.
 
-**Empty masks:** both empty: 0 (`"best"`) or NaN. Exactly one empty: the Betti number of the other mask (the empty
-mask has \(\beta = (0,0,0)\)).
+??? info "Details: empty masks, parameters, reference"
+    **Empty masks.** Both empty: 0 (`"best"`) or NaN. One empty: \(\beta_0\) of the other mask.
 
-**Parameters:** none.
-
-**Reference:** Hu X, Li F, Samaras D, Chen C. Topology-preserving deep image segmentation. *NeurIPS 2019*.
-[arXiv:1906.05404](https://arxiv.org/abs/1906.05404). Yang K, Musio F, Ma Y, et al. TopCoW: benchmarking
-topology-aware anatomical segmentation of the circle of Willis. [arXiv:2312.17670](https://arxiv.org/abs/2312.17670)
-(2023).
+    **Reference.** Hu X et al. Topology-preserving deep image segmentation. *NeurIPS 2019*. [arXiv:1906.05404](https://arxiv.org/abs/1906.05404). Yang K et al. TopCoW, 2023. [arXiv:2312.17670](https://arxiv.org/abs/2312.17670)
 
 </div>
 
 <div class="sek-metric" markdown>
 
-### Betti-1 error (tunnels/loops) (β₁ err) {#betti1_error}
+### Betti-1 error (β₁ err; tunnels/loops) {#betti1_error}
 
-<div class="sek-meta"><span class="sek-chip">key: <code>betti1_error</code></span><span class="sek-chip">range [0, ∞)</span><span class="sek-chip teal">lower is better</span><span class="sek-chip orange">count</span></div>
+<div class="sek-meta"><span class="sek-chip">betti1_error</span><span class="sek-chip">[0, ∞)</span><span class="sek-chip teal">↓ lower is better</span><span class="sek-chip orange">count</span></div>
 
 \[
 \varepsilon_{\beta_1} = \lvert\beta_1(P) - \beta_1(G)\rvert
 \]
 
-**In plain words:** the difference in the number of loops or handles, for example a vessel ring (the circle of
-Willis) that is opened, or two branches falsely fused into a loop.
+**In words** The difference in the number of loops, e.g. an opened circle of Willis or two branches falsely fused.
 
-**Use it when:** loops are anatomically meaningful (circle of Willis, vascular anastomoses) or should be absent
-(most airway and vessel trees). Filling the hole of a ring gives \(\varepsilon_{\beta_1} = 1\) with Dice 0.80.
+**Use when** Loops are meaningful (circle of Willis, anastomoses) or should be absent (most trees); filling a ring's hole gives 1 at Dice 0.80.
 
-**Watch out for:** it is spatially blind: a lost loop in one place and a spurious loop elsewhere give 0. Small
-false bridges between adjacent structures create loops, so it is sensitive to touching predictions.
+**Watch out** Spatially blind (lost and spurious loops cancel), and small false bridges between touching structures create loops.
 
-**Empty masks:** as [β₀ error](#betti0_error).
+??? info "Details: empty masks, parameters, reference"
+    **Empty masks.** As [β₀ error](#betti0_error), with \(\beta_1\).
 
-**Parameters:** none.
-
-**Reference:** Hu et al. 2019, [arXiv:1906.05404](https://arxiv.org/abs/1906.05404); Yang et al. 2023 (TopCoW),
-[arXiv:2312.17670](https://arxiv.org/abs/2312.17670).
+    **Reference.** Hu et al. 2019, [arXiv:1906.05404](https://arxiv.org/abs/1906.05404); Yang et al. 2023 (TopCoW), [arXiv:2312.17670](https://arxiv.org/abs/2312.17670).
 
 </div>
 
 <div class="sek-metric" markdown>
 
-### Betti-2 error (cavities) (β₂ err) {#betti2_error}
+### Betti-2 error (β₂ err; cavities) {#betti2_error}
 
-<div class="sek-meta"><span class="sek-chip">key: <code>betti2_error</code></span><span class="sek-chip">range [0, ∞)</span><span class="sek-chip teal">lower is better</span><span class="sek-chip orange">count</span></div>
+<div class="sek-meta"><span class="sek-chip">betti2_error</span><span class="sek-chip">[0, ∞)</span><span class="sek-chip teal">↓ lower is better</span><span class="sek-chip orange">count</span></div>
 
 \[
 \varepsilon_{\beta_2} = \lvert\beta_2(P) - \beta_2(G)\rvert
 \]
 
-**In plain words:** the difference in the number of enclosed holes, for example a lumen that has been filled in or
-a spurious void inside a solid organ.
+**In words** The difference in the number of enclosed holes, e.g. a filled-in lumen or a spurious void.
 
-**Use it when:** segmenting hollow or thin-walled structures (bladder wall, myocardium, colon wall) whose
-cavity must be preserved.
+**Use when** Hollow or thin-walled structures (bladder wall, myocardium, colon wall) must keep their cavity.
 
-**Watch out for:** a cavity counts only if it is fully enclosed (no 6-connected path to the outside). A lumen
-that is open at both ends is a tunnel (\(\beta_1\)), not a cavity. It is spatially blind like the other Betti
-errors.
+**Watch out** Only fully enclosed cavities count; a lumen open at both ends is a tunnel (\(\beta_1\)); spatially blind.
 
-**Empty masks:** as [β₀ error](#betti0_error).
+??? info "Details: empty masks, parameters, reference"
+    **Empty masks.** As [β₀ error](#betti0_error), with \(\beta_2\).
 
-**Parameters:** none.
-
-**Reference:** Hu et al. 2019, [arXiv:1906.05404](https://arxiv.org/abs/1906.05404).
+    **Reference.** Hu et al. 2019, [arXiv:1906.05404](https://arxiv.org/abs/1906.05404).
 
 </div>
 
@@ -135,27 +106,24 @@ errors.
 
 ### Euler characteristic error (χ err) {#euler_error}
 
-<div class="sek-meta"><span class="sek-chip">key: <code>euler_error</code></span><span class="sek-chip">range [0, ∞)</span><span class="sek-chip teal">lower is better</span><span class="sek-chip orange">count</span></div>
+<div class="sek-meta"><span class="sek-chip">euler_error</span><span class="sek-chip">[0, ∞)</span><span class="sek-chip teal">↓ lower is better</span><span class="sek-chip orange">count</span></div>
 
 \[
 \varepsilon_\chi = \lvert\chi(P) - \chi(G)\rvert,\qquad \chi = \beta_0 - \beta_1 + \beta_2
 \]
 
-**In plain words:** one number for the overall topology: components minus loops plus cavities.
+**In words** One number for the overall topology: components minus loops plus cavities.
 
-**Use it when:** you want a cheap topology screen, for example cortical-surface genus.
+**Use when** You want a cheap topology screen, for example cortical-surface genus.
 
-**Watch out for:** errors of different kind cancel: one extra component plus one extra loop gives
-\(\Delta\chi = 0\). Use it as a screen and follow up with the individual Betti errors. It is not the expected
-calibration error ([ECE](calibration.md#ece)), which is why the key is `euler_error`.
+**Watch out** Error kinds cancel (one extra component plus one extra loop gives 0); follow up with the Betti errors.
 
-**Empty masks:** both empty: 0 (`"best"`) or NaN. Exactly one empty: \(\lvert\chi\rvert\) of the other mask.
+??? info "Details: empty masks, parameters, reference"
+    **Empty masks.** Both empty: 0 (`"best"`) or NaN. One empty: \(\lvert\chi\rvert\) of the other mask.
 
-**Parameters:** none.
+    **Naming.** The key is `euler_error` to avoid confusion with the calibration error [ECE](calibration.md#ece).
 
-**Reference:** Kong TY, Rosenfeld A. Digital topology: introduction and survey. *Computer Vision, Graphics, and
-Image Processing* 48(3), 357–393 (1989).
-[doi:10.1016/0734-189X(89)90147-3](https://doi.org/10.1016/0734-189X(89)90147-3)
+    **Reference.** Kong TY, Rosenfeld A. Digital topology. *CVGIP* 48(3):357–393, 1989. [doi:10.1016/0734-189X(89)90147-3](https://doi.org/10.1016/0734-189X(89)90147-3)
 
 </div>
 
@@ -163,71 +131,46 @@ Image Processing* 48(3), 357–393 (1989).
 
 ### Centreline Dice (clDice) {#cldice}
 
-<div class="sek-meta"><span class="sek-chip">key: <code>cldice</code></span><span class="sek-chip">alias: <code>cldsc</code></span><span class="sek-chip">range [0, 1]</span><span class="sek-chip teal">higher is better</span><span class="sek-chip orange">dimensionless</span></div>
+<div class="sek-meta"><span class="sek-chip">cldice · cldsc</span><span class="sek-chip">[0, 1]</span><span class="sek-chip teal">↑ higher is better</span></div>
 
 \[
-\mathrm{clDice} = 2\,\frac{T_{prec}\,T_{sens}}{T_{prec}+T_{sens}},\qquad
-T_{prec} = \frac{\lvert S_P\cap G\rvert}{\lvert S_P\rvert},\quad
-T_{sens} = \frac{\lvert S_G\cap P\rvert}{\lvert S_G\rvert}
+\mathrm{clDice} = 2\,\frac{T_{\mathrm{prec}}\,T_{\mathrm{sens}}}{T_{\mathrm{prec}}+T_{\mathrm{sens}}},\qquad
+T_{\mathrm{prec}} = \frac{\lvert S_P\cap G\rvert}{\lvert S_P\rvert},\quad
+T_{\mathrm{sens}} = \frac{\lvert S_G\cap P\rvert}{\lvert S_G\rvert}
 \]
 
-**In plain words:** checks that the reference centreline is covered by the prediction (topology sensitivity) and
-that the predicted centreline stays inside the reference (topology precision). It rewards complete, connected
-tubes.
+**In words** Rewards complete tubes: the reference centreline must lie in the prediction, and the predicted centreline in the reference.
 
-**Use it when:** segmenting tubular structures (vessels, airways, nerves, ducts). Metrics Reloaded recommends
-clDice as the overlap metric when the target is tubular.
+**Use when** Segmenting tubular structures (vessels, airways, nerves, ducts); Metrics Reloaded's overlap metric for tubular targets.
 
-**Watch out for:** it depends on the skeletonisation algorithm and on voxel anisotropy; resample to isotropic
-spacing for thin structures, or state the choice. It is insensitive to radius errors. A short gap removes only a
-short piece of centreline, so a 2-voxel break in a 56-voxel vessel still scores 0.98; pair it with
-[β₀ error](#betti0_error) when breaks matter. Skeletons of blob-like, non-tubular structures are unstable.
+**Watch out** Short gaps barely move it (a 2-voxel break scores 0.98; add [β₀ error](#betti0_error)); radius-blind; skeleton- and anisotropy-dependent.
 
-**Empty masks:** both empty: 1 (`"best"`) or NaN. Exactly one empty: 0. If a skeleton is empty, or
-\(T_{prec} + T_{sens} = 0\), the value is 0.
+??? info "Details: empty masks, parameters, reference"
+    **Skeletons.** Resample thin structures to isotropic spacing or state the choice; skeletons of blob-like, non-tubular structures are unstable.
 
-**Parameters:** none.
+    **Empty masks.** Both empty: 1 (`"best"`) or NaN. One empty: 0. An empty skeleton, or \(T_{\mathrm{prec}}+T_{\mathrm{sens}}=0\), gives 0.
 
-**Reference:** Shit S, Paetzold JC, Sekuboyina A, et al. clDice – a novel topology-preserving loss function for
-tubular structure segmentation. *CVPR 2021*, 16560–16569.
-[arXiv:2003.07311](https://arxiv.org/abs/2003.07311)
+    **Reference.** Shit S et al. clDice. *CVPR 2021*, 16560–16569. [arXiv:2003.07311](https://arxiv.org/abs/2003.07311)
 
 </div>
 
 ## Code
 
-The `topology` metric set contains `cldice`, `betti0_error`, `betti1_error`, `betti2_error` and `euler_error`.
-Betti numbers are computed once per pair and cached.
+The `topology` set is `cldice`, `betti0_error`, `betti1_error`, `betti2_error`, `euler_error`; Betti numbers are
+computed once per pair and cached.
 
 ```python
 import numpy as np
 from segevalkit.metrics import compute_metrics, betti_numbers
 
-vessel = np.zeros((60, 9, 9), bool)
-vessel[2:58, 3:6, 3:6] = True            # a straight 3x3 "vessel"
-broken = vessel.copy()
-broken[29:31] = False                    # a 2-voxel gap in the middle
-
-print(betti_numbers(vessel), betti_numbers(broken))
+vessel = np.zeros((60, 9, 9), bool); vessel[2:58, 3:6, 3:6] = True    # straight 3x3 "vessel"
+broken = vessel.copy(); broken[29:31] = False                         # 2-voxel gap
+print(betti_numbers(vessel), betti_numbers(broken))                   # (1, 0, 0) (2, 0, 0)
 scores = compute_metrics(broken, vessel, ["dice", "hd95", "topology"], spacing=(1, 1, 1))
-for name, value in scores.items():
-    print(f"{name:14s} {value:.4f}")
+# dice 0.9818  hd95 0.0000  cldice 0.9818
+# betti0_error 1  betti1_error 0  betti2_error 0  euler_error 1
 ```
 
-```text
-(1, 0, 0) (2, 0, 0)
-dice           0.9818
-hd95           0.0000
-cldice         0.9818
-betti0_error   1.0000
-betti1_error   0.0000
-betti2_error   0.0000
-euler_error    1.0000
-```
-
-Dice, HD95 and even clDice barely register the break; the β₀ error is the only metric that flags it.
-
-!!! note "Betti matching"
-    Betti number errors compare counts, not locations. Betti matching (Stucki et al., ICML 2023,
-    [code](https://github.com/nstucki/Betti-matching)) matches features spatially through persistent homology.
-    It is not built into SegEvalKit, but can be added as a [custom metric](index.md#custom-metrics).
+Only the β₀ error flags the break. Spatial Betti matching (Stucki et al., ICML 2023,
+[code](https://github.com/nstucki/Betti-matching)) is not built in but can be added as a
+[custom metric](index.md#custom-metrics).

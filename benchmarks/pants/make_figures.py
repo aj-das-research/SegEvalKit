@@ -61,7 +61,7 @@ def _pred(model, case, structure, ref_shape):
         v = load_volume(PRED / "nnunet_pants_regions" / f"{case}.nii.gz")
         return np.isin(v.data, ids)
     if model == "medformer":
-        f = PRED / "medformer_pants" / case / "predictions" / f"{structure}.nii.gz"
+        f = PRED / "medformer_pants" / "abdomenatlas" / "pants_pancreas_release" / case / "predictions" / f"{structure}.nii.gz"
     else:
         f = PRED / "totalsegmentator" / case / f"{ts}.nii.gz"
     if not f.exists():
@@ -152,7 +152,7 @@ def qualitative(res, out: Path, model: str = "nnunet"):
 
 def calibration(out: Path):
     """Reliability diagram of MedFormer lesion probabilities pooled over cases (band ROI)."""
-    rel = STORE / "outputs/predictions/medformer_pants"
+    rel = STORE / "outputs/predictions/medformer_pants/abdomenatlas/pants_pancreas_release"
     ps, ys = [], []
     for cdir in sorted(rel.glob("*"))[:120]:
         f = cdir / "predictions_raw" / "pancreatic_lesion.nii.gz"

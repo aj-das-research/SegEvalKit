@@ -1,13 +1,13 @@
 # Datasets & benchmarks
 
-SegEvalKit ships **presets** for public volumetric segmentation benchmarks: label ids and evaluation regions,
-the on-disk layout of the reference labels, the official metrics and their parameters (per-structure NSD
-tolerances included) and the empty-mask convention. One flag reproduces a benchmark's protocol:
+A **preset** encodes a public benchmark's label map, evaluation regions, on-disk layout, official metrics and
+parameters (including per-structure NSD tolerances) and empty-mask convention. One flag reproduces the protocol:
 
 ```console
 $ segevalkit datasets                     # list the presets
 $ segevalkit datasets kits23              # details of one
-$ segevalkit evaluate --dataset msd_liver --pred preds/ --ref Task03_Liver/labelsTr --out eval/
+$ segevalkit evaluate --dataset msd_liver --pred preds/ \
+    --ref Task03_Liver/labelsTr --out eval/
 ```
 
 <div class="grid cards" markdown>
@@ -15,10 +15,6 @@ $ segevalkit evaluate --dataset msd_liver --pred preds/ --ref Task03_Liver/label
 -   **[Dataset presets](presets.md)**
 
     Every preset with labels, layout, metrics, parameters, licence and citation (generated from the registry).
-
--   **[PanTS benchmark](pants-benchmark.md)**
-
-    Three official models evaluated on the 901-case PanTS test set with SegEvalKit.
 
 -   **[Full datasets survey](../research/datasets-survey.md)**
 
@@ -28,8 +24,8 @@ $ segevalkit evaluate --dataset msd_liver --pred preds/ --ref Task03_Liver/label
 
 ## Official protocols at a glance
 
-Evaluation protocols differ in ways that change the numbers. The most consequential differences, verified from
-official evaluation code where it is public:
+Protocols differ in ways that change the numbers. Key differences, verified against official evaluation code where
+public:
 
 | Benchmark | Official metrics | Boundary tolerance | Empty reference & empty prediction | Notable detail |
 |---|---|---|---|---|
@@ -49,15 +45,13 @@ official evaluation code where it is public:
     BraTS 2023 uses 1 NCR, 2 ED, 3 ET. PanTS per-structure masks overlap (pancreas contains its sub-parts, duct and
     lesion), so its `combined_labels.nii.gz` is lossy. The presets encode the correct maps.
 
-## Data used in this project
+## Data available in this project
 
-The benchmark and the sensitivity study in this documentation use, read-only:
+The real-data tests (`tests/test_real_data.py`) check layouts, geometry handling and presets on these public
+datasets (read-only):
 
-| Dataset | Split | Cases | Used for |
-|---|---|---|---|
-| PanTS | public test (`ImageTe`, `LabelTe`) | 901 | [PanTS benchmark](pants-benchmark.md), [sensitivity study](../guide/sensitivity-study.md) |
-| TotalSegmentator v2 | local subset | 183 | layout and preset tests |
-| MSD Task03 Liver, Task10 Colon | labelled training data | 131, 126 | preset and layout tests |
-
-Model predictions were produced for this documentation from the **official code and official checkpoints** of
-each model, run from scratch; no third-party prediction files were reused.
+| Dataset | Split | Cases |
+|---|---|---|
+| PanTS | public test (`ImageTe`, `LabelTe`) | 901 |
+| TotalSegmentator v2 | local subset | 183 |
+| MSD Task03 Liver, Task10 Colon | labelled training data | 131, 126 |

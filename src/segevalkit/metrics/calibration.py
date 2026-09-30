@@ -1,7 +1,7 @@
 r"""Probabilistic and calibration metrics (need a soft prediction).
 
 A thresholded mask throws away the model's confidence. When a probability map
-:math:`p\in[0,1]^N` is available these metrics ask two different questions:
+\(p\in[0,1]^N\) is available these metrics ask two different questions:
 
 * **Discrimination** (AUROC, AUPRC): does the model rank foreground voxels
   above background voxels?
@@ -159,8 +159,8 @@ def reliability_curve(p: np.ndarray, y: np.ndarray, n_bins: int = 15) -> Dict[st
     """Top-label reliability diagram data.
 
     Returns a dict with per-bin ``confidence`` (mean), ``accuracy``, ``count``
-    and the bin ``edges``. Confidence is :math:`\\max(p, 1-p)` and the
-    predicted label is :math:`p\\ge 0.5` (Guo et al. 2017).
+    and the bin ``edges``. Confidence is \\(\\max(p, 1-p)\\) and the
+    predicted label is \\(p\\ge 0.5\\) (Guo et al. 2017).
     """
     p = np.asarray(p, dtype=np.float64).ravel()
     y = np.asarray(y, dtype=bool).ravel()

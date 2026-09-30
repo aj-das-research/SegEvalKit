@@ -1,14 +1,14 @@
 r"""Boundary and surface-distance metrics.
 
-Let :math:`\partial P` and :math:`\partial G` be the surface voxels of the
-prediction and the reference (see :func:`segevalkit.metrics.context.surface`)
-and :math:`d(x, S) = \min_{y\in S}\lVert x-y\rVert_2` the Euclidean distance in
+Let \(\partial P\) and \(\partial G\) be the surface voxels of the
+prediction and the reference (see `segevalkit.metrics.context.surface`)
+and \(d(x, S) = \min_{y\in S}\lVert x-y\rVert_2\) the Euclidean distance in
 millimetres from a point to a surface. The two *directed* distance sets are
 
-.. math::
-
-    D_{P\to G} = \{d(p, \partial G) : p\in\partial P\},\qquad
-    D_{G\to P} = \{d(g, \partial P) : g\in\partial G\}.
+\[
+D_{P\to G} = \{d(p, \partial G) : p\in\partial P\},\qquad
+D_{G\to P} = \{d(g, \partial P) : g\in\partial G\}.
+\]
 
 Every metric in this module is a summary of these two sets. Overlap metrics
 are blind to *where* the error is; distance metrics are blind to *how much*
@@ -58,11 +58,11 @@ def hd(ctx: PairContext) -> float:
 def hd_percentile(ctx: PairContext, q: float = 95.0, mode: str = "directed") -> float:
     r"""$$\mathrm{HD}_q = \max\Big(P_q(D_{P\to G}),\; P_q(D_{G\to P})\Big)$$
 
-    :math:`P_q` is the *q*-th percentile (linear interpolation).
+    \(P_q\) is the *q*-th percentile (linear interpolation).
     ``mode="directed"`` (default) takes the maximum of the two directed
     percentiles, the convention of MetricsReloaded, MONAI, DeepMind's
     ``surface-distance`` and the BraTS code. ``mode="pooled"`` takes the
-    percentile of the pooled set :math:`D_{P\to G}\cup D_{G\to P}`, the
+    percentile of the pooled set \(D_{P\to G}\cup D_{G\to P}\), the
     MedPy convention; it is never larger than the directed form.
     """
     e = _distance_or_empty(ctx)
@@ -86,7 +86,7 @@ def hd_percentile(ctx: PairContext, q: float = 95.0, mode: str = "directed") -> 
 def hd95(ctx: PairContext, mode: str = "directed") -> float:
     r"""$$\mathrm{HD}_{95} = \max\Big(P_{95}(D_{P\to G}),\; P_{95}(D_{G\to P})\Big)$$
 
-    ``mode="pooled"`` gives the MedPy convention (see :func:`hd_percentile`).
+    ``mode="pooled"`` gives the MedPy convention (see `hd_percentile`).
     """
     return hd_percentile(ctx, q=95.0, mode=mode)
 
@@ -167,7 +167,7 @@ def _inner_band(mask: np.ndarray, width_mm: float, spacing) -> np.ndarray:
 def boundary_iou(ctx: PairContext, width_mm: float = 2.0) -> float:
     r"""$$\mathrm{BIoU}_d = \frac{|(P_d\cap P)\cap(G_d\cap G)|}{|(P_d\cap P)\cup(G_d\cap G)|}$$
 
-    :math:`X_d` is the set of voxels within distance *d* of the contour of *X*.
+    \(X_d\) is the set of voxels within distance *d* of the contour of *X*.
     """
     if ctx.both_empty:
         return ctx.best_or_nan(1.0)

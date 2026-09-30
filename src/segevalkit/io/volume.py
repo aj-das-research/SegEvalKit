@@ -2,7 +2,7 @@
 
 A segmentation metric is only meaningful on the voxel grid it was computed on,
 so SegEvalKit never separates an array from its geometry: every loader returns
-a :class:`Volume` (array + spacing + affine), and :func:`check_alignment`
+a `Volume` (array + spacing + affine), and `check_alignment`
 refuses to compare two volumes that do not live on the same grid unless you
 explicitly ask for resampling.
 
@@ -127,7 +127,7 @@ def load_volume(path: PathLike, *, kind: str = "label", spacing: Optional[Sequen
 
 
 def save_volume(data: Union[np.ndarray, Volume], path: PathLike, affine: Optional[np.ndarray] = None) -> None:
-    """Write an array (or :class:`Volume`) to NIfTI."""
+    """Write an array (or `Volume`) to NIfTI."""
     import nibabel as nib
 
     if isinstance(data, Volume):

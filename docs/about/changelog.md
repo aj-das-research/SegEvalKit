@@ -6,7 +6,7 @@ First release.
 
 - 53 metrics in 7 families (overlap, volume, distance, topology, detection, calibration, agreement) with a
   shared cached computation context and explicit empty-mask policies (`segevalkit`, `brats2023`,
-  `metrics_reloaded`, `nan`).
+  `metrics_reloaded`, `topcow`, `nan` / `nnunet`).
 - Directed and pooled HD-percentiles, ASSD and MASD, voxel NSD, boundary IoU, clDice with a symmetric-object
   skeleton fallback, Betti-0/1/2 and Euler errors, lesion-wise recall / precision / F1 / Dice, panoptic quality,
   split / merge counts, soft Dice, AUROC, AUPRC, Brier, NLL, ECE with a boundary-band ROI.

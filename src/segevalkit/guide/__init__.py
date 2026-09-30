@@ -2,16 +2,15 @@
 
 Following the Metrics Reloaded framework (Maier-Hein et al. 2024, *Nat
 Methods* 21:195), the choice of metrics is derived from properties of the
-problem, not from habit. Describe the problem with a :class:`Fingerprint` and
-:func:`recommend` returns a metric set, each with the reason it was chosen and
+problem, not from habit. Describe the problem with a `Fingerprint` and
+`recommend` returns a metric set, each with the reason it was chosen and
 the pitfall it guards against.
 
-```python
->>> from segevalkit.guide import Fingerprint, recommend
->>> rec = recommend(Fingerprint(structure="small_lesion", multi_instance=True))
->>> rec.metrics[:4]
-['dice', 'nsd', 'masd', 'lesion_f1']
-```
+Examples:
+    >>> from segevalkit.guide import Fingerprint, recommend
+    >>> rec = recommend(Fingerprint(structure="small_lesion", multi_instance=True))
+    >>> rec.metrics[:4]
+    ['dice', 'nsd', 'masd', 'lesion_f1']
 
 The combined rule of thumb from the literature: **one overlap metric + one
 boundary metric**, plus detection metrics when objects are instances,
@@ -57,7 +56,7 @@ class Fingerprint:
     """Properties of a segmentation problem that drive metric choice.
 
     Attributes:
-        structure: One of :data:`STRUCTURES`.
+        structure: One of `STRUCTURES`.
         multi_instance: Several separate objects per image whose *detection*
             matters (lesions, nodules, metastases).
         boundary_critical: Boundary position has clinical consequences
@@ -151,7 +150,7 @@ class Recommendation:
 
 
 def recommend(fp: Optional[Fingerprint] = None, **kwargs) -> Recommendation:
-    """Recommend metrics for a problem described by a :class:`Fingerprint` (or keyword arguments)."""
+    """Recommend metrics for a problem described by a `Fingerprint` (or keyword arguments)."""
     fp = fp or Fingerprint(**kwargs)
     r = Recommendation()
     tol = fp.tolerance_mm

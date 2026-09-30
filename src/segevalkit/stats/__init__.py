@@ -5,17 +5,17 @@ spread, its confidence interval and a paired test against the competitor says
 very little (Maier-Hein et al. 2018, *Nat Commun* 9:5217; Wiesenfarth et al.
 2021, *Sci Rep* 11:2369). This module provides:
 
-* :func:`summarize` / :func:`bootstrap_ci`: descriptive statistics with
+* `summarize` / `bootstrap_ci`: descriptive statistics with
   percentile-bootstrap confidence intervals.
-* :func:`compare`: paired tests between two methods (Wilcoxon signed-rank,
+* `compare`: paired tests between two methods (Wilcoxon signed-rank,
   paired t, sign-flip permutation) with Holm or Benjamini-Hochberg correction
   across labels and metrics, plus effect sizes.
-* :func:`rank_methods` and :func:`ranking_stability`: challenge-style ranking
+* `rank_methods` and `ranking_stability`: challenge-style ranking
   (aggregate-then-rank, rank-then-aggregate) and its robustness under
   bootstrap resampling of cases (Kendall's tau to the full-data ranking).
-* :func:`bland_altman` and :func:`icc`: volumetric agreement.
-* :func:`stratify`: summaries within bins of a covariate such as structure size.
-* :func:`presence_detection`: case-level ("does this patient have a tumour?")
+* `bland_altman` and `icc`: volumetric agreement.
+* `stratify`: summaries within bins of a covariate such as structure size.
+* `presence_detection`: case-level ("does this patient have a tumour?")
   sensitivity / specificity / ROC-AUC from predicted volume, the PanTS
   patient-wise protocol.
 """
@@ -132,7 +132,7 @@ def compare(a: "EvaluationResult", b: "EvaluationResult", *, metrics: Optional[S
     """Paired comparison of two evaluation results on their common cases.
 
     Args:
-        a: First :class:`~segevalkit.results.EvaluationResult` (or long table).
+        a: First `EvaluationResult` (or long table).
         b: Second result, compared with ``a`` on their common cases.
         test: ``"wilcoxon"`` (default; no normality assumption), ``"ttest"`` or
             ``"permutation"`` (sign-flip test of the mean difference).
@@ -198,6 +198,8 @@ def rank_methods(results: Mapping[str, object], metric: str, label: Optional[str
 
     Args:
         results: ``{method_name: EvaluationResult}``.
+        metric: Metric key to rank on; its better direction sets the order.
+        label: Structure to rank on; ``None`` pools every structure.
         scheme: ``"aggregate-then-rank"`` (rank the per-method mean/median) or
             ``"rank-then-aggregate"`` (rank methods within every case, then
             average ranks; robust to a few catastrophic cases). Both are used

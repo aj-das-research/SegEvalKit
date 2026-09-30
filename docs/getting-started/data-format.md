@@ -1,8 +1,7 @@
 # Data & output format
 
-SegEvalKit aims to be the **standard interface** between a segmentation model and its evaluation: any model that
-writes NIfTI files in one of three layouts can be evaluated on any dataset, and every evaluation produces the same
-documented results folder.
+Any model that writes masks in one of three layouts can be evaluated on any dataset, and every evaluation writes
+the same documented results folder.
 
 ## Input layouts
 
@@ -41,8 +40,8 @@ documented results folder.
     └── case_002/ ...
     ```
 
-`layout="auto"` (the default) detects which one a folder uses. Prediction and reference **do not need the same
-layout**: a model writing `pancreas = 7` in a multi-label map can be scored against `segmentations/pancreas.nii.gz`.
+`layout="auto"` (default) detects the layout. Prediction and reference **may differ**: a multi-label map with
+`pancreas = 7` can be scored against `segmentations/pancreas.nii.gz`.
 
 | Format | Extension | Requirement |
 |---|---|---|
@@ -52,7 +51,7 @@ layout**: a model writing `pancreas = 7` in a multi-label map can be scored agai
 
 ## Labels
 
-Labels map a structure name to how to find it on each side:
+Each structure name maps to how it is found on each side:
 
 ```yaml
 labels:
@@ -62,13 +61,13 @@ labels:
   lesion: {ref_file: pancreatic_lesion.nii.gz, pred: 28}
 ```
 
-An MSD / nnU-Net `dataset.json` `labels` block can be passed as is. Without labels, SegEvalKit evaluates every
-non-zero id (multi-label references) or every structure file (per-structure references).
+An MSD / nnU-Net `dataset.json` `labels` block works as is. Without labels, every non-zero id (multi-label
+references) or every structure file (per-structure references) is evaluated.
 
 ## Probability maps
 
-Calibration metrics need foreground probabilities. Pass a folder with one float NIfTI per case and structure,
-`probs/<case>/<structure>.nii.gz`, values in [0, 1], on the reference grid:
+Calibration metrics need foreground probabilities: one float NIfTI per case and structure,
+`probs/<case>/<structure>.nii.gz`, values in [0, 1], on the reference grid.
 
 ```python
 ev.evaluate("predictions/", "labels/", prob="probs/")
@@ -76,37 +75,41 @@ ev.evaluate("predictions/", "labels/", prob="probs/")
 
 ## Geometry checks
 
-Before comparing masks SegEvalKit checks that prediction and reference share **shape, spacing and affine**.
+Prediction and reference must share **shape, spacing and affine**:
 
 | `alignment=` | Behaviour |
 |---|---|
 | `"strict"` (default) | a mismatch fails the case (recorded in `meta.json`, the run continues) |
 | `"resample"` | the prediction is resampled onto the reference grid (nearest neighbour) |
-| `"ignore"` | only equal shapes are required; use when headers are known to be unreliable |
+| `"ignore"` | only equal shapes are required (for known-unreliable headers) |
 
-Spacing always comes from the **reference** header, so distances are in millimetres and volumes in millilitres.
+Spacing always comes from the **reference** header; distances are in mm, volumes in mL.
 
 ## The results folder
 
-```text
-eval/
-├── per_case.csv
-├── per_case_wide.csv
-├── lesions.csv
-├── summary.csv
-└── meta.json
-```
+`per_case.csv`
+:   Tidy table `case_id, label, metric, value`, one row per number. Descriptive per-case flags start with `_`:
+    `_ref_empty`, `_pred_empty`, `_ref_volume_ml`, `_pred_volume_ml`.
 
-| File | Content |
-|---|---|
-| `per_case.csv` | Tidy table: `case_id, label, metric, value`. One row per number. Descriptive per-case flags start with `_`: `_ref_empty`, `_pred_empty`, `_ref_volume_ml`, `_pred_volume_ml`. |
-| `per_case_wide.csv` | One row per `(case_id, label)`; one column per metric plus `ref_empty`, `pred_empty`, `ref_volume_ml`, `pred_volume_ml`. |
-| `lesions.csv` | One row per reference lesion (`kind = ref`) and per unmatched predicted component (`kind = pred_fp`): `volume_ml`, `detected`, `dice`, `iou`, `n_touching`. |
-| `summary.csv` | Per `(label, metric)`: `n, n_nan, mean, std, median, q1, q3, min, max, ci_low, ci_high` (95 % percentile bootstrap of the mean). |
-| `meta.json` | `results_format`, `segevalkit_version`, timestamp, Python version, the complete configuration (metrics, parameters, empty policy, connectivity, alignment, device), paths and layouts, labels, missing and extra predictions, per-case errors, runtime. |
+`per_case_wide.csv`
+:   One row per `(case_id, label)`; one column per metric plus `ref_empty`, `pred_empty`, `ref_volume_ml`,
+    `pred_volume_ml`.
 
-Load a folder back with `segevalkit.load_results("eval/")`. The format is versioned (`results_format: 1`).
+`lesions.csv`
+:   One row per reference lesion (`kind = ref`) and per unmatched predicted component (`kind = pred_fp`):
+    `volume_ml`, `detected`, `dice`, `iou`, `n_touching`.
+
+`summary.csv`
+:   Per `(label, metric)`: `n, n_nan, mean, std, median, q1, q3, min, max, ci_low, ci_high` (95 % percentile
+    bootstrap of the mean).
+
+`meta.json`
+:   `results_format`, `segevalkit_version`, timestamp, Python version, full configuration (metrics, parameters,
+    empty policy, connectivity, alignment, device), paths, layouts, labels, missing/extra predictions, per-case
+    errors, runtime.
+
+Load it back with `segevalkit.load_results("eval/")`. The format is versioned (`results_format: 1`).
 
 !!! tip "Why a long table?"
-    One row per number means new metrics never change the schema, NaNs are explicit, and the table drops
-    straight into pandas, R, or any plotting library. `per_case_wide.csv` is a convenience view of the same data.
+    New metrics never change the schema, NaNs are explicit, and the table drops straight into pandas, R or any
+    plotting library. `per_case_wide.csv` is a convenience view of the same data.

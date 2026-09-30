@@ -5,7 +5,7 @@ misses every small metastasis. When the clinical question is *"were the
 lesions found?"* the unit of analysis must be the lesion, not the voxel.
 
 Instances are the connected components of each mask (26-connected by default;
-see :class:`~segevalkit.metrics.context.PairContext`). Components are then
+see `PairContext`). Components are then
 matched between prediction and reference with one of two criteria:
 
 ``"overlap"`` (default)
@@ -138,7 +138,7 @@ _MATCH_DOC = dict(criterion="overlap", iou_threshold=0.5, min_overlap=0.0)
     defaults=_MATCH_DOC,
 )
 def lesion_recall(ctx: PairContext, **kw) -> float:
-    r"""$$\mathrm{L\text{-}TPR} = \frac{TP_{les}}{TP_{les} + FN_{les}}$$"""
+    r"""$$\mathrm{L\text{-}TPR} = \frac{TP_{\mathrm{les}}}{TP_{\mathrm{les}} + FN_{\mathrm{les}}}$$"""
     m = match_instances(ctx, **kw)
     if m.n_ref == 0:
         return ctx.best_or_nan(1.0) if m.n_pred == 0 else float("nan")
@@ -152,7 +152,7 @@ def lesion_recall(ctx: PairContext, **kw) -> float:
     defaults=_MATCH_DOC,
 )
 def lesion_precision(ctx: PairContext, **kw) -> float:
-    r"""$$\mathrm{L\text{-}PPV} = \frac{TP_{les}}{TP_{les} + FP_{les}}$$"""
+    r"""$$\mathrm{L\text{-}PPV} = \frac{TP_{\mathrm{les}}}{TP_{\mathrm{les}} + FP_{\mathrm{les}}}$$"""
     m = match_instances(ctx, **kw)
     if m.n_pred == 0:
         return ctx.best_or_nan(1.0) if m.n_ref == 0 else float("nan")
@@ -166,9 +166,9 @@ def lesion_precision(ctx: PairContext, **kw) -> float:
     defaults=_MATCH_DOC,
 )
 def lesion_f1(ctx: PairContext, **kw) -> float:
-    r"""$$\mathrm{L\text{-}F1} = \frac{2\,TP_{les}}{2\,TP_{les} + FP_{les} + FN_{les}}$$
+    r"""$$\mathrm{L\text{-}F1} = \frac{2\,TP_{\mathrm{les}}}{2\,TP_{\mathrm{les}} + FP_{\mathrm{les}} + FN_{\mathrm{les}}}$$
 
-    Under the ``"overlap"`` criterion :math:`TP_{les}` is the number of detected
+    Under the ``"overlap"`` criterion \(TP_{\mathrm{les}}\) is the number of detected
     reference lesions (as in the ISLES'22 evaluation code).
     """
     m = match_instances(ctx, **kw)
@@ -190,7 +190,7 @@ def lesion_count_difference(ctx: PairContext) -> float:
 
 
 @register_metric(
-    "false_positive_lesions", display="False-positive lesion count", abbr="FP_les", family="detection",
+    "false_positive_lesions", display="False-positive lesion count", abbr="FP lesions", family="detection",
     better="lower", value_range=(0.0, float("inf")),
     summary="Number of predicted components that overlap no reference lesion.",
     reference="Maier-Hein et al. 2024 (Metrics Reloaded); Chakraborty & Berbaum 2004, Med Phys 31(8) (FROC)",
@@ -201,7 +201,7 @@ def false_positive_lesions(ctx: PairContext, **kw) -> float:
 
 
 @register_metric(
-    "false_negative_lesions", display="Missed lesion count", abbr="FN_les", family="detection",
+    "false_negative_lesions", display="Missed lesion count", abbr="FN lesions", family="detection",
     better="lower", value_range=(0.0, float("inf")),
     summary="Number of reference lesions that were not detected.",
     reference="Maier-Hein et al. 2024 (Metrics Reloaded)",
@@ -258,7 +258,7 @@ def panoptic_quality(ctx: PairContext, iou_threshold: float = 0.5) -> float:
     reference="Kazerooni et al. 2023, arXiv:2305.17033; BraTS-2023-Metrics code (github.com/rachitsaluja/BraTS-2023-Metrics)",
 )
 def lesionwise_dice(ctx: PairContext) -> float:
-    r"""$$\mathrm{LW\text{-}DSC} = \frac{1}{N_G + FP_{les}}\sum_{i=1}^{N_G}
+    r"""$$\mathrm{LW\text{-}DSC} = \frac{1}{N_G + FP_{\mathrm{les}}}\sum_{i=1}^{N_G}
     \mathrm{DSC}\Big(G_i,\ \textstyle\bigcup_{j: P_j\cap G_i\neq\emptyset} P_j\Big)$$
 
     Every reference lesion is compared with the union of the predicted

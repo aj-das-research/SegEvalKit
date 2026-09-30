@@ -1,6 +1,6 @@
 """Evaluation results and the SegEvalKit results format.
 
-A results folder written by :meth:`EvaluationResult.save` is the library's
+A results folder written by `EvaluationResult.save` is the library's
 standard output. Every file is plain CSV/JSON so that it can be read without
 SegEvalKit:
 
@@ -169,7 +169,7 @@ def _json_default(o):
 
 
 def load_results(path: Union[str, os.PathLike]) -> EvaluationResult:
-    """Load a results folder written by :meth:`EvaluationResult.save`."""
+    """Load a results folder written by `EvaluationResult.save`."""
     p = Path(path)
     long = pd.read_csv(p / "per_case.csv", dtype={"case_id": str, "label": str})
     les = pd.read_csv(p / "lesions.csv", dtype={"case_id": str}) if (p / "lesions.csv").exists() else pd.DataFrame()

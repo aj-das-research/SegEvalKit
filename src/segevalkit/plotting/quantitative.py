@@ -1,6 +1,6 @@
 """Quantitative plots of evaluation results.
 
-Every function accepts either one :class:`~segevalkit.results.EvaluationResult`
+Every function accepts either one `EvaluationResult`
 or a mapping ``{method_name: EvaluationResult}`` for comparisons, returns the
 matplotlib ``Figure``, draws on ``ax=`` when given, and labels axes with the
 metric's unit and better-direction arrow from the metric registry.
@@ -352,7 +352,7 @@ def metric_profile(results: Mapping[str, object], metrics: Sequence[str], label:
 
 
 def comparison_forest(compare_df: pd.DataFrame, ax=None, figsize=None, name_a: str = "A", name_b: str = "B"):
-    """Forest plot of paired mean differences (A − B) with CIs from :func:`segevalkit.stats.compare`.
+    """Forest plot of paired mean differences (A − B) with CIs from `segevalkit.stats.compare`.
 
     Filled markers are significant after correction.
     """
@@ -505,7 +505,7 @@ def failure_quadrants(result, label: str, x: str = "dice", y: str = "hd95", x_th
 
 def sensitivity_curves(df: pd.DataFrame, metrics: Sequence[str], perturbation: Optional[str] = None,
                        figsize=None):
-    """Metric response to controlled perturbations (see :mod:`segevalkit.synthetic`).
+    """Metric response to controlled perturbations (see `segevalkit.synthetic`).
 
     ``df`` has columns ``perturbation, magnitude, metric, value`` (one row per
     case × magnitude × metric); medians and IQR bands are drawn.

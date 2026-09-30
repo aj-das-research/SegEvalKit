@@ -1,14 +1,15 @@
 """Self-contained HTML evaluation report.
 
->>> from segevalkit.report import build_report
->>> build_report(result, "report.html", image_source="imagesTr/")  # doctest: +SKIP
-
 The report is a single HTML file (figures embedded as PNG) containing: run
 provenance and configuration, warnings (missing / failed cases), per-structure
 summary tables with direction arrows and 95 % CIs, distribution / size /
 correlation / volume / failure-mode figures, a worst-case gallery with error
 overlays, and a glossary with the definition and reference of every metric
 used, so a reader never has to guess what a number means.
+
+Examples:
+    >>> from segevalkit.report import build_report
+    >>> build_report(result, "report.html", image_source="imagesTr/")
 """
 
 from __future__ import annotations
@@ -161,7 +162,7 @@ def build_report(result: "EvaluationResult", path: Union[str, Path], *, title: O
                  metrics: Optional[Sequence[str]] = None, image_source: Union[str, Path, None] = None,
                  gallery_metric: str = "dice", gallery_k: int = 3, window="abdomen",
                  max_labels: int = 8, gallery: bool = True) -> Path:
-    """Write a self-contained HTML report for an :class:`~segevalkit.results.EvaluationResult`.
+    """Write a self-contained HTML report for an `EvaluationResult`.
 
     Args:
         result: The evaluation result.

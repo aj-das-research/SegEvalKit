@@ -1,6 +1,6 @@
 # Adding a dataset preset
 
-A preset lets anyone evaluate on a benchmark **exactly the way the benchmark does** with one flag:
+A preset reproduces a benchmark's **official protocol** behind one flag:
 
 ```console
 $ segevalkit evaluate --dataset my_dataset --pred preds/ --ref my_dataset/labels --out eval/
@@ -8,7 +8,7 @@ $ segevalkit evaluate --dataset my_dataset --pred preds/ --ref my_dataset/labels
 
 ## 1. Collect the protocol
 
-Before writing code, find in the challenge paper or the official evaluation code:
+From the challenge paper or official evaluation code, collect:
 
 | Item | Example (KiTS23) |
 |---|---|
@@ -35,15 +35,16 @@ register_dataset(DatasetPreset(
     url="https://example.org/my-dataset",
     license="CC BY 4.0",
     citation="Author et al. 2026, Journal",
-    notes="Lesions < 10 voxels are ignored by the official code: use --min-lesion-voxels 10.",
+    notes="Lesions < 10 voxels are ignored by the official code: "
+          "use --min-lesion-voxels 10.",
 ))
 ```
 
-For per-structure datasets (one file per structure), set `labels=None` (all files) or a list of structure names,
-`ref_layout="per_structure"` and `ref_subdir="segmentations"`.
+For one file per structure, set `ref_layout="per_structure"`, `ref_subdir="segmentations"` and `labels=None` (all
+files) or a list of structure names.
 
 ## 3. Verify against the official code
 
-Evaluate a few cases with the official evaluation script and with the preset, and compare per-case numbers. Record
-any deviation (e.g. surfel-weighted surface Dice) in `notes`. The [presets page](../datasets/presets.md) is
-generated from the registry, so the documentation updates itself.
+Evaluate a few cases with both the official script and the preset and compare per-case numbers. Record any deviation
+(e.g. surfel-weighted surface Dice) in `notes`. The [presets page](../datasets/presets.md) is generated from the
+registry.

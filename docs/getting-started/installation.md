@@ -1,7 +1,7 @@
 # Installation
 
-SegEvalKit needs Python ≥ 3.9. The core depends only on NumPy, SciPy, nibabel, pandas, scikit-image,
-matplotlib, PyYAML, tqdm and Jinja2.
+SegEvalKit needs Python ≥ 3.9. Core dependencies: NumPy, SciPy, nibabel, pandas, scikit-image, matplotlib,
+PyYAML, tqdm, Jinja2 and rich.
 
 === "pip (from GitHub)"
 
@@ -21,8 +21,8 @@ matplotlib, PyYAML, tqdm and Jinja2.
     $ git clone https://github.com/aj-das-research/SegEvalKit.git
     $ cd SegEvalKit
     $ pip install -e ".[all,dev,docs]"
-    $ pytest                       # ~70 tests, including conformance with MONAI / MedPy / DeepMind
-    $ mkdocs serve                 # this documentation at http://127.0.0.1:8000
+    $ pytest                       # ~75 tests, incl. conformance with MONAI / MedPy / DeepMind
+    $ mkdocs serve                 # this site at http://127.0.0.1:8000
     ```
 
 ## Optional extras
@@ -33,14 +33,14 @@ matplotlib, PyYAML, tqdm and Jinja2.
 | `sitk` | `SimpleITK` | `.mha`, `.mhd`, `.nrrd` inputs |
 | `interactive` | `plotly` | interactive 3D surface-distance maps (`backend="plotly"`) |
 | `all` | all of the above | |
-| `dev` | pytest, ruff | the test-suite |
+| `dev` | pytest, ruff | the test suite |
 | `docs` | mkdocs-material, mkdocstrings | building this site |
 
 !!! tip "PyTorch and CUDA"
-    Install the PyTorch build that matches your driver *before* SegEvalKit, e.g.
+    Install the PyTorch build matching your driver *before* SegEvalKit, e.g.
     `pip install torch --index-url https://download.pytorch.org/whl/cu128`. SegEvalKit never pins a CUDA version.
 
-`cc3d` (connected-components-3d) is used automatically when installed and makes lesion labelling 5–10× faster.
+If `cc3d` (connected-components-3d) is installed it is used automatically; lesion labelling is 5–10× faster.
 
 ## Check the installation
 

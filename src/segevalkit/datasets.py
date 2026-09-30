@@ -5,18 +5,19 @@ benchmark does*: its label ids and region definitions, the on-disk layout of
 its reference labels, its official metrics and their parameters (e.g. NSD
 tolerance), and its empty-mask convention.
 
-```python
->>> from segevalkit.datasets import get_dataset
->>> kits = get_dataset("kits23")
->>> kits.labels["masses"]
-[2, 3]
+Examples:
+    >>> from segevalkit.datasets import get_dataset
+    >>> kits = get_dataset("kits23")
+    >>> kits.labels["masses"]
+    [2, 3]
+
+From the command line:
+
+```console
+segevalkit datasets            # list
+segevalkit datasets kits23     # details
+segevalkit evaluate --dataset kits23 --pred preds/ --ref kits23/labels --out eval/
 ```
-
-.. code-block:: console
-
-    segevalkit datasets            # list
-    segevalkit datasets kits23     # details
-    segevalkit evaluate --dataset kits23 --pred preds/ --ref kits23/labels --out eval/
 
 Official protocols evolve; each preset cites its source and the notes list
 known deviations. Where a challenge uses a convention SegEvalKit implements
@@ -40,12 +41,12 @@ class DatasetPreset:
         title: Full name.
         modality: ``"CT"``, ``"MR"``, ``"PET/CT"``, ``"CT+MR"``...
         anatomy: Region / targets.
-        labels: Label spec (see :func:`segevalkit.io.parse_labels`); for
+        labels: Label spec (see `segevalkit.io.parse_labels`); for
             per-structure datasets a list of structure names (``None`` = all
             files found).
         metrics: Official (or de-facto standard) metrics.
         params: Metric parameters, e.g. NSD tolerance.
-        empty_policy: :class:`~segevalkit.metrics.EmptyPolicy` preset name.
+        empty_policy: `EmptyPolicy` preset name.
         ref_layout / ref_file / ref_subdir: Layout of the reference labels.
         cases: Approximate number of labelled cases.
         url: Download / project page.

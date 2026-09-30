@@ -5,11 +5,11 @@ Survey for **SegEvalKit** (an open-source evaluation library). Compiled 2026-09-
 ## How to read this document
 
 - **Verification levels.** Every fact carries one of three tags:
-  - **[V-code]**: checked directly against official files. That means official evaluation code, `dataset.json`, a Zenodo record, a HuggingFace card, or label files downloaded and inspected by us.
-  - **[V-doc]**: checked against an official web page, README or paper.
-  - **[UNVERIFIED]**: taken from memory or secondary sources. Check it before encoding it in SegEvalKit defaults.
+    - **[V-code]**: checked directly against official files. That means official evaluation code, `dataset.json`, a Zenodo record, a HuggingFace card, or label files downloaded and inspected by us.
+    - **[V-doc]**: checked against an official web page, README or paper.
+    - **[UNVERIFIED]**: taken from memory or secondary sources. Check it before encoding it in SegEvalKit defaults.
 - The **"official metric" rows** describe what the organisers' own code does. In particular they record how it handles **empty masks**, **tolerances**, and **aggregation**. Those three things are where re-implementations usually disagree with leaderboards.
-- The table of empty-mask conventions across benchmarks is in [Section 4](#4-cross-benchmark-empty-mask--tolerance-conventions).
+- The table of empty-mask conventions across benchmarks is in [Section 4](#4-cross-benchmark-empty-mask-and-tolerance-conventions).
 
 ---
 
@@ -330,9 +330,9 @@ Note that the `numTraining` values in `dataset.json` differ from the paper's tab
 ### 3.2 Notes on the metric implementations (surface metrics)
 
 - **DeepMind `surface-distance`** is used by FLARE, KiTS, BraTS-2023 and HECKTOR.
-  - `compute_surface_distances(gt, pred, spacing)` needs the spacing in **array-axis order**. With SimpleITK arrays (z, y, x) pass `GetSpacing()[::-1]`; KiTS does exactly this. With nibabel arrays pass `header.get_zooms()`; FLARE does this.
-  - An empty mask gives `inf` distances. NSD is `nan` when both masks are empty and `0` when only one is.
-  - HD95 is surface-area weighted.
+    - `compute_surface_distances(gt, pred, spacing)` needs the spacing in **array-axis order**. With SimpleITK arrays (z, y, x) pass `GetSpacing()[::-1]`; KiTS does exactly this. With nibabel arrays pass `header.get_zooms()`; FLARE does this.
+    - An empty mask gives `inf` distances. NSD is `nan` when both masks are empty and `0` when only one is.
+    - HD95 is surface-area weighted.
 - **MONAI `DiceMetric`** defaults to `ignore_empty=True`: an empty GT returns NaN **even when the prediction contains false positives**, and `nanmean` then drops the case. This silently hides FPs.
 - **MONAI `HausdorffDistanceMetric`**: one mask empty gives inf; both empty give NaN. Without `spacing=` the result is in voxels.
 - **MONAI `SurfaceDiceMetric`**: both empty give NaN; one empty gives 0. With `use_subvoxels=False` it counts edge voxels, which differs from DeepMind's surfel areas.
@@ -390,11 +390,12 @@ It should be combined with an NSD tolerance map, connectivity, and "NSD := 0 if 
 ## 6. Recommendations for SegEvalKit
 
 1. **Ingestion adapters.** Support three shapes of input:
-   - (a) an ML NIfTI plus an id→name map (MSD/nnU-Net `dataset.json`, v1 and v2 schemas);
-   - (b) a PS folder `segmentations/<name>.nii.gz` (TotalSegmentator, AbdomenAtlas, PanTS, SuPreM);
-   - (c) per-instance or per-annotator files (KiTS21/23).
+    - (a) an ML NIfTI plus an id→name map (MSD/nnU-Net `dataset.json`, v1 and v2 schemas);
+    - (b) a PS folder `segmentations/<name>.nii.gz` (TotalSegmentator, AbdomenAtlas, PanTS, SuPreM);
+    - (c) per-instance or per-annotator files (KiTS21/23).
 
-   Also read `.mha`, `.nrrd` and `.mhd` (PI-CAI, SPIDER, ToothFairy, LNQ, LA2018, LUNA16) through SimpleITK.
+    Also read `.mha`, `.nrrd` and `.mhd` (PI-CAI, SPIDER, ToothFairy, LNQ, LA2018, LUNA16) through SimpleITK.
+
 2. **Name-keyed matching.** Map everything to structure names. Ids collide across datasets: ACDC and M&Ms swap LV/RV; TotalSegmentator CT and MR ids differ; BraTS ET is 4 in 2021 and 3 from 2023; MSD Task01 uses 1 = edema.
 3. **Overlapping structures.** Never collapse PS masks into ML for evaluation (PanTS pancreas ⊃ head/body/tail; veins overlapping organs). Evaluate each binary mask independently.
 4. **Binarisation.** Use `> 0.5`, not `== 1` (PanTS pancreas sub-parts load as 1.0000000591). Cast float label maps (MSD Colon, CT-ORG) with rounding.

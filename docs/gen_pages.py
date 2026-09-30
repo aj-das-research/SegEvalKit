@@ -5,6 +5,7 @@
 * ``datasets/presets.md``: every dataset preset.
 """
 
+import html
 import math
 import sys
 from pathlib import Path
@@ -21,9 +22,18 @@ FAMILY_PAGE = {"overlap": "overlap", "volume": "volume", "distance": "distance",
 BETTER = {"higher": "↑ higher", "lower": "↓ lower", "zero": "→ 0", "none": "descriptive"}
 
 
+def _prose(text):
+    """Registry prose for Markdown: typographic relations and units, literal angle brackets."""
+    for a, b in (("<=", "≤"), (">=", "≥"), ("mm^3", "mm³"), ("mm^2", "mm²")):
+        text = text.replace(a, b)
+    return html.escape(text, quote=False)
+
+
 def _rng(r):
-    f = lambda v: "∞" if math.isinf(v) and v > 0 else ("−∞" if math.isinf(v) else f"{v:g}")  # noqa: E731
-    return f"[{f(r[0])}, {f(r[1])}]"
+    f = lambda v: "∞" if math.isinf(v) and v > 0 else ("−∞" if math.isinf(v) else f"{v:g}".replace("-", "−"))  # noqa: E731
+    lo = "(" if math.isinf(r[0]) else "["
+    hi = ")" if math.isinf(r[1]) else "]"
+    return f"{lo}{f(r[0])}, {f(r[1])}{hi}"
 
 
 with mkdocs_gen_files.open("metrics/catalogue.md", "w") as fh:
@@ -37,13 +47,14 @@ with mkdocs_gen_files.open("metrics/catalogue.md", "w") as fh:
         rows = [m for m in ms if m.family == fam]
         if not rows:
             continue
-        fh.write(f"## {title}\n\n| Metric | Key | Better | Range | Unit | Needs | In one sentence |\n"
-                 "|---|---|---|---|---|---|---|\n")
+        fh.write(f"## {title}\n\n<div class=\"sek-catalogue\" markdown>\n\n"
+                 "| Metric and key | Better | Range | Unit | Needs | In one sentence |\n"
+                 "|---|---|---|---|---|---|\n")
         for m in rows:
             needs = ", ".join(m.requires) or "–"
-            fh.write(f"| [{m.display}]({FAMILY_PAGE[fam]}.md#{m.name}) | `{m.name}` | {BETTER[m.better]} | "
+            fh.write(f"| [{m.display}]({FAMILY_PAGE[fam]}.md#{m.name})<br>`{m.name}` | {BETTER[m.better]} | "
                      f"{_rng(m.value_range)} | {m.unit or '–'} | {needs} | {m.summary} |\n")
-        fh.write("\n")
+        fh.write("\n</div>\n\n")
     fh.write("## Metric sets\n\nNamed bundles accepted anywhere a metric list is expected "
              "(`metrics=[\"default\", \"cldice\"]`, `--metrics distance,detection`).\n\n| Set | Metrics |\n|---|---|\n")
     for k, v in METRIC_SETS.items():
@@ -64,8 +75,8 @@ with mkdocs_gen_files.open("datasets/presets.md", "w") as fh:
     for k, d in DATASETS.items():
         fh.write(f"\n## {d.title} {{#{k}}}\n\n")
         fh.write(f"<div class=\"sek-meta\"><span class=\"sek-chip\">{d.modality}</span>"
-                 f"<span class=\"sek-chip teal\">{d.cases}</span><span class=\"sek-chip orange\">{d.license}</span></div>\n\n")
-        fh.write(f"**Anatomy:** {d.anatomy}  \n")
+                 f"<span class=\"sek-chip teal\">{_prose(d.cases)}</span><span class=\"sek-chip orange\">{_prose(d.license)}</span></div>\n\n")
+        fh.write(f"**Anatomy:** {_prose(d.anatomy)}  \n")
         fh.write(f"**Labels:** {d.label_summary()}  \n")
         lay = d.ref_layout or "auto"
         extra = d.ref_subdir or d.ref_file
@@ -76,4 +87,4 @@ with mkdocs_gen_files.open("datasets/presets.md", "w") as fh:
         fh.write(f"**Empty policy:** `{d.empty_policy}`  \n")
         fh.write(f"**Source:** <{d.url}>  \n**Cite:** {d.citation}\n")
         if d.notes:
-            fh.write(f"\n!!! note \"Protocol notes\"\n    {d.notes}\n")
+            fh.write(f"\n!!! note \"Protocol notes\"\n    {_prose(d.notes)}\n")

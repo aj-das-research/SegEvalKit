@@ -21,10 +21,6 @@ questions you need answered.
     Why the same metric gives different numbers in different tools, which convention SegEvalKit uses, and the
     tests that pin it down.
 
--   :material-chart-bell-curve-cumulative:{ .lg } **[Sensitivity study](sensitivity-study.md)**
-
-    What each metric actually responds to, measured on real CT anatomy under controlled errors.
-
 </div>
 
 !!! note "The one-line rule"

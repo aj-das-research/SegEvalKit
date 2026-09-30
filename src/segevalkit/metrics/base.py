@@ -1,8 +1,8 @@
 """Metric registry.
 
 Every metric in SegEvalKit is a plain function ``fn(ctx, **params) -> float`` that
-reads what it needs from a :class:`~segevalkit.metrics.context.PairContext`.
-The function is registered together with a :class:`MetricInfo` record that
+reads what it needs from a `PairContext`.
+The function is registered together with a `MetricInfo` record that
 carries everything a user (or the documentation, the report and the metric
 recommender) needs to know about it: family, range, better direction, units,
 what inputs it requires, and the primary reference.
@@ -48,7 +48,7 @@ class MetricInfo:
         name: Registry key, ``snake_case`` (e.g. ``"hd95"``).
         display: Human-readable name.
         abbr: Short label used on plots and tables.
-        family: One of :data:`FAMILIES`.
+        family: One of `FAMILIES`.
         better: ``"higher"``, ``"lower"``, ``"zero"`` (signed metrics whose
             ideal value is 0, e.g. relative volume difference) or ``"none"``
             (descriptive quantities such as a volume, which are not scores).
@@ -142,7 +142,7 @@ def register_metric(
 
 
 def get_metric(name: str) -> MetricInfo:
-    """Return the :class:`MetricInfo` registered under ``name`` (or an alias)."""
+    """Return the `MetricInfo` registered under ``name`` (or an alias)."""
     key = _ALIASES.get(name.lower(), name.lower())
     try:
         return _REGISTRY[key]

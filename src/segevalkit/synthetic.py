@@ -15,8 +15,8 @@ so that results transfer across datasets and voxel spacings:
 ``boundary_noise``     smooth random boundary jitter of amplitude *d* mm
 =====================  =============================================================
 
-:func:`sensitivity_study` runs a grid of perturbations and returns a tidy
-table ready for :func:`segevalkit.plotting.sensitivity_curves`.
+`sensitivity_study` runs a grid of perturbations and returns a tidy
+table ready for `segevalkit.plotting.sensitivity_curves`.
 """
 
 from __future__ import annotations
@@ -187,7 +187,7 @@ def sensitivity_study(refs: Iterable, metrics: Sequence[str], *,
     Args:
         refs: Iterable of ``(case_id, mask, spacing)`` tuples.
         metrics: Metric names.
-        perturbations: ``{name: magnitudes}``; defaults to :data:`PERTURBATIONS`.
+        perturbations: ``{name: magnitudes}``; defaults to `PERTURBATIONS`.
         params: Metric parameter overrides.
 
     Returns:

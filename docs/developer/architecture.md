@@ -3,18 +3,22 @@
 ## Layers
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph IO["segevalkit.io"]
+        direction LR
         S["Source<br/>flat · folder · per_structure"] --> L["LabelSpec<br/>ids · regions · files"]
         L --> V["Volume<br/>array + spacing + affine"]
     end
     subgraph CORE["segevalkit.metrics"]
+        direction LR
         C["PairContext<br/>cached intermediates"] --> R["Metric registry<br/>53 metrics · MetricInfo"]
     end
     subgraph RUN["segevalkit.evaluator"]
+        direction LR
         E["Evaluator<br/>cases × labels × metrics"] --> ER["EvaluationResult<br/>long table · lesions · meta"]
     end
     subgraph OUT["analysis"]
+        direction LR
         ST["stats"]; PL["plotting"]; VZ["viz"]; RP["report"]
     end
     V --> E
@@ -32,28 +36,24 @@ flowchart LR
 | Guidance | `guide`, `datasets`, `synthetic` | which metrics, which protocol, how metrics behave | metrics |
 | Interface | `cli`, `_console` | the `segevalkit` command and its terminal UI | everything above, rich |
 
-Lower layers never import higher ones. The metric layer knows nothing about files; the I/O layer knows nothing about
-metrics. This is what lets `compute_metrics` work on in-memory arrays from any source.
+Lower layers never import higher ones: metrics know nothing about files and I/O knows nothing about metrics, so
+`compute_metrics` works on in-memory arrays from any source.
 
 ## The life of one evaluation
 
-1. **Discovery.** `Source` detects the layout of the prediction and reference folders and builds an index of case
-   ids. `discover_cases` pairs them; the **reference defines the case list**.
-2. **Loading.** Per case and label, `Source.load_mask` returns a boolean mask and its `Volume` geometry. For
-   multi-label files the volume is loaded once per case and cached.
-3. **Geometry.** `check_alignment` compares shape, spacing and affine; the `alignment` policy decides between
-   failing the case, resampling the prediction or ignoring header differences.
-4. **Context.** A `PairContext(pred, ref, spacing, prob)` is created. Nothing is computed yet.
-5. **Metrics.** Each requested metric is called with the context. The first metric that needs, say, surface
-   distances triggers their computation; every later metric reuses them.
-6. **Rows.** Each value becomes a row `(case_id, label, metric, value)`, plus descriptive `_` flags and optional
-   lesion rows.
-7. **Result.** Rows from all workers become an `EvaluationResult` with a provenance `meta` dictionary, saved as the
-   [standard results folder](../getting-started/data-format.md#the-results-folder).
+| Step | What happens |
+|---|---|
+| 1. Discovery | `Source` detects the folder layout and indexes case ids; `discover_cases` pairs them. The **reference defines the case list**. |
+| 2. Loading | `Source.load_mask` returns a boolean mask and its `Volume` geometry per case and label; multi-label files are loaded once per case. |
+| 3. Geometry | `check_alignment` compares shape, spacing and affine; the `alignment` policy fails the case, resamples the prediction or ignores header differences. |
+| 4. Context | A lazy `PairContext(pred, ref, spacing, prob)` is created. |
+| 5. Metrics | Each metric is called with the context; the first one needing an intermediate (e.g. surface distances) computes it, later ones reuse it. |
+| 6. Rows | Each value becomes a row `(case_id, label, metric, value)`, plus descriptive `_` flags and optional lesion rows. |
+| 7. Result | Rows from all workers form an `EvaluationResult` with a provenance `meta` dictionary, saved as the [standard results folder](../getting-started/data-format.md#the-results-folder). |
 
 ## The computation context
 
-`PairContext` is the performance and correctness core. Each expensive intermediate is a cached property:
+`PairContext` caches each expensive intermediate as a property:
 
 | Property | Computed from | Used by |
 |---|---|---|
@@ -64,17 +64,16 @@ metrics. This is what lets `compute_metrics` work on in-memory arrays from any s
 | `pred_skeleton`, `ref_skeleton` | 3D thinning with a symmetric-object fallback | clDice |
 | `memo(key, fn)` | anything a metric plug-in needs | e.g. Betti numbers, instance matching, ROI bands |
 
-All geometry is computed on the union bounding box grown by one voxel and padded, so a small structure in a large
-CT costs as much as its crop, and voxels on the true image border still count as surface.
+Geometry is computed on the padded union bounding box (grown by one voxel), so a small structure in a large CT costs
+only its crop, and voxels on the image border still count as surface.
 
 ## Design rules
 
-1. **Every number has a written definition.** Each metric's docstring holds its equation; its registry entry holds
-   range, direction, unit and reference; the docs render both.
-2. **Conventions are explicit and recorded.** Empty masks, percentile mode, connectivity, tolerances and alignment
-   are arguments, stored in `meta.json`, and pinned by conformance tests.
-3. **Undefined is NaN, not 0.** A value that does not exist (precision of an empty prediction) is reported as NaN
-   and counted in summaries.
-4. **Backends compute the same thing.** The GPU path is an acceleration, never a different definition.
-5. **Plain outputs.** Results are CSV and JSON so they outlive the library.
-6. **No hidden state.** No global configuration; everything flows through arguments.
+1. **Every number has a written definition**: the equation in the docstring; range, direction, unit and reference in
+   the registry. The docs render both.
+2. **Conventions are explicit**: empty masks, percentile mode, connectivity, tolerances and alignment are arguments,
+   stored in `meta.json` and pinned by conformance tests.
+3. **Undefined is NaN, not 0** (e.g. precision of an empty prediction), and NaNs are counted in summaries.
+4. **Backends compute the same thing**: the GPU path is an acceleration, never a different definition.
+5. **Plain outputs**: CSV and JSON, so results outlive the library.
+6. **No hidden state**: no global configuration; everything flows through arguments.

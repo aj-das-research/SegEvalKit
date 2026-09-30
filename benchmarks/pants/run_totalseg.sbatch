@@ -14,7 +14,7 @@ STORE=/l/users/$USER/SegEvalKit
 ENV=/nfs-stor/$USER/envs/sek-totalseg
 export TOTALSEG_HOME_DIR=$STORE/checkpoints/totalsegmentator
 export TMPDIR=$STORE/tmp/$SLURM_JOB_ID; mkdir -p "$TMPDIR"
-export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=4 MPLCONFIGDIR=$TMPDIR/mpl
 OUT=$STORE/outputs/predictions/totalsegmentator
 N=4
 for i in $(seq 0 $((N-1))); do

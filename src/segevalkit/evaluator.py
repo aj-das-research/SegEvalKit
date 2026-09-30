@@ -1,18 +1,18 @@
 """The dataset-level evaluation engine.
 
-:class:`Evaluator` turns *(prediction folder, reference folder, label spec)*
-into a tidy, reproducible :class:`~segevalkit.results.EvaluationResult`:
+`Evaluator` turns *(prediction folder, reference folder, label spec)*
+into a tidy, reproducible `EvaluationResult`:
 
-.. code-block:: python
+```python
+from segevalkit import Evaluator
 
-    from segevalkit import Evaluator
-
-    ev = Evaluator(labels={"liver": 1, "tumour": 2},
-                   metrics=["default", "lesion_f1"],
-                   params={"nsd": {"tolerance_mm": 2.0}})
-    res = ev.evaluate("preds/", "labelsTr/", n_workers=8)
-    res.summary()          # per-label mean / median / CI table
-    res.save("eval_out/")  # standard SegEvalKit results folder
+ev = Evaluator(labels={"liver": 1, "tumour": 2},
+               metrics=["default", "lesion_f1"],
+               params={"nsd": {"tolerance_mm": 2.0}})
+res = ev.evaluate("preds/", "labelsTr/", n_workers=8)
+res.summary()          # per-label mean / median / CI table
+res.save("eval_out/")  # standard SegEvalKit results folder
+```
 
 Every choice that changes a number (empty-mask policy, connectivity,
 tolerances, alignment handling) is an explicit argument and is written to the
@@ -75,7 +75,7 @@ class Evaluator:
     """Evaluate segmentations over labels and cases.
 
     Args:
-        labels: Structures to evaluate (see :func:`segevalkit.io.parse_labels`);
+        labels: Structures to evaluate (see `segevalkit.io.parse_labels`);
             ``None`` evaluates every non-zero value found in the reference
             (multi-label layouts) or every reference structure file
             (per-structure layouts).
@@ -83,7 +83,7 @@ class Evaluator:
         params: Global per-metric keyword overrides, e.g.
             ``{"nsd": {"tolerance_mm": 1.0}}``. Per-label overrides in the
             label spec take precedence.
-        empty: :class:`~segevalkit.metrics.EmptyPolicy` for empty masks.
+        empty: `EmptyPolicy` for empty masks.
         device: ``"cpu"`` or ``"cuda"``/``"cuda:N"`` (surface distances and
             confusion counts on the GPU).
         connectivity: Connectivity for lesion/instance components (6/18/26).
@@ -172,7 +172,7 @@ class Evaluator:
         """Evaluate every reference case against its prediction.
 
         Args:
-            pred: Prediction folder (or :class:`~segevalkit.io.Source`).
+            pred: Prediction folder (or `Source`).
             ref: Reference folder (or Source). Defines the case list.
             prob: Optional folder of per-structure probability maps
                 (``<case>/<label>.nii.gz``, float in [0, 1]).

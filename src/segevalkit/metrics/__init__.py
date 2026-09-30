@@ -1,10 +1,10 @@
 """Segmentation metrics.
 
 Importing this package registers every built-in metric. Use
-:func:`compute_metrics` for one binary pair, or the higher-level
-:class:`segevalkit.Evaluator` for whole datasets and multi-label volumes.
+`compute_metrics` for one binary pair, or the higher-level
+`segevalkit.Evaluator` for whole datasets and multi-label volumes.
 
-Example:
+Examples:
     >>> import numpy as np
     >>> from segevalkit.metrics import compute_metrics
     >>> g = np.zeros((32, 32, 32), bool); g[8:24, 8:24, 8:24] = True
@@ -68,11 +68,11 @@ def compute_metrics(
     """Compute several metrics for one binary (prediction, reference) pair.
 
     Args:
-        pred: Predicted mask, or an existing :class:`PairContext` (then ``ref``
+        pred: Predicted mask, or an existing `PairContext` (then ``ref``
             and the context arguments are ignored).
         ref: Reference mask.
         metrics: Metric names, aliases or set names (see
-            :data:`~segevalkit.metrics.base.METRIC_SETS`), or ``"all"``.
+            `METRIC_SETS`), or ``"all"``.
         spacing: Voxel spacing in mm.
         prob: Optional foreground probability map.
         params: Per-metric keyword overrides, e.g. ``{"nsd": {"tolerance_mm": 1}}``.

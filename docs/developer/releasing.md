@@ -2,7 +2,7 @@
 
 ## Versioning
 
-SegEvalKit follows semantic versioning. The version lives in `src/segevalkit/__init__.py`.
+Semantic versioning; the version lives in `src/segevalkit/__init__.py`.
 
 | Change | Version bump |
 |---|---|
@@ -13,14 +13,14 @@ SegEvalKit follows semantic versioning. The version lives in `src/segevalkit/__i
 
 ## The results-format contract
 
-`meta.json` carries `results_format`. Tools reading SegEvalKit results rely on the column names of `per_case.csv`
-(`case_id, label, metric, value`), the `_` prefix for descriptive flags, and the columns of `summary.csv` and
-`lesions.csv`. Changing them requires a new `results_format` and a loader that still reads the old one.
+`meta.json` carries `results_format`. Readers rely on the `per_case.csv` columns (`case_id, label, metric, value`),
+the `_` prefix for descriptive flags, and the `summary.csv` and `lesions.csv` columns. Changing any of them needs a
+new `results_format` and a loader that still reads the old one.
 
 ## Deprecation policy
 
-Public names are deprecated for one minor release (with a `FutureWarning` naming the replacement) before removal.
-Metric registry keys are never reused for a different definition.
+Public names are deprecated for one minor release (a `FutureWarning` naming the replacement) before removal. Metric
+registry keys are never reused for a different definition.
 
 ## Release checklist
 

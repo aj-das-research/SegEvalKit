@@ -5,10 +5,10 @@ acceleration, never a different definition. ``tests/test_backends.py`` checks
 that they agree to floating-point precision.
 
 * Surface distances on the CPU use an exact Euclidean distance transform
-  (:func:`scipy.ndimage.distance_transform_edt`) of the other mask's surface,
+  (`scipy.ndimage.distance_transform_edt`) of the other mask's surface,
   sampled at this mask's surface voxels.
 * On the GPU the surface voxels become point clouds in millimetres and the
-  nearest-neighbour distance is taken with a chunked :func:`torch.cdist`,
+  nearest-neighbour distance is taken with a chunked `torch.cdist`,
   which is exact and scales to organ-sized surfaces (10^5 points) in well
   under a second on an A100.
 """

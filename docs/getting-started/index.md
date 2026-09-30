@@ -4,19 +4,19 @@
 
 -   :material-download:{ .lg } **[Installation](installation.md)**
 
-    pip, optional GPU / SimpleITK / plotly extras, development setup.
+    pip, optional extras, development setup.
 
 -   :material-rocket-launch-outline:{ .lg } **[Quickstart](quickstart.md)**
 
-    Evaluate a folder in five minutes, then read the results, the plots and the report.
+    Evaluate a folder, read the results, plot and report in five minutes.
 
 -   :material-file-tree-outline:{ .lg } **[Data & output format](data-format.md)**
 
-    The input layouts SegEvalKit reads and the standard results folder it writes.
+    Input layouts read and the results folder written.
 
 -   :material-cog-outline:{ .lg } **[Configuration](configuration.md)**
 
-    Every option that changes a number, and the YAML config file.
+    Every option that changes a number; the YAML file.
 
 -   :material-console:{ .lg } **[Command line](cli.md)**
 
@@ -24,6 +24,6 @@
 
 -   :material-server:{ .lg } **[GPU & HPC](gpu-hpc.md)**
 
-    GPU surface distances, worker processes, SLURM templates, memory.
+    GPU surface distances, workers, SLURM template, memory.
 
 </div>

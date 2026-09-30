@@ -16,15 +16,23 @@ ENV=/nfs-stor/$USER/envs/sek-nnunet
 export nnUNet_raw=$STORE/tmp/nnunet_raw nnUNet_preprocessed=$STORE/tmp/nnunet_pre nnUNet_results=$STORE/tmp/nnunet_res
 export nnUNet_extTrainer=$STORE/third_party/nnUNet-PanTS-regions/nnunetv2/custom_code
 export TMPDIR=$STORE/tmp/$SLURM_JOB_ID; mkdir -p "$TMPDIR" "$nnUNet_raw" "$nnUNet_preprocessed" "$nnUNet_results"
-export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=4 MPLCONFIGDIR=$TMPDIR/mpl
 OUT=$STORE/outputs/predictions/nnunet_pants_regions
 mkdir -p "$OUT"
 N=4
+# predict_from_modelfolder has no -num_parts: shard the (symlinked) inputs into N folders instead.
+for i in $(seq 0 $((N-1))); do
+  mkdir -p "$STORE/data/pants_nnunet/shard$i"
+done
+ls "$STORE/data/pants_nnunet/imagesTs" | sort | awk -v n=$N -v d="$STORE/data/pants_nnunet" \
+  '{ print d "/imagesTs/" $0, d "/shard" (NR-1)%n "/" $0 }' | while read src dst; do
+  [ -e "$dst" ] || ln -s "$(readlink -f "$src")" "$dst"
+done
 for i in $(seq 0 $((N-1))); do
   srun --exact -n1 --gres=gpu:1 --cpus-per-task=8 --mem=58G \
     "$ENV/bin/nnUNetv2_predict_from_modelfolder" -m "$STORE/checkpoints/nnunet_pants_regions" \
-      -i "$STORE/data/pants_nnunet/imagesTs" -o "$OUT" -f all -chk checkpoint_best.pth \
-      -npp 3 -nps 3 -num_parts $N -part_id $i --disable_progress_bar --continue_prediction \
+      -i "$STORE/data/pants_nnunet/shard$i" -o "$OUT" -f all -chk checkpoint_best.pth \
+      -npp 3 -nps 3 --disable_progress_bar --continue_prediction \
       > "$STORE/logs/nnunet-part$i-$SLURM_JOB_ID.log" 2>&1 &
 done
 wait

@@ -3,7 +3,10 @@
    Academic serif typography (STIX Two Text, a Times-family face in the spirit of
    the ICLR template), a restrained purple palette, and one spacing scale.
    ========================================================================== */
-@import url("https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&family=Noto+Serif:ital,wght@0,400;0,600;1,400&family=Noto+Sans+Symbols+2&display=swap");
+/* STIX Two Text from Google Fonts only ships Latin/Greek subsets: arrows, relations and operators in running text
+   (→ ≤ ≥ ≈ ∞ ∈ ∪ ₀ ✓ ...) fall through to Noto Serif's "math" subset and Noto Sans Symbols 2 instead of a
+   random system font or a missing-glyph box. Browsers fetch those subsets only when such a character occurs. */
 
 :root {
   /* palette */
@@ -11,7 +14,7 @@
   --sk-500: #7c4ee4; --sk-600: #6d3fd6; --sk-700: #5a2fb8; --sk-800: #472594; --sk-900: #2e1766; --sk-950: #1c0f40;
   --sk-teal: #139a8a; --sk-orange: #e2712f;
   /* type */
-  --sk-serif: "STIX Two Text", "Times New Roman", Times, serif;
+  --sk-serif: "STIX Two Text", "Noto Serif", "Noto Sans Symbols 2", "Times New Roman", Times, serif;
   --sk-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   /* spacing & radii */
   --sk-r-sm: 6px; --sk-r: 10px; --sk-r-lg: 14px;
@@ -83,12 +86,17 @@ code, kbd, pre, .md-typeset code, .md-typeset pre { font-family: var(--sk-mono);
 .md-typeset h3 { font-size: 1.14em; font-weight: 600; line-height: 1.35; margin: 1.7em 0 .5em; color: var(--md-default-fg-color); }
 .md-typeset h4 { font-size: 1em; font-weight: 600; margin: 1.4em 0 .4em; }
 .md-typeset h1 + h2, .md-typeset h2:first-child { border-top: 0; padding-top: 0; }
+/* a Markdown `---` rule right before an h2 would draw a second line above the heading's own rule */
+.md-typeset hr:has(+ h2) { display: none; }
 .md-typeset code { font-size: .8em; padding: .08em .35em; border-radius: 4px; }
 .md-typeset pre > code { font-size: .8em; line-height: 1.6; padding: 1em 1.2em; border-radius: var(--sk-r); }
 .md-typeset a { text-decoration: none; }
 .md-typeset a:hover { text-decoration: underline; text-underline-offset: 2px; }
-.md-typeset .arithmatex { overflow-x: auto; overflow-y: hidden; }
-mjx-container { font-size: 104% !important; }
+/* display maths scrolls horizontally on narrow screens instead of overflowing the column;
+   inline maths must stay inline (an overflow box on a span can clip super/subscripts) */
+.md-typeset div.arithmatex { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+.md-typeset div.arithmatex > mjx-container[display="true"] { margin: .6em 0; }
+.md-typeset mjx-container[jax="CHTML"] { font-size: 104% !important; }
 
 /* -------------------------------------------------------------- layout */
 .md-grid { max-width: 76rem; }
@@ -125,6 +133,8 @@ mjx-container { font-size: 104% !important; }
 .md-typeset table:not([class]) { font-size: .74rem; border: 1px solid var(--sk-border); border-radius: var(--sk-r); box-shadow: none; overflow: hidden; }
 .md-typeset table:not([class]) th { background: var(--sk-bg-tint); font-weight: 600; color: var(--md-default-fg-color); border-bottom: 1px solid var(--sk-border); }
 .md-typeset table:not([class]) td { border-top: 1px solid var(--sk-border); vertical-align: top; }
+.md-typeset table:not([class]) th, .md-typeset table:not([class]) td { padding: .75em .9em; }
+.md-typeset table:not([class]) th { min-width: 0; }
 .md-typeset table:not([class]) tr:hover { background: var(--md-accent-fg-color--transparent); }
 
 /* -------------------------------------------------------------- admonitions */
@@ -132,6 +142,9 @@ mjx-container { font-size: 104% !important; }
   border-radius: var(--sk-r); box-shadow: none; background: var(--sk-card); }
 .md-typeset .admonition-title, .md-typeset summary { font-weight: 600; background: transparent !important; }
 .md-typeset .admonition-title::before, .md-typeset summary::before { background-color: var(--sk-600) !important; }
+/* typed admonitions keep the neutral frame; only the left rule carries the colour */
+.md-typeset :is(.admonition, details):is(.note, .tip, .warning, .info, .example, .abstract, .question, .quote) {
+  border-color: var(--sk-border); border-left-color: var(--sk-500); }
 .md-typeset .admonition.tip, .md-typeset details.tip { border-left-color: var(--sk-teal); }
 .md-typeset .tip > .admonition-title::before, .md-typeset .tip > summary::before { background-color: var(--sk-teal) !important; }
 .md-typeset .admonition.warning, .md-typeset details.warning { border-left-color: var(--sk-orange); }
@@ -151,7 +164,7 @@ mjx-container { font-size: 104% !important; }
 .sek-metric { border: 1px solid var(--sk-border); border-left: 3px solid var(--sk-500); border-radius: var(--sk-r);
   padding: .9rem 1.2rem .3rem; margin: 1.4rem 0; background: var(--sk-card); }
 .sek-metric h3 { margin-top: .2em !important; }
-.sek-metric .sek-meta { display: flex; flex-wrap: wrap; gap: .35rem; margin: .1rem 0 .7rem; }
+.md-typeset .sek-meta { display: flex; flex-wrap: wrap; gap: .35rem; margin: .1rem 0 .7rem; }
 .sek-chip { font-family: var(--sk-mono); font-size: .6rem; font-weight: 500; padding: .12rem .5rem; border-radius: 999px;
   background: var(--sk-100); color: var(--sk-800); }
 [data-md-color-scheme="slate"] .sek-chip { background: #2a2145; color: #d6c7fb; }
@@ -224,7 +237,7 @@ mjx-container { font-size: 104% !important; }
 [data-md-color-scheme="slate"] .sk-feature__icon { background: #2a2145; color: var(--sk-300); }
 .sk-feature__icon svg { width: 1.25rem; height: 1.25rem; fill: currentColor; }
 
-.sk-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+.sk-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.4rem; }
 .sk-step { background: var(--sk-card); border: 1px solid var(--sk-border); border-radius: var(--sk-r-lg); padding: 1.4rem 1.4rem 1.2rem;
   display: flex; flex-direction: column; }
 .sk-step h3 { font-size: 1rem; font-weight: 600; margin: .8rem 0 .35rem; color: var(--md-default-fg-color); }
@@ -283,3 +296,34 @@ mjx-container { font-size: 104% !important; }
 /* definition lists */
 .md-typeset dl dt { font-weight: 600; color: var(--md-default-fg-color); margin-top: 1.1em; }
 .md-typeset dl dd { margin: .3em 0 .9em 1.4em; }
+
+/* inline code never breaks inside an identifier; tables scroll instead */
+.md-typeset code { word-break: keep-all; overflow-wrap: normal; }
+.md-typeset td code, .md-typeset th code { white-space: nowrap; }
+/* hero install box: wrap on narrow screens */
+@media screen and (max-width: 44em) {
+  .sk-install { display: flex; white-space: normal; text-align: left; }
+  .sk-install code { white-space: normal; word-break: break-all; }
+}
+
+/* -------------------------------------------------------------- API symbol badges (mkdocstrings) in the palette */
+:root, [data-md-color-scheme="default"] {
+  --doc-symbol-module-fg-color: var(--sk-800); --doc-symbol-module-bg-color: var(--sk-200);
+  --doc-symbol-class-fg-color: var(--sk-700); --doc-symbol-class-bg-color: var(--sk-100);
+  --doc-symbol-function-fg-color: var(--sk-600); --doc-symbol-function-bg-color: var(--sk-50);
+  --doc-symbol-method-fg-color: var(--sk-600); --doc-symbol-method-bg-color: var(--sk-50);
+  --doc-symbol-attribute-fg-color: #0e7468; --doc-symbol-attribute-bg-color: rgba(19, 154, 138, .1);
+}
+[data-md-color-scheme="slate"] {
+  --doc-symbol-module-fg-color: var(--sk-200); --doc-symbol-module-bg-color: #3a2d63;
+  --doc-symbol-class-fg-color: var(--sk-200); --doc-symbol-class-bg-color: #2a2145;
+  --doc-symbol-function-fg-color: var(--sk-300); --doc-symbol-function-bg-color: #221b36;
+  --doc-symbol-method-fg-color: var(--sk-300); --doc-symbol-method-bg-color: #221b36;
+  --doc-symbol-attribute-fg-color: #5fd1c2; --doc-symbol-attribute-bg-color: rgba(95, 209, 194, .12);
+}
+
+/* wide tables (six or more columns): a denser type size keeps them inside the text column */
+.md-typeset table:not([class]):has(th:nth-child(6)) { font-size: .68rem; }
+.md-typeset table:not([class]):has(th:nth-child(6)) :is(th, td) { padding: .65em .7em; }
+/* long inline code (commands, URLs, paths) in the last, descriptive column may wrap instead of widening the table */
+.md-typeset table:not([class]) td:last-child code { overflow-wrap: anywhere; }

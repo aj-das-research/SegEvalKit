@@ -1,17 +1,17 @@
 """The ``segevalkit`` command line.
 
-.. code-block:: console
-
-    segevalkit evaluate --pred preds/ --ref labelsTr/ --labels liver=1,tumour=2 --out eval/ --report
-    segevalkit evaluate --config eval.yaml
-    segevalkit evaluate --dataset pants --pred preds/ --ref PanTS/LabelTe --out eval/
-    segevalkit report eval/ --images imagesTr/
-    segevalkit compare eval_A/ eval_B/ --out compare/
-    segevalkit rank eval_A/ eval_B/ eval_C/ --metric dice --label liver
-    segevalkit metrics
-    segevalkit recommend --structure small_lesion --multi-instance
-    segevalkit datasets [NAME]
-    segevalkit visualize --pred p.nii.gz --ref g.nii.gz --image ct.nii.gz --label 1 --out fig.png
+```console
+segevalkit evaluate --pred preds/ --ref labelsTr/ --labels liver=1,tumour=2 --out eval/ --report
+segevalkit evaluate --config eval.yaml
+segevalkit evaluate --dataset pants --pred preds/ --ref PanTS/LabelTe --out eval/
+segevalkit report eval/ --images imagesTr/
+segevalkit compare eval_A/ eval_B/ --out compare/
+segevalkit rank eval_A/ eval_B/ eval_C/ --metric dice --label liver
+segevalkit metrics
+segevalkit recommend --structure small_lesion --multi-instance
+segevalkit datasets [NAME]
+segevalkit visualize --pred p.nii.gz --ref g.nii.gz --image ct.nii.gz --label 1 --out fig.png
+```
 """
 
 from __future__ import annotations

@@ -1,7 +1,7 @@
 # Configuration
 
-Every option that can change a reported number is an explicit argument, and all of them are written to
-`meta.json` with the results. Nothing depends on hidden defaults of a third-party library.
+Every option that can change a reported number is an explicit argument and is written to `meta.json`. Nothing
+depends on a third-party library's hidden defaults.
 
 ## Evaluator options
 
@@ -10,15 +10,15 @@ Every option that can change a reported number is an explicit argument, and all 
 | `labels` | all ids / files | Structures to evaluate ([forms](data-format.md#labels)). |
 | `metrics` | `"default"` | Names, aliases (`dsc`, `jaccard`, `hausdorff`...), sets (`default`, `overlap`, `distance`, `volume`, `topology`, `detection`, `calibration`, `agreement`) or `"all"`. |
 | `params` | `{}` | Per-metric keyword overrides, e.g. `{"nsd": {"tolerance_mm": 1.0}, "hd_percentile": {"q": 99}}`. |
-| `empty` | `EmptyPolicy()` | Empty-mask policy (see below). |
+| `empty` | `EmptyPolicy()` | Empty-mask policy ([below](#empty-masks)). |
 | `device` | `"cpu"` | `"cuda"` / `"cuda:1"` for GPU surface distances and confusion counts. |
 | `connectivity` | `26` | Connectivity of lesion components (6, 18, 26). |
 | `min_lesion_voxels` | `0` | Components smaller than this are ignored by detection metrics. |
 | `alignment` | `"strict"` | `strict`, `resample` or `ignore` ([geometry checks](data-format.md#geometry-checks)). |
-| `missing_pred` | `"empty"` | `empty` scores a missing prediction as an empty mask; `skip` drops the case. |
+| `missing_pred` | `"empty"` | `empty`: score a missing prediction as an empty mask; `skip`: drop the case. |
 | `lesion_table` | `True` | Collect per-lesion rows when detection metrics run. |
 
-Per-structure parameters override global ones. Tolerances *should* depend on the structure:
+Per-structure parameters override global ones — tolerances *should* depend on the structure:
 
 ```python
 ev = sek.Evaluator(
@@ -32,8 +32,8 @@ ev = sek.Evaluator(
 
 ## Empty masks
 
-When both masks are empty the structure was correctly called absent. When one is empty most metrics are
-undefined. SegEvalKit makes the choice explicit:
+Both masks empty means the structure was correctly called absent; with one empty, most metrics are undefined.
+The choice is an explicit preset:
 
 | Preset | Both empty | Distance with one empty | Used by |
 |---|---|---|---|
@@ -41,6 +41,7 @@ undefined. SegEvalKit makes the choice explicit:
 | `brats2023` | ideal value | 374 mm | BraTS 2023 lesion-wise code |
 | `metrics_reloaded` | ideal value | worst (image diagonal) | Metrics Reloaded aggregation advice |
 | `nan` / `nnunet` | NaN (excluded) | NaN (excluded) | nnU-Net, MONAI `ignore_empty` |
+| `topcow` | ideal value | 90 mm | TopCoW 2024 HD95 cap |
 
 ```python
 from segevalkit import EmptyPolicy
@@ -48,12 +49,12 @@ ev = sek.Evaluator(..., empty=EmptyPolicy.preset("brats2023"))
 ev = sek.Evaluator(..., empty=EmptyPolicy(both_empty="nan", one_empty_distance=100.0))
 ```
 
-Precision with an empty prediction and recall with an empty reference are *undefined* (NaN), never a silent 0.
-Every per-case row carries `ref_empty` / `pred_empty` flags so you can analyse these cases separately.
+Precision with an empty prediction and recall with an empty reference are NaN, never a silent 0. Per-case
+`ref_empty` / `pred_empty` flags let you analyse these cases separately.
 
 ## Configuration file
 
-The same options in YAML, for the command line:
+The same options in YAML for the command line:
 
 ```yaml title="eval.yaml"
 pred: /data/predictions/nnunet
@@ -80,4 +81,5 @@ report: true
 $ segevalkit evaluate --config eval.yaml
 ```
 
-Command-line flags override the file.
+Command-line flags override the file, except `--connectivity` and `--min-lesion-voxels`, where a value in the
+file wins.

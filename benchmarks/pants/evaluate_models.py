@@ -37,7 +37,8 @@ OUT = STORE / "outputs/eval/pants"
 ORGAN = ["dice", "iou", "nsd", "hd95", "assd", "masd", "precision", "recall", "relative_volume_difference",
          "absolute_volume_difference"]
 TUBULAR = ORGAN + ["cldice", "betti0_error", "betti1_error"]
-LESION = ["dice", "nsd", "hd95", "assd", "precision", "recall", "relative_volume_difference",
+LESION = ["dice", "nsd", "hd95", "assd", "precision", "recall", "relative_volume_difference", "ece", "brier",
+          "auprc", "soft_dice",
           "absolute_volume_difference", "lesion_recall", "lesion_precision", "lesion_f1", "lesionwise_dice",
           "panoptic_quality", "false_positive_lesions", "false_negative_lesions", "lesion_count_difference"]
 
@@ -63,7 +64,7 @@ STRUCTURES = {
     "common_bile_duct": ("tubular", [7], None),
 }
 METRICS = {"organ": ORGAN, "tubular": TUBULAR, "lesion": LESION}
-PARAMS = {"nsd": {"tolerance_mm": 2.0}}
+PARAMS = {"nsd": {"tolerance_mm": 2.0}, "ece": {"roi": "band"}, "brier": {"roi": "band"}, "auprc": {"roi": "band"}}
 
 
 def labels_for(model: str):
@@ -86,7 +87,9 @@ def labels_for(model: str):
 
 SOURCES = {
     "nnunet": dict(root=PRED / "nnunet_pants_regions", layout="flat", name="nnU-Net ResEnc-M"),
-    "medformer": dict(root=PRED / "medformer_pants", layout="per_structure", subdir="predictions", name="MedFormer"),
+    # The official R-Super script nests outputs under <save_path>/<dataset>/<experiment>/.
+    "medformer": dict(root=PRED / "medformer_pants" / "abdomenatlas" / "pants_pancreas_release",
+                      layout="per_structure", subdir="predictions", prob_subdir="predictions_raw", name="MedFormer"),
     "totalseg": dict(root=PRED / "totalsegmentator", layout="per_structure", subdir="", name="TotalSegmentator"),
 }
 
@@ -111,7 +114,10 @@ def main():
             cases = cases[: a.limit]
         ev = sek.Evaluator(labels=labels_for(m), metrics=ORGAN, params=PARAMS, device=a.device,
                            min_lesion_voxels=10, alignment="resample")
-        res = ev.evaluate(pred, ref, cases=cases, n_workers=a.workers, out_dir=OUT / m, name=s["name"])
+        prob = None
+        if s.get("prob_subdir"):  # lesion probabilities -> calibration metrics
+            prob = Source(s["root"], layout="per_structure", subdir=s["prob_subdir"], kind="prob")
+        res = ev.evaluate(pred, ref, prob=prob, cases=cases, n_workers=a.workers, out_dir=OUT / m, name=s["name"])
         print(res, json.dumps({k: res.meta[k] for k in ("seconds",)}))
 
 

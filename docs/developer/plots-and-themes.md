@@ -2,7 +2,7 @@
 
 ## The design system
 
-Every figure (plots, overlays, the HTML report, this site and the terminal) shares one palette, defined once in
+Plots, overlays, the HTML report, this site and the terminal share one palette, defined in
 `segevalkit.plotting.theme`.
 
 | Role | Values | Rule |
@@ -12,13 +12,13 @@ Every figure (plots, overlays, the HTML report, this site and the terminal) shar
 | Diverging (signed values, correlations) | orange ← grey → purple | neutral grey midpoint (`diverging_cmap()`) |
 | Segmentation errors | TP violet, FN orange, FP teal | the three all-pairs colour-vision-safe slots |
 
-The categorical order was chosen by running a colour-vision-deficiency validator over candidate orderings: every
-adjacent pair stays separable under protan, deutan and tritan simulation (ΔE ≥ 11), and the first three slots are
-separable in every pair, which is why they encode TP / FN / FP.
+The categorical order was chosen with a colour-vision-deficiency validator: adjacent pairs stay separable under
+protan, deutan and tritan simulation (ΔE ≥ 11), and the first three slots are separable in every pair, hence
+TP / FN / FP.
 
 ## Writing a new plot
 
-Follow the conventions of `segevalkit/plotting/quantitative.py`:
+Follow `segevalkit/plotting/quantitative.py`:
 
 ```python
 def my_plot(results, metric, label=None, ax=None, figsize=(5, 3.5)):
@@ -36,21 +36,20 @@ def my_plot(results, metric, label=None, ax=None, figsize=(5, 3.5)):
 Checklist:
 
 * accept one result **or** a mapping of results, and an optional `ax`;
-* label axes with `info.label` so units and direction are always shown;
-* one y-axis per chart; small multiples instead of dual axes;
-* show individual cases where possible (dots, rainclouds, ECDFs), not only bars of means;
-* legend for two or more series; no legend for one;
-* return the figure; add it to `tests/test_cli_plots.py::test_all_plots_render`.
+* label axes with `info.label` (unit and direction);
+* one y-axis per chart: small multiples, not dual axes;
+* show individual cases (dots, rainclouds, ECDFs), not only bars of means;
+* a legend only for two or more series;
+* return the figure and add it to `tests/test_cli_plots.py::test_all_plots_render`.
 
 ## Qualitative views
 
-`segevalkit.viz` reorients every volume to RAS with its affine, displays slices in radiological convention with the
-physical aspect ratio, and picks slices automatically (`pick_slice`: most error, largest reference, or centroid).
-New views should reuse `_prep`, `_slice`, `_draw` and `_legend` so the orientation and colour conventions stay
-identical across figures.
+`segevalkit.viz` reorients volumes to RAS, shows slices in radiological convention at the physical aspect ratio and
+picks slices automatically (`pick_slice`: most error, largest reference or centroid). New views should reuse
+`_prep`, `_slice`, `_draw` and `_legend` to keep orientation and colours identical.
 
 ## Terminal
 
 `segevalkit._console` provides the rich console, banner, progress bar and tables. Use `console.print` with the
-`sek.*` styles (`sek.brand`, `sek.key`, `sek.muted`, `sek.ok`, `sek.warn`) rather than raw colours. Output degrades to
-plain text when `NO_COLOR` or `SEGEVALKIT_PLAIN` is set or when output is not a terminal.
+`sek.*` styles (`sek.brand`, `sek.key`, `sek.muted`, `sek.ok`, `sek.warn`), not raw colours. Output falls back to
+plain text when `NO_COLOR` or `SEGEVALKIT_PLAIN` is set or stdout is not a terminal.

@@ -9,11 +9,11 @@ agree:
 * as a **binary file per structure** (TotalSegmentator, AbdomenAtlas, PanTS:
   ``<case>/segmentations/<name>.nii.gz``).
 
-:class:`LabelSpec` records both, separately for the prediction and the
+`LabelSpec` records both, separately for the prediction and the
 reference, so a model that writes ``pancreas = 7`` in one file can be scored
 against a dataset that ships ``segmentations/pancreas.nii.gz``.
 
-Accepted forms for :func:`parse_labels` (all equivalent in a YAML config)::
+Accepted forms for `parse_labels` (all equivalent in a YAML config)::
 
     {"liver": 1, "tumour": 2}                 # same id in pred and ref
     {"kidney": [2, 3]}                         # region = union of ids
@@ -78,7 +78,7 @@ def _ids(v: Union[int, Iterable[int], None]) -> Tuple[int, ...]:
 
 
 def parse_labels(spec: Union[Mapping, Iterable[str], None]) -> List[LabelSpec]:
-    """Normalise any supported label description into a list of :class:`LabelSpec`."""
+    """Normalise any supported label description into a list of `LabelSpec`."""
     if spec is None:
         return []
     if isinstance(spec, str):
@@ -115,7 +115,7 @@ def extract_mask(label_map: np.ndarray, values: Tuple[int, ...]) -> np.ndarray:
 
 
 def labels_from_map(label_map: np.ndarray, names: Optional[Dict[int, str]] = None) -> List[LabelSpec]:
-    """One :class:`LabelSpec` per non-zero value present in ``label_map``."""
+    """One `LabelSpec` per non-zero value present in ``label_map``."""
     vals = [int(v) for v in np.unique(label_map) if v != 0]
     names = names or {}
     return [LabelSpec(names.get(v, f"label_{v}"), (v,), (v,)) for v in vals]

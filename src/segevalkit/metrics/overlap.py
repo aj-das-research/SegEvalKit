@@ -1,12 +1,12 @@
 r"""Overlap metrics computed from the voxel confusion matrix.
 
-With :math:`P` the predicted and :math:`G` the reference foreground,
-:math:`TP = |P \cap G|`, :math:`FP = |P \setminus G|`,
-:math:`FN = |G \setminus P|` and :math:`TN` the remaining voxels.
+With \(P\) the predicted and \(G\) the reference foreground,
+\(TP = |P \cap G|\), \(FP = |P \setminus G|\),
+\(FN = |G \setminus P|\) and \(TN\) the remaining voxels.
 
-Metrics that ignore :math:`TN` (Dice, IoU, precision, recall...) are
+Metrics that ignore \(TN\) (Dice, IoU, precision, recall...) are
 *invariant to the size of the image*, which is why they are preferred for
-segmentation. Metrics that use :math:`TN` (specificity, accuracy, kappa, MCC)
+segmentation. Metrics that use \(TN\) (specificity, accuracy, kappa, MCC)
 are dominated by the background in 3D volumes and should be read with that
 in mind (Metrics Reloaded pitfall "class imbalance").
 """

@@ -1,7 +1,7 @@
 """Quantitative plotting in the SegEvalKit purple theme.
 
 All functions return a matplotlib ``Figure``; save with
-``fig.savefig("plot.png")``. See :mod:`segevalkit.plotting.theme` for the
+``fig.savefig("plot.png")``. See `segevalkit.plotting.theme` for the
 palette and its colour-vision-deficiency validation.
 """
 
