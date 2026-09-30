@@ -91,6 +91,41 @@ def matrix_figure(r: pd.DataFrame, out: Path):
     plt.close(fig)
 
 
+PAPER_TITLES = {"boundary_noise": "Boundary\nnoise", "islands": "FP\nislands", "remove_slab": "Missing\nslab",
+                "holes": "Internal\nholes"}
+
+
+def matrix_figure_paper(r: pd.DataFrame, out: Path, width: float = 4.8):
+    """The same matrix drawn at its printed size (``width`` inches, no scaling in LaTeX), 7-8 pt text."""
+    piv = r.pivot(index="metric", columns="perturbation", values="rho").reindex(index=ORDER_M, columns=ORDER_P)
+    with theme():
+        fig, ax = plt.subplots(figsize=(width, 0.8 * width), constrained_layout=True)
+        im = ax.imshow(piv.values, cmap=sequential_cmap(), vmin=0, vmax=1, aspect="auto")
+        ax.set_xticks(range(len(ORDER_P)))
+        ax.set_xticklabels([f"{PAPER_TITLES.get(p, TITLES[p])}\n{_mag_label(p)}" for p in ORDER_P], fontsize=6.5,
+                           linespacing=1.05)
+        ax.xaxis.tick_top()
+        ax.set_yticks(range(len(ORDER_M)))
+        ax.set_yticklabels([get_metric(m).abbr for m in ORDER_M], fontsize=7.5)
+        ax.tick_params(length=0, pad=2)
+        ax.grid(False)
+        for sp in ax.spines.values():
+            sp.set_visible(False)
+        for i in range(piv.shape[0]):
+            for j in range(piv.shape[1]):
+                v = piv.values[i, j]
+                if np.isfinite(v):
+                    ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=6.5,
+                            color=INK["surface"] if v > 0.55 else INK["primary"])
+        cb = fig.colorbar(im, ax=ax, fraction=0.04, pad=0.02, aspect=30)
+        cb.set_label("fraction of cases with a meaningful change", fontsize=7)
+        cb.ax.tick_params(labelsize=6.5, length=2)
+        cb.outline.set_visible(False)
+    fig.savefig(out / "sensitivity_matrix_paper.pdf")
+    fig.savefig(out / "sensitivity_matrix_paper.png", dpi=300)
+    plt.close(fig)
+
+
 def curves(df: pd.DataFrame, out: Path):
     kinds = {"liver": "large organ", "kidney_left": "compact organ", "pancreas": "elongated organ",
              "gall_bladder": "small organ", "aorta": "tubular", "veins": "branching tubular",
@@ -165,6 +200,7 @@ def main():
     r = responsiveness(df)
     r.to_csv(out / "sensitivity_summary.csv", index=False)
     matrix_figure(r, out)
+    matrix_figure_paper(r, out)
     curves(df, out)
     size_bias(df, out)
     print(r.pivot(index="metric", columns="perturbation", values="rho").round(2))
