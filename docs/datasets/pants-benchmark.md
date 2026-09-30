@@ -8,7 +8,7 @@ Three official models, run here from their official code and checkpoints, on the
 ## What the numbers say
 
 - **Paired cases, not means.** MedFormer has the higher Dice in 79–98 % of cases on each of the ten compared organs, yet the lower *mean* HD95 is TotalSegmentator's on most organs.
-- **A failure tail drives the mean.** On the spleen, 79 of 901 MedFormer cases with HD95 > 50 mm make up 94 % of its mean HD95 (median 1.5 mm vs mean 31.7 mm).
+- **A failure tail drives the mean.** On the spleen, 79 of 901 MedFormer cases with HD95 > 50 mm make up 94 % of its mean HD95 (median 1.5 mm vs mean 31.7 mm); 29 of them are scans with an empty reference spleen mask in which MedFormer still predicts a spleen, scored at the image diagonal.
 - **The ranking scheme picks the winner** on the spleen and kidney (left): aggregate-then-rank and rank-then-aggregate disagree, while bootstrap resampling never changes either ranking.
 - **Tumours:** MedFormer finds 0.81 of reference lesions but only 0.24 of its predicted lesions match a reference lesion (0.49 false-positive lesions per scan); patient-level AUC 0.905.
 - **Cohorts:** both models are less accurate on non-contrast and on GE scans; thin-slice scans score lower, which points to site and case-mix confounding rather than resolution.
@@ -122,4 +122,4 @@ $ sbatch --export=ALL,MODELS=totalseg slurm/pants_eval.sbatch        # evaluatio
 $ python benchmarks/pants/write_results.py                          # these tables
 ```
 
-MedFormer runs the official R-Super script with one upstream fix: its 3D padding swapped the slice and width axes, which made post-processing fail on 25 scans shorter than the training patch (`benchmarks/pants/patch_medformer.py`).
+MedFormer runs the official R-Super script with one upstream fix: its 3D padding swapped the slice and width axes, which made post-processing fail on 25 scans smaller than the training patch along the slice or width axis (`benchmarks/pants/patch_medformer.py`).
