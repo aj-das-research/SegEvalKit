@@ -19,7 +19,7 @@ export TMPDIR=$STORE/tmp/$SLURM_JOB_ID; mkdir -p "$TMPDIR" "$nnUNet_raw" "$nnUNe
 export OMP_NUM_THREADS=4 MPLCONFIGDIR=$TMPDIR/mpl
 OUT=$STORE/outputs/predictions/nnunet_pants_regions
 mkdir -p "$OUT"
-N=4
+N=${NGPU:-4}   # one SLURM step per allocated GPU
 # predict_from_modelfolder has no -num_parts: shard the (symlinked) inputs into N folders instead.
 for i in $(seq 0 $((N-1))); do
   mkdir -p "$STORE/data/pants_nnunet/shard$i"

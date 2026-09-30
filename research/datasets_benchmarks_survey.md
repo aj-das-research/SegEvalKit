@@ -261,7 +261,7 @@ Note that the `numTraining` values in `dataset.json` differ from the paper's tab
 | Dataset | Modality | Labels | Cases | Format | Licence | Tag |
 |---|---|---|---|---|---|---|
 | **ACDC** | Cine SA MRI (ED/ES) | **1 RV, 2 MYO, 3 LV** | 100 / 50 | `patientXXX_frameYY.nii.gz` + `_gt.nii.gz` | CC BY-NC-SA 4.0 [UNVERIFIED primary] | V-code (labels) |
-| **M&Ms-1** | Cine SA MRI, 4 vendors | **1 LV, 2 MYO, 3 RV (the reverse of ACDC!)** | 375 subjects: 150 labelled + 25 unlabelled train / 34 val / 136 test [UNVERIFIED] | `<code>_sa.nii.gz`, `_sa_gt.nii.gz` | [UNVERIFIED] | V-code (labels via nnU-Net conversion) |
+| **M&Ms-1** | Cine SA MRI, 4 vendors | **1 LV, 2 MYO, 3 RV (the reverse of ACDC!)** | 375 subjects: 150 labelled + 25 unlabelled train / 34 val / 136 test [UNVERIFIED] | `{subject}_sa.nii.gz`, `_sa_gt.nii.gz` | [UNVERIFIED] | V-code (labels via nnU-Net conversion) |
 | **M&Ms-2** | SA + LA cine MRI | 1 LV, 2 MYO, 3 RV | 160 / 40 / 160 | `{id}_SA_ED(_gt).nii.gz` [UNVERIFIED] | [UNVERIFIED] | V-doc |
 | **LA 2018 (Utah)** | 3D LGE-MRI | LA cavity, **0/255** | 154 volumes (100 / 54 [UNVERIFIED]) | **NRRD** (`lgemri.nrrd`, `laendo.nrrd`) | [UNVERIFIED] | V-doc |
 | **MSD Heart (Task02)** | MRI | 1 left atrium | 20 / 10 | NIfTI | CC BY-SA 4.0 | V-code |

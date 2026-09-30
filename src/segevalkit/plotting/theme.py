@@ -53,7 +53,7 @@ _RC = {
     "axes.edgecolor": INK["muted"],
     "axes.labelcolor": INK["secondary"],
     "axes.titlecolor": INK["primary"],
-    "axes.titleweight": "semibold",
+    "axes.titleweight": "bold",
     "axes.titlesize": 11,
     "axes.titlelocation": "left",
     "axes.labelsize": 9.5,
@@ -76,7 +76,9 @@ _RC = {
     "legend.title_fontsize": 9,
     # Academic serif matching the ICLR-style Times typography of the paper and docs;
     # STIXGeneral ships with matplotlib, so this works without system fonts.
-    "font.family": "serif",
+    # A list of families gives per-glyph fallback: STIX for text, DejaVu Serif for the few
+    # glyphs STIX lacks (subscript digits such as the 0 in "β0").
+    "font.family": ["STIX Two Text", "STIXGeneral", "DejaVu Serif"],
     "font.serif": ["STIX Two Text", "STIXGeneral", "Times New Roman", "Times", "DejaVu Serif"],
     "mathtext.fontset": "stix",
     "font.size": 9.5,

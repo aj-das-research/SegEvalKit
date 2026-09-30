@@ -42,9 +42,14 @@ PERTURBATIONS = {
 }
 
 
+ONLY: list = []  # restrict to these metrics (supplementary runs); set from --only
+
+
 def _one(args):
-    case_id, structure, ref_root, out = args
-    part = Path(out) / "parts" / f"{structure}__{case_id}.csv"
+    case_id, structure, ref_root, out, only = args
+    global ONLY
+    ONLY = only
+    part = Path(out) / ("parts" if not only else "parts_" + "_".join(only)) / f"{structure}__{case_id}.csv"
     if part.exists():
         return pd.read_csv(part)
     from segevalkit.io import load_volume
@@ -61,7 +66,9 @@ def _one(args):
     # Work in a crop with an 80 mm margin: perturbations stay inside, EDTs stay small.
     margin = int(np.ceil(80 / min(v.spacing)))
     m = m[bbox(m, margin)]
-    metrics = METRICS + (["cldice", "betti0_error", "betti1_error"] if structure in TOPOLOGY else [])
+    metrics = METRICS + (["cldice", "betti0_error", "betti1_error", "betti2_error"] if structure in TOPOLOGY else [])
+    if ONLY:
+        metrics = [m for m in metrics if m in ONLY]
     df = sensitivity_study([(case_id, m, v.spacing)], metrics, perturbations=PERTURBATIONS,
                            params={"nsd": {"tolerance_mm": 2.0}, "boundary_iou": {"width_mm": 2.0}}, seed=7)
     df["structure"] = structure
@@ -79,6 +86,8 @@ def main():
     ap.add_argument("--n-cases", type=int, default=12)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--only", nargs="*", default=[], help="compute only these metrics (supplementary run)")
+    ap.add_argument("--structures", nargs="*", default=None)
     a = ap.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -87,7 +96,7 @@ def main():
     lesion_cases = [c for c in cases if (Path(a.ref_root) / c / "segmentations" / "pancreatic_lesion.nii.gz").exists()]
     pick = list(rng.choice(cases, size=min(a.n_cases, len(cases)), replace=False))
     jobs = []
-    for s in STRUCTURES:
+    for s in (a.structures or STRUCTURES):
         pool_cases = pick
         if s == "pancreatic_lesion":
             # Lesion masks are empty in tumour-free patients; sample among cases that have one.
@@ -100,13 +109,14 @@ def main():
                 if len(nonempty) >= a.n_cases:
                     break
             pool_cases = nonempty
-        jobs += [(c, s, a.ref_root, str(out)) for c in pool_cases]
+        jobs += [(c, s, a.ref_root, str(out), a.only) for c in pool_cases]
     with ProcessPoolExecutor(a.workers) as ex:
         frames = [d for d in ex.map(_one, jobs) if d is not None]
     df = pd.concat(frames, ignore_index=True)
-    df.to_csv(out / "sensitivity.csv", index=False)
+    dest = out / ("sensitivity.csv" if not a.only else f"sensitivity_{'_'.join(a.only)}.csv")
+    df.to_csv(dest, index=False)
     print(df.groupby(["structure"])["case_id"].nunique())
-    print(f"wrote {out / 'sensitivity.csv'} ({len(df)} rows)")
+    print(f"wrote {dest} ({len(df)} rows)")
 
 
 if __name__ == "__main__":

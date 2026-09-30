@@ -41,6 +41,14 @@ df = compare(res_a, res_b, metrics=["dice", "nsd", "hd95"],
 * `correction`: `holm` (family-wise, default), `bh` (false discovery rate) or `none`. The family is every
   (label, metric) pair in the call.
 
+<figure class="sk-fig sk-fig--md" markdown>
+[![Paired differences nnU-Net minus MedFormer](../assets/showcase/comparison_forest.png)](../assets/showcase/comparison_forest.png)
+<figcaption>Real output of <code>compare</code> drawn with <a href="../plots/#comparing-methods"><code>comparison_forest</code></a>:
+nnU-Net − MedFormer on 8 PanTS test CTs (an illustration, not a benchmark). Every marker is hollow: after Holm
+correction over these 12 tests no difference is significant. Pancreas Dice reads p = 1 here but 0.445 when the
+three pancreas tests form the family alone (<a href="../../getting-started/quickstart/">quickstart</a>): the family matters.</figcaption>
+</figure>
+
 ## Ranking
 
 ```python
@@ -58,6 +66,12 @@ stab = ranking_stability(results, "dice", label="pancreas", n_boot=1000)
 `ranking_stability` bootstraps the cases, re-ranks, and returns the rank distribution per method and Kendall's τ
 to the full-data ranking ([blob plot](plots.md#ranking-stability)). A median τ well below 1 means the ranking
 depends on which cases were in the test set.
+
+<figure class="sk-fig sk-fig--sm" markdown>
+[![Bootstrap ranking stability of three models](../assets/showcase/ranking_stability.png)](../assets/showcase/ranking_stability.png)
+<figcaption>Pancreas Dice on 8 PanTS test CTs, 300 bootstrap samples. The full-data ranking is MedFormer (0.894),
+nnU-Net (0.889), TotalSegmentator (0.863); the top two swap in some samples.</figcaption>
+</figure>
 
 ## Volume agreement
 

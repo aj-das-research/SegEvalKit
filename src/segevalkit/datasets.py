@@ -47,7 +47,12 @@ class DatasetPreset:
         metrics: Official (or de-facto standard) metrics.
         params: Metric parameters, e.g. NSD tolerance.
         empty_policy: `EmptyPolicy` preset name.
-        ref_layout / ref_file / ref_subdir: Layout of the reference labels.
+        ref_layout: Layout of the reference labels (``"flat"``, ``"folder"``,
+            ``"per_structure"`` or ``"auto"``; ``None`` = auto).
+        ref_file: Reference file name inside each case folder (``"folder"``
+            layout).
+        ref_subdir: Sub-folder holding one file per structure
+            (``"per_structure"`` layout).
         cases: Approximate number of labelled cases.
         url: Download / project page.
         license: Data licence.
@@ -141,8 +146,11 @@ register_dataset(DatasetPreset(
     license="CC BY-NC-ND 4.0 (GitHub LICENSE; the HF card says CC BY-NC-SA 4.0): non-commercial",
     citation="Li et al. 2025, PanTS: The Pancreatic Tumor Segmentation Dataset, NeurIPS Datasets & Benchmarks",
     notes="Evaluate from LabelTe/<case>/segmentations/<name>.nii.gz, not combined_labels.nii.gz: the "
-          "per-structure masks overlap (pancreas contains head/body/tail, duct and lesion; veins overlap "
-          "organs), so the combined map is lossy. Orientation varies per case. Most test cases are "
+          "per-structure masks overlap (pancreas contains head/body/tail and duct; veins overlap "
+          "organs), so the combined map is lossy. The lesion is annotated inconsistently relative to the "
+          "pancreas mask (sometimes inside it, sometimes outside), so evaluate the pancreas as pancreas "
+          "\u222a lesion (ref_file 'pancreas.nii.gz+pancreatic_lesion.nii.gz'). Orientation varies per case. "
+          "Most test cases are "
           "tumour-free: report patient-level presence detection (stats.presence_detection) next to lesion "
           "Dice. The official leaderboard reports patient-wise sensitivity/specificity/AUC, tumour-wise "
           "sensitivity and lesion DSC; the NSD tolerance and the detection rule are not published.",

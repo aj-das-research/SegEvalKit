@@ -106,7 +106,6 @@ plugins:
 # Pages whose results are still being computed are kept out of the published site
 # until their figures are generated from real runs (no placeholders online).
 exclude_docs: |
-  guide/sensitivity-study.md
   datasets/pants-benchmark.md
 
 nav:
@@ -134,6 +133,7 @@ nav:
       - Decision guide: guide/choosing.md
       - Pitfalls: guide/pitfalls.md
       - Conventions & conformance: guide/conventions.md
+      - Sensitivity study: guide/sensitivity-study.md
   - Analysis:
       - analysis/index.md
       - Statistics & ranking: analysis/statistics.md

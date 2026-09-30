@@ -5,15 +5,15 @@ real reference mask, increase its magnitude, and watch the metric respond.
 Every perturbation here is parameterised in physical units (mm, mL, counts)
 so that results transfer across datasets and voxel spacings:
 
-=====================  =============================================================
-``dilate`` / ``erode`` uniform boundary over-/under-segmentation by *d* mm
-``shift``              rigid translation by *d* mm (registration-like error)
-``islands``            *k* spurious false-positive blobs placed near the structure
-``remove_slab``        a fraction of the structure cut away (partial miss)
-``holes``              *k* internal cavities (topology change without much volume)
-``cut``                a planar cut of width *d* mm (breaks connectivity, e.g. a vessel)
-``boundary_noise``     smooth random boundary jitter of amplitude *d* mm
-=====================  =============================================================
+| Perturbation | Error it simulates |
+|---|---|
+| ``dilate`` / ``erode`` | uniform boundary over-/under-segmentation by *d* mm |
+| ``shift`` | rigid translation by *d* mm (registration-like error) |
+| ``islands`` | *k* spurious false-positive blobs placed near the structure |
+| ``remove_slab`` | a fraction of the structure cut away (partial miss) |
+| ``holes`` | *k* internal cavities (topology change without much volume) |
+| ``cut`` | a planar cut of width *d* mm (breaks connectivity, e.g. a vessel) |
+| ``boundary_noise`` | smooth random boundary jitter of amplitude *d* mm |
 
 `sensitivity_study` runs a grid of perturbations and returns a tidy
 table ready for `segevalkit.plotting.sensitivity_curves`.

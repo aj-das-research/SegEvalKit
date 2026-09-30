@@ -117,7 +117,7 @@ def qualitative(res, out: Path, model: str = "nnunet"):
     case = les.iloc[(les["dice"] - les["dice"].median()).abs().argsort().iloc[0]]["case_id"]
     img = load_volume(PANTS / "ImageTe" / case / "ct.nii.gz", kind="image")
     ref_l = load_volume(PANTS / "LabelTe" / case / "segmentations" / "pancreatic_lesion.nii.gz")
-    ref_p = load_volume(PANTS / "LabelTe" / case / "segmentations" / "pancreas.nii.gz").data > 0
+    ref_p = (load_volume(PANTS / "LabelTe" / case / "segmentations" / "pancreas.nii.gz").data > 0) | (ref_l.data > 0)
     pl = _pred(model, case, "pancreatic_lesion", ref_l.shape)
     pp = _pred(model, case, "pancreas", ref_l.shape)
     rl = ref_l.data > 0

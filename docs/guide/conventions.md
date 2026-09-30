@@ -20,11 +20,11 @@ down.
 | **HD** | \(\max(\max D_{P\to G}, \max D_{G\to P})\) | Identical in every library |
 | **HD95** | \(\max(P_{95}(D_{P\to G}), P_{95}(D_{G\to P}))\) (`mode="directed"`) | MetricsReloaded, MONAI, DeepMind, BraTS. MedPy uses the percentile of the **pooled** distances: `params={"hd95": {"mode": "pooled"}}`. The pooled form is never larger. |
 | **ASSD** | Mean of the **pooled** distances \(\big(\sum D_{P\to G} + \sum D_{G\to P}\big) / \big(\lvert\partial P\rvert + \lvert\partial G\rvert\big)\) | MONAI (`symmetric=True`), MedPy ≥ 0.5.2 `assd`. |
-| **MASD** | Mean of the two **directed means** \(\tfrac12(\bar D_{P\to G} + \bar D_{G\to P})\) | MetricsReloaded; MedPy ≤ 0.5.1 `assd`. Differs from ASSD when the two surfaces have very different sizes. |
+| **MASD** | Mean of the two **directed means** \(\tfrac12(\bar D_{P\to G} + \bar D_{G\to P})\) | MetricsReloaded; MedPy ≤ 0.4.0 `assd` (0.5.0 and 0.5.1 raise an error when the surfaces differ in size). Differs from ASSD when the two surfaces have very different sizes. |
 | **NSD** | Fraction of surface voxels within τ, voxel counting | MONAI `compute_surface_dice`, FLARE code. DeepMind / KiTS weight by surfel area. |
 
 !!! warning "Name collisions"
-    MedPy renamed the meaning of `assd` between 0.5.1 and 0.5.2. In SegEvalKit the names are fixed:
+    MedPy changed the meaning of `assd`: up to 0.4.0 it is the mean of directed means, in 0.5.2 the pooled mean. In SegEvalKit the names are fixed:
     [`assd`](../metrics/distance.md#assd) is the pooled mean and [`masd`](../metrics/distance.md#masd) the mean
     of directed means. Always report which one you use.
 

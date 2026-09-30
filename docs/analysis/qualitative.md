@@ -50,6 +50,62 @@ viz.case_gallery(items)                                         # worst cases si
 
 All views zoom to the structure (`zoom=True`) and return a matplotlib figure.
 
+### On real data
+
+Every view below is a real output: nnU-Net ResEnc-M on PanTS test CTs, drawn by the call named in the tab. These
+cases illustrate the library; they are not a benchmark. The pancreas is scored as pancreas ∪ lesion
+([why](../guide/pitfalls.md#annotation-conventions)).
+
+=== "Overlay"
+
+    <figure class="sk-fig sk-fig--sm" markdown>
+    [![Lesion error overlay on one axial slice](../assets/showcase/overlay_lesion_large.png)](../assets/showcase/overlay_lesion_large.png)
+    <figcaption><code>error_overlay</code>: a 15.3 mL tumour (PanTS_00009152), Dice 0.78. The core is found; a rim of tumour is missed.</figcaption>
+    </figure>
+
+=== "Small lesion"
+
+    <figure class="sk-fig sk-fig--sm" markdown>
+    [![Missed small lesion on one axial slice](../assets/showcase/overlay_lesion_small.png)](../assets/showcase/overlay_lesion_small.png)
+    <figcaption>A 0.18 mL lesion (PanTS_00009027) missed entirely: Dice 0. Small lesions are where lesion-wise metrics matter.</figcaption>
+    </figure>
+
+=== "Contour"
+
+    <figure class="sk-fig sk-fig--sm" markdown>
+    [![Reference and predicted pancreas contours](../assets/showcase/contour_pancreas.png)](../assets/showcase/contour_pancreas.png)
+    <figcaption><code>style="contour"</code>: reference in lavender, prediction in dashed teal; the prediction extends below the reference.</figcaption>
+    </figure>
+
+=== "Tri-planar"
+
+    <figure class="sk-fig" markdown>
+    [![Axial, coronal and sagittal error views](../assets/showcase/triplanar_pancreas.png)](../assets/showcase/triplanar_pancreas.png)
+    <figcaption><code>triplanar</code>: axial, coronal and sagittal slices through the region of largest error; added (teal) and missed (orange) tissue show up in different planes.</figcaption>
+    </figure>
+
+=== "Montage"
+
+    <figure class="sk-fig" markdown>
+    [![Eight axial slices through a lesion](../assets/showcase/montage_lesion.png)](../assets/showcase/montage_lesion.png)
+    <figcaption><code>slice_montage</code>, 8 evenly spaced slices through the lesion: the missed rim runs through the whole tumour, with added tissue at its ends.</figcaption>
+    </figure>
+
+=== "3D projection"
+
+    <figure class="sk-fig" markdown>
+    [![Pancreas errors projected along three axes](../assets/showcase/projection_pancreas.png)](../assets/showcase/projection_pancreas.png)
+    <figcaption><code>error_projection</code>: missed and added voxels projected along the three axes, showing where errors cluster in 3D rather than on one slice.</figcaption>
+    </figure>
+
+=== "Three models"
+
+    <figure class="sk-fig" markdown>
+    [![Three models on one slice](../assets/showcase/model_comparison.png)](../assets/showcase/model_comparison.png)
+    <figcaption>The same slice, three official models: pancreas ∪ lesion (top) and lesion (bottom). TotalSegmentator has no lesion class, so the whole tumour is missed.</figcaption>
+    </figure>
+
+
 ## Surface-distance maps
 
 ```python
@@ -61,6 +117,11 @@ viz.surface_distance_map(P, G, ref.spacing, backend="plotly",
 Each vertex of the predicted surface (marching cubes) is coloured by its **signed** distance to the reference:
 purple for over-segmentation, orange for under-segmentation, grey on the boundary. The colour range defaults to the
 95th percentile of the absolute distance (at least 2 mm). The plotly backend needs `pip install segevalkit[interactive]`.
+
+<figure class="sk-fig" markdown>
+[![Signed surface-distance map of a pancreas](../assets/showcase/surface_pancreas.png)](../assets/showcase/surface_pancreas.png)
+<figcaption>nnU-Net pancreas, PanTS_00009152, from two viewpoints: purple over-segmented, orange under-segmented. <a href="../../assets/showcase/surface_pancreas.html">Open the interactive version</a> to rotate it.</figcaption>
+</figure>
 
 ## Worst-case galleries
 
@@ -80,6 +141,11 @@ viz.case_gallery(items, window="pancreas", title="Four worst pancreas cases")
 ```
 
 The [HTML report](report.md) builds this gallery for every structure.
+
+<figure class="sk-fig" markdown>
+[![Four worst pancreas cases side by side](../assets/showcase/gallery_worst_pancreas.png)](../assets/showcase/gallery_worst_pancreas.png)
+<figcaption>nnU-Net's four lowest pancreas Dice in the showcase (0.73 to 0.90): spurious tissue, a boundary shift and a missed region are three different failures behind similar scores.</figcaption>
+</figure>
 
 ## Command line
 

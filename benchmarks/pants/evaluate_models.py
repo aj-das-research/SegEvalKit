@@ -67,16 +67,22 @@ METRICS = {"organ": ORGAN, "tubular": TUBULAR, "lesion": LESION}
 PARAMS = {"nsd": {"tolerance_mm": 2.0}, "ece": {"roi": "band"}, "brier": {"roi": "band"}, "auprc": {"roi": "band"}}
 
 
+# PanTS annotates the lesion inconsistently relative to the pancreas mask: in most cases the lesion lies
+# inside pancreas.nii.gz, in others almost entirely outside it. The pancreas is therefore evaluated as
+# pancreas ∪ lesion on both sides, which is also how the nnU-Net checkpoint defines its pancreas region.
+UNION = {"pancreas": "pancreas.nii.gz+pancreatic_lesion.nii.gz"}
+
+
 def labels_for(model: str):
     out = {}
     for name, (kind, ids, ts) in STRUCTURES.items():
-        spec = {"ref_file": f"{name}.nii.gz", "metrics": METRICS[kind]}
+        spec = {"ref_file": UNION.get(name, f"{name}.nii.gz"), "metrics": METRICS[kind]}
         if model == "nnunet":
             spec["pred"] = ids
         elif model == "medformer":
             if name == "pancreatic_duct":  # not predicted by this checkpoint
                 continue
-            spec["pred_file"] = f"{name}.nii.gz"
+            spec["pred_file"] = UNION.get(name, f"{name}.nii.gz")
         elif model == "totalseg":
             if ts is None:
                 continue

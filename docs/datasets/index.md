@@ -32,7 +32,7 @@ public:
 | MSD | DSC, NSD | per task: 1 mm (hippocampus) to 7 mm (liver) | reported as 0 if undefined | Wilcoxon significance ranking |
 | FLARE22 | DSC, NSD | per organ: 2 mm (vessels, adrenals) to 7 mm (duodenum) | 1 / 1 | NSD forced to 0 if DSC < 0.2 |
 | KiTS21/23 | Dice, surface Dice on nested regions | 1.03 / 1.13 / 1.15 mm (from inter-observer variability) | 1 / 1 | surfel-weighted surface Dice |
-| BraTS 2023 | lesion-wise Dice and HD95 on WT / TC / ET | – | Dice 1, HD95 0 | reference dilated before matching; FP lesions add 374 mm; lesions ≤ 50 mm³ dropped |
+| BraTS 2023 | lesion-wise Dice and HD95 on WT / TC / ET | – | Dice 1, HD95 0 | reference dilated before matching; each FP lesion scores HD95 374 mm; lesions ≤ 50 mm³ dropped |
 | ISLES'22 | Dice, volume difference, lesion count difference, lesion F1 | – | Dice 1, F1 1 | any 1-voxel overlap is a hit |
 | autoPET | Dice, FP volume, FN volume | – | tumour-free studies scored by FP volume only | 18-connected components |
 | TopCoW 2024 | Dice, clDice, Betti-0 error, HD95 | – | classes absent from both skipped | HD95 capped at 90 mm |

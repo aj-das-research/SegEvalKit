@@ -1,7 +1,7 @@
 # Metric pitfalls
 
 A metric value means little without the task, the data and the way it was computed and aggregated. This page
-lists the twelve pitfalls that most often distort 3D segmentation results, following the taxonomy of
+lists the thirteen pitfalls that most often distort 3D segmentation results, following the taxonomy of
 Reinke et al. (2024): poor metric *selection* (P2) and poor metric *application* (P3). Each worked example was
 computed with SegEvalKit on 1 mm isotropic voxels unless stated otherwise.
 
@@ -19,6 +19,7 @@ computed with SegEvalKit on 1 mm isotropic voxels unless stated otherwise.
 | [Ranking instability](#ranking) | Winner changes with aggregation or scheme | `stats.rank_methods`, `stats.ranking_stability` |
 | [Background-dominated calibration](#calibration-background) | Easy background makes ECE, Brier, NLL look good | `roi="band"` for [calibration](../metrics/calibration.md) metrics |
 | [Convention mismatches](#conventions) | Same name, different formula across libraries | Unambiguous keys; [conventions page](conventions.md) |
+| [Annotation conventions](#annotation-conventions) | The reference defines a structure differently from the model | Evaluate a region both sides agree on (`ref_file="a+b"`) |
 
 ## Size and small-structure bias {#size-bias}
 
@@ -279,6 +280,29 @@ policy and all parameters; the [conventions page](conventions.md) lists conforma
     NSD also differs between voxel counting (MONAI, SegEvalKit) and surface-area weighting (DeepMind), and BraTS
     2023 lesion-wise Dice dilates reference lesions before matching; SegEvalKit's
     [lesion-wise Dice](../metrics/detection.md#lesionwise_dice) does not.
+
+## Annotation conventions of the reference {#annotation-conventions}
+
+A dataset's masks encode choices: whether a tumour belongs to the organ, whether vessels are cut out, where an
+organ ends. A model trained elsewhere follows its own choices, and the mismatch is scored as error. PanTS annotates
+the pancreatic lesion inconsistently relative to the pancreas mask (sometimes inside it, sometimes outside), so a
+correct pancreas prediction loses Dice wherever the lesion was left out of the reference. Evaluate the region both
+conventions agree on, pancreas ∪ lesion, and state it with the results (the [PanTS preset](../datasets/presets.md#pants)
+notes say the same).
+
+??? example "Worked example"
+
+    ```python
+    ev = sek.Evaluator(labels={
+        # reference: union of two per-structure files; prediction: union of ids
+        "pancreas": {"ref_file": "pancreas.nii.gz+pancreatic_lesion.nii.gz",
+                     "pred": [17, 18, 19, 20, 21, 28]},
+        "pancreatic_lesion": {"ref_file": "pancreatic_lesion.nii.gz", "pred": 28},
+    })
+    ```
+
+    All pancreas results in the [quickstart walkthrough](../getting-started/quickstart.md) use this union
+    (the top row of the three-model comparison shows it on one slice).
 
 ## References
 

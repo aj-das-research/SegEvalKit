@@ -63,7 +63,7 @@ images: /data/PanTS/ImageTe
 name: nnunet-pants
 out: eval/nnunet
 labels:
-  pancreas: {pred: [17, 18, 19, 20, 21, 28], ref_file: pancreas.nii.gz}
+  pancreas: {pred: [17, 18, 19, 20, 21, 28], ref_file: pancreas.nii.gz+pancreatic_lesion.nii.gz}
   pancreatic_lesion: {pred: 28, ref_file: pancreatic_lesion.nii.gz}
 metrics: [default, detection, cldice]
 params:

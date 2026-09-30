@@ -12,7 +12,7 @@ From the challenge paper or official evaluation code, collect:
 
 | Item | Example (KiTS23) |
 |---|---|
-| Label ids and **evaluation regions** | kidney = 1, tumour = 2, cyst = 3; HECs: kidney+masses = {1,2,3}, masses = {2,3}, tumour = {2} |
+| Label ids and evaluation regions | kidney = 1, tumour = 2, cyst = 3; HECs: kidney+masses = {1,2,3}, masses = {2,3}, tumour = {2} |
 | Reference layout | `case_xxxxx/segmentation.nii.gz` (folder layout) |
 | Official metrics and parameters | Dice and surface Dice (tolerance per HEC) |
 | Empty-mask convention | how cases without a tumour are scored |

@@ -119,3 +119,16 @@ def test_per_label_metrics(tmp_path):
     got = res.per_case().groupby("label")["metric"].unique().to_dict()
     assert list(got["organ"]) == ["dice"] and set(got["lesion"]) == {"dice", "lesion_f1"}
     assert len(res.lesions) and set(res.lesions["label"]) == {"lesion"}
+
+
+def test_per_structure_file_union(tmp_path):
+    ref = tmp_path / "ref" / "c0" / "segmentations"
+    ref.mkdir(parents=True)
+    a = np.zeros((10, 10, 10), np.uint8); a[2:5, 2:5, 2:5] = 1
+    b = np.zeros((10, 10, 10), np.uint8); b[6:8, 6:8, 6:8] = 1
+    save_volume(a, ref / "organ.nii.gz"); save_volume(b, ref / "lesion.nii.gz")
+    pr = tmp_path / "pr"; pr.mkdir()
+    save_volume(a + 2 * b, pr / "c0.nii.gz")
+    ev = sek.Evaluator(labels={"organ_with_lesion": {"ref_file": "organ.nii.gz+lesion.nii.gz", "pred": [1, 2]}},
+                       metrics=["dice"])
+    assert ev.evaluate(pr, tmp_path / "ref", progress=False).wide()["dice"].item() == 1.0

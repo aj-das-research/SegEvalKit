@@ -2,6 +2,8 @@
 
 ## Layers
 
+<div class="sk-diagram" markdown>
+
 ```mermaid
 flowchart TB
     subgraph IO["segevalkit.io"]
@@ -26,6 +28,8 @@ flowchart TB
     ER --> ST & PL & RP
     V --> VZ
 ```
+
+</div>
 
 | Layer | Package | Responsibility | Depends on |
 |---|---|---|---|

@@ -83,7 +83,7 @@ with mkdocs_gen_files.open("datasets/presets.md", "w") as fh:
         fh.write(f"**Reference layout:** `{lay}`" + (f" (`{extra}`)" if extra else "") + "  \n")
         fh.write("**Metrics:** " + ", ".join(f"`{m}`" for m in d.metrics) + "  \n")
         if d.params:
-            fh.write("**Parameters:** " + ", ".join(f"`{m}`: {p}" for m, p in d.params.items()) + "  \n")
+            fh.write("**Parameters:** " + "; ".join(f"`{m}`: " + ", ".join(f"`{k}={v}`" for k, v in p.items()) for m, p in d.params.items()) + "  \n")
         fh.write(f"**Empty policy:** `{d.empty_policy}`  \n")
         fh.write(f"**Source:** <{d.url}>  \n**Cite:** {d.citation}\n")
         if d.notes:

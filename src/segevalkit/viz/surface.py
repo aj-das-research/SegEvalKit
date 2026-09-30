@@ -101,5 +101,5 @@ def surface_distance_map(pred: np.ndarray, ref: np.ndarray, spacing: Sequence[fl
         cb.set_label("Signed distance to reference [mm]\n← under-segmented · over-segmented →")
         cb.outline.set_visible(False)
         fig.suptitle(title or "Surface distance to reference", x=0.01, ha="left", fontsize=11,
-                     fontweight="semibold", color=INK["primary"])
+                     fontweight="bold", color=INK["primary"])
     return fig

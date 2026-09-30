@@ -18,7 +18,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-from scipy.stats import spearmanr  # noqa: E402
 
 from segevalkit.metrics import get_metric  # noqa: E402
 from segevalkit.plotting.theme import CATEGORICAL, INK, PURPLE, color_for, sequential_cmap, theme  # noqa: E402
@@ -27,31 +26,53 @@ ORDER_P = ["erode", "dilate", "boundary_noise", "shift", "islands", "remove_slab
 TITLES = {"erode": "Erosion", "dilate": "Dilation", "boundary_noise": "Boundary noise", "shift": "Shift",
           "islands": "FP islands", "remove_slab": "Missing slab", "holes": "Internal holes", "cut": "Cut"}
 ORDER_M = ["dice", "iou", "nsd", "boundary_iou", "hd", "hd95", "assd", "masd", "centroid_distance",
-           "relative_volume_difference", "cldice", "betti0_error", "betti1_error", "lesion_f1"]
+           "relative_volume_difference", "cldice", "betti0_error", "betti1_error", "betti2_error", "lesion_f1"]
+
+
+# A representative, clinically plausible size for each error type.
+REF_MAG = {"erode": 2.0, "dilate": 2.0, "boundary_noise": 2.0, "shift": 4.0, "islands": 2.0,
+           "remove_slab": 0.1, "holes": 2.0, "cut": 4.0}
+# The smallest change of each metric that a reader would call meaningful.
+MEANINGFUL = {"dice": 0.02, "iou": 0.02, "nsd": 0.02, "boundary_iou": 0.02, "cldice": 0.02, "lesion_f1": 0.02,
+              "relative_volume_difference": 0.02, "hd": 1.0, "hd95": 1.0, "assd": 1.0, "masd": 1.0,
+              "centroid_distance": 1.0, "betti0_error": 1.0, "betti1_error": 1.0, "betti2_error": 1.0}
 
 
 def responsiveness(df: pd.DataFrame) -> pd.DataFrame:
-    """Median over (structure, case) of |Spearman rho(magnitude, metric)|; NaN-safe."""
+    """Does the metric notice the error?
+
+    For each (perturbation, metric): the fraction of structure-cases in which
+    the metric changes, between the unperturbed mask and the perturbation at
+    its representative size (REF_MAG), by at least the meaningful difference
+    (MEANINGFUL: 0.02 for bounded scores, 1 mm for distances, 1 for counts).
+    Also returns the median absolute change in the metric's own units.
+    """
     rows = []
     for (p, m), g in df.groupby(["perturbation", "metric"]):
-        rhos = []
-        for _, h in g.groupby(["structure", "case_id"]):
-            h = h.dropna(subset=["value"])
-            if h["value"].nunique() < 2:
-                rhos.append(0.0)  # metric did not move at all
-                continue
-            rhos.append(abs(spearmanr(h["magnitude"], h["value"]).statistic))
-        rows.append({"perturbation": p, "metric": m, "rho": float(np.nanmedian(rhos)), "n": len(rhos)})
+        if m not in MEANINGFUL or p not in REF_MAG:
+            continue
+        base = g[g.magnitude == 0].set_index(["structure", "case_id"])["value"]
+        pert = g[np.isclose(g.magnitude, REF_MAG[p])].set_index(["structure", "case_id"])["value"]
+        delta = (pert - base.reindex(pert.index)).abs().dropna()
+        if delta.empty:
+            continue
+        rows.append({"perturbation": p, "metric": m, "rho": float((delta >= MEANINGFUL[m] - 1e-12).mean()),
+                     "median_change": float(delta.median()), "n": int(delta.size)})
     return pd.DataFrame(rows)
+
+
+def _mag_label(p: str) -> str:
+    m = REF_MAG[p]
+    return {"islands": f"{m:g} blobs", "holes": f"{m:g} holes", "remove_slab": f"{100 * m:g} %"}.get(p, f"{m:g} mm")
 
 
 def matrix_figure(r: pd.DataFrame, out: Path):
     piv = r.pivot(index="metric", columns="perturbation", values="rho").reindex(index=ORDER_M, columns=ORDER_P)
     with theme():
-        fig, ax = plt.subplots(figsize=(7.2, 5.6), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(8.4, 5.6), constrained_layout=True)
         im = ax.imshow(piv.values, cmap=sequential_cmap(), vmin=0, vmax=1, aspect="auto")
         ax.set_xticks(range(len(ORDER_P)))
-        ax.set_xticklabels([TITLES[p] for p in ORDER_P], rotation=30, ha="right")
+        ax.set_xticklabels([f"{TITLES[p]}\n{_mag_label(p)}" for p in ORDER_P], rotation=0, fontsize=7.5)
         ax.set_yticks(range(len(ORDER_M)))
         ax.set_yticklabels([f"{get_metric(m).abbr}" for m in ORDER_M])
         ax.grid(False)
@@ -62,9 +83,9 @@ def matrix_figure(r: pd.DataFrame, out: Path):
                     ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=7,
                             color=INK["surface"] if v > 0.55 else INK["primary"])
         cb = fig.colorbar(im, ax=ax, fraction=0.035, pad=0.02)
-        cb.set_label("median |Spearman ρ| between error size and metric")
+        cb.set_label("fraction of real structures where the metric changes meaningfully")
         cb.outline.set_visible(False)
-        ax.set_title("Which metric notices which error? (real PanTS anatomy)")
+        ax.set_title("Which metric notices which error? (7 PanTS structures × 10 cases)")
     for ext in ("png", "pdf"):
         fig.savefig(out / f"sensitivity_matrix.{ext}", dpi=190)
     plt.close(fig)
@@ -96,7 +117,7 @@ def curves(df: pd.DataFrame, out: Path):
                 ax.set_xlabel(d["unit"].iloc[0], fontsize=8)
                 ax.grid(True, axis="both")
             axes[-1].legend(loc="upper left", bbox_to_anchor=(1.02, 1.0), fontsize=7.5, title="structure")
-            fig.suptitle(f"{TITLES[p]}: median over cases", x=0.01, ha="left", fontsize=11, fontweight="semibold",
+            fig.suptitle(f"{TITLES[p]}: median over cases", x=0.01, ha="left", fontsize=11, fontweight="bold",
                          color=INK["primary"])
         for ext in ("png", "pdf"):
             fig.savefig(out / f"sensitivity_{p}.{ext}", dpi=170)
@@ -110,7 +131,7 @@ def size_bias(df: pd.DataFrame, out: Path, mag: float = 2.0):
         fig, axes = plt.subplots(1, 3, figsize=(9.6, 3.0), constrained_layout=True, sharey=True)
         for ax, m in zip(axes, ["dice", "nsd", "hd95"]):
             vals = [d[(d.metric == m) & (d.structure == s)]["value"].to_numpy() for s in order]
-            bp = ax.boxplot(vals, vert=False, patch_artist=True, widths=0.55,
+            bp = ax.boxplot(vals, orientation="horizontal", patch_artist=True, widths=0.55,
                             medianprops=dict(color="white", linewidth=1.5), showfliers=False)
             for b in bp["boxes"]:
                 b.set_facecolor(PURPLE[500])
@@ -124,7 +145,7 @@ def size_bias(df: pd.DataFrame, out: Path, mag: float = 2.0):
             ax.grid(False, axis="y")
             ax.invert_yaxis()
         fig.suptitle(f"The same {mag:g} mm erosion, seen by three metrics (structures ordered by volume)",
-                     x=0.01, ha="left", fontsize=11, fontweight="semibold", color=INK["primary"])
+                     x=0.01, ha="left", fontsize=11, fontweight="bold", color=INK["primary"])
     for ext in ("png", "pdf"):
         fig.savefig(out / f"size_bias_erode.{ext}", dpi=190)
     plt.close(fig)
@@ -138,6 +159,9 @@ def main():
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     df = pd.read_csv(a.csv)
+    # Supplementary runs (e.g. sensitivity_betti2_error.csv) add metrics on the same cases.
+    for extra in sorted(Path(a.csv).parent.glob("sensitivity_*.csv")):
+        df = pd.concat([df, pd.read_csv(extra)], ignore_index=True)
     r = responsiveness(df)
     r.to_csv(out / "sensitivity_summary.csv", index=False)
     matrix_figure(r, out)

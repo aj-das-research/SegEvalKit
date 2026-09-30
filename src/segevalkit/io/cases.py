@@ -156,22 +156,34 @@ class Source:
             self._cache_key = case_id
         return self._cache
 
+    def _structure_file(self, case_id: str, name: str) -> Optional[Path]:
+        f = self.path(case_id) / name
+        if f.exists():
+            return f
+        alt = [p for p in (self.path(case_id) / (name.split(".")[0] + suf) for suf in _SUFFIXES) if p.exists()]
+        return alt[0] if alt else None
+
     def load_mask(self, case_id: str, label: LabelSpec, side: str) -> Tuple[Optional[np.ndarray], Volume]:
         """Binary mask for ``label``; ``(None, geometry)`` if a per-structure file is missing."""
         if self.layout == "per_structure":
-            f = self.path(case_id) / label.file(side)
-            if not f.exists():
-                alt = [p for p in (self.path(case_id) / (label.file(side).split(".")[0] + s) for s in _SUFFIXES) if p.exists()]
-                if not alt:
-                    return None, None
-                f = alt[0]
-            vol = load_volume(f, kind=self.kind)
-            data = vol.data
-            if self.kind == "prob":
-                return data.astype(np.float32, copy=False), vol
-            values = label.values(side)
-            mask = extract_mask(data, values) if values else data != 0
-            return mask, vol
+            # "a.nii.gz+b.nii.gz" is the union of several structure files (e.g. an organ and
+            # its lesion when a dataset annotates them inconsistently).
+            mask, geom = None, None
+            for name in label.file(side).split("+"):
+                f = self._structure_file(case_id, name.strip())
+                if f is None:
+                    continue
+                vol = load_volume(f, kind=self.kind)
+                data = vol.data
+                if self.kind == "prob":
+                    part = data.astype(np.float32, copy=False)
+                    mask = part if mask is None else np.maximum(mask, part)
+                else:
+                    values = label.values(side)
+                    part = extract_mask(data, values) if values else data != 0
+                    mask = part if mask is None else (mask | part)
+                geom = geom or vol
+            return mask, geom
         vol = self.load(case_id)
         values = label.values(side)
         if not values:

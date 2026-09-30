@@ -327,3 +327,64 @@ code, kbd, pre, .md-typeset code, .md-typeset pre { font-family: var(--sk-mono);
 .md-typeset table:not([class]):has(th:nth-child(6)) :is(th, td) { padding: .65em .7em; }
 /* long inline code (commands, URLs, paths) in the last, descriptive column may wrap instead of widening the table */
 .md-typeset table:not([class]) td:last-child code { overflow-wrap: anywhere; }
+
+/* sensitivity-study error curves: wide multi-panel PNGs inside tabs */
+.md-typeset .sk-curves .tabbed-block { overflow-x: auto; }
+.md-typeset .sk-curves .tabbed-block img { display: block; max-width: 100%; border-radius: var(--sk-r);
+  border: 1px solid var(--sk-border); background: #fff; }
+@media screen and (max-width: 60em) {
+  .md-typeset .sk-curves .tabbed-block img { max-width: none; width: 56rem; }
+}
+
+/* API tables: let long type annotations wrap so the Default column stays inside the frame */
+.md-typeset .doc-contents td:not(:first-child) code { white-space: normal; }
+
+/* wide Mermaid diagrams: keep labels legible on phones by scrolling inside the frame */
+@media screen and (max-width: 45em) {
+  .md-typeset .sk-diagram { overflow-x: auto; }
+  .md-typeset .sk-diagram .mermaid { min-width: 34rem; }
+}
+
+/* phones: long inline identifiers in prose may break instead of widening the page
+   (table cells keep whole identifiers; wide tables scroll inside their frame) */
+@media screen and (max-width: 30em) {
+  .md-typeset p > code, .md-typeset li > code { overflow-wrap: anywhere; }
+}
+
+/* phones: shrink wide display equations so most fit; the rest scroll inside their block */
+@media screen and (max-width: 30em) {
+  .md-typeset div.arithmatex { font-size: .8em; scrollbar-width: thin; padding-bottom: .2em; }
+  .md-typeset .sek-metric div.arithmatex { font-size: .74em; }
+}
+
+/* dark mode: native scrollbars (wide tables, code, equations) must not render as white bars */
+[data-md-color-scheme="slate"] { color-scheme: dark; }
+.md-typeset__scrollwrap, .md-typeset div.arithmatex, .md-typeset .sk-curves .tabbed-block, .md-typeset .sk-diagram {
+  scrollbar-width: thin; scrollbar-color: var(--md-default-fg-color--lighter) transparent; }
+
+/* -------------------------------------------------------------- real-data showcase figures */
+.md-typeset figure.sk-fig { margin: 1.1em auto 1.5em; max-width: 100%; }
+.md-typeset figure.sk-fig a:has(> img) { display: block; }
+.md-typeset figure.sk-fig img { display: block; width: 100%; height: auto; }
+.md-typeset figure.sk-fig--md img { width: min(100%, 28rem); margin: 0 auto; }
+.md-typeset figure.sk-fig--sm img { width: min(100%, 20rem); margin: 0 auto; }
+.md-typeset figure.sk-fig figcaption { margin-left: auto; margin-right: auto; text-align: center; }
+.md-typeset .tabbed-block > figure.sk-fig:first-child { margin-top: .6em; }
+[data-md-color-scheme="slate"] .md-typeset figure img { border-color: #2a243b; }
+
+/* home: real-data gallery (one large figure, two small) */
+.sk-gallery { display: grid; grid-template-columns: 11fr 6fr; gap: 1.1rem; }
+.sk-gallery__side { display: grid; grid-template-rows: 1fr 1fr; gap: 1.1rem; }
+.sk-shot { display: flex; flex-direction: column; justify-content: center; background: #fff; border: 1px solid var(--sk-border);
+  border-radius: var(--sk-r-lg); overflow: hidden; box-shadow: var(--sk-shadow); transition: all .15s ease;
+  color: var(--sk-muted) !important; }
+.sk-shot:hover { border-color: var(--sk-300); transform: translateY(-2px); text-decoration: none !important; }
+.sk-shot img { display: block; width: 100%; height: auto; padding: .5rem .6rem 0; box-sizing: border-box; margin: auto 0; }
+.sk-shot span { display: block; font-size: .68rem; font-style: italic; padding: .45rem .9rem .55rem; color: #6b6488;
+  border-top: 1px solid #ebe6f5; background: #faf8ff; }
+[data-md-color-scheme="slate"] .sk-shot { border-color: #3a3056; }
+.md-typeset .sk-gallery__note, .sk-gallery__note { text-align: center; font-size: .74rem; color: var(--sk-muted); font-style: italic;
+  max-width: 40rem; margin: 1.2rem auto 1.4rem; line-height: 1.6; }
+.md-typeset .sk-lede-c, .sk-lede-c { text-align: center; font-size: .86rem; color: var(--sk-muted); line-height: 1.7;
+  max-width: 40rem; margin: -1.6rem auto 2rem; }
+@media screen and (max-width: 60em) { .sk-gallery { grid-template-columns: 1fr; } .sk-gallery__side { grid-template-rows: none; } }

@@ -4,16 +4,13 @@ A results folder written by `EvaluationResult.save` is the library's
 standard output. Every file is plain CSV/JSON so that it can be read without
 SegEvalKit:
 
-=======================  ==========================================================
-``per_case.csv``         long/tidy: ``case_id, label, metric, value`` (one row per number)
-``per_case_wide.csv``    one row per ``(case_id, label)``, one column per metric,
-                         plus ``ref_empty``, ``pred_empty``, ``ref_volume_ml``, ``pred_volume_ml``
-``lesions.csv``          one row per reference lesion / false-positive component
-``summary.csv``          per ``(label, metric)``: n, mean, std, median, IQR, min, max,
-                         95 % bootstrap CI of the mean, number of NaN
-``meta.json``            provenance: version, full configuration, paths, labels, timing,
-                         missing / failed cases
-=======================  ==========================================================
+| File | Contents |
+|---|---|
+| ``per_case.csv`` | long/tidy: ``case_id, label, metric, value`` (one row per number) |
+| ``per_case_wide.csv`` | one row per ``(case_id, label)``, one column per metric, plus ``ref_empty``, ``pred_empty``, ``ref_volume_ml``, ``pred_volume_ml`` |
+| ``lesions.csv`` | one row per reference lesion / false-positive component |
+| ``summary.csv`` | per ``(label, metric)``: n, mean, std, median, IQR, min, max, 95 % bootstrap CI of the mean, number of NaN |
+| ``meta.json`` | provenance: version, full configuration, paths, labels, timing, missing / failed cases |
 
 Descriptive per-case flags are stored in the long table with a leading
 underscore (``_ref_empty``...) so they never mix with metrics.

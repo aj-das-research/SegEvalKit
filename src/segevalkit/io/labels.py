@@ -13,7 +13,7 @@ agree:
 reference, so a model that writes ``pancreas = 7`` in one file can be scored
 against a dataset that ships ``segmentations/pancreas.nii.gz``.
 
-Accepted forms for `parse_labels` (all equivalent in a YAML config)::
+Accepted forms for `parse_labels` (all equivalent in a YAML config):
 
     {"liver": 1, "tumour": 2}                 # same id in pred and ref
     {"kidney": [2, 3]}                         # region = union of ids
@@ -39,10 +39,14 @@ class LabelSpec:
 
     Attributes:
         name: Structure name used in all outputs.
-        ref_values / pred_values: Integer ids forming the structure in a
+        ref_values: Integer ids forming the structure in the reference
             multi-label map (``()`` when the structure comes from its own file).
-        ref_file / pred_file: File name of the per-structure binary mask inside
-            a case folder (defaults to ``<name>.nii.gz``).
+        pred_values: Integer ids forming the structure in the prediction
+            multi-label map (``()`` when the structure comes from its own file).
+        ref_file: File name of the per-structure reference mask inside a case
+            folder (defaults to ``<name>.nii.gz``).
+        pred_file: File name of the per-structure predicted mask inside a case
+            folder (defaults to ``<name>.nii.gz``).
         params: Per-structure metric parameter overrides, e.g.
             ``{"nsd": {"tolerance_mm": 1.0}}`` (tolerances should be
             structure-specific; Metrics Reloaded).

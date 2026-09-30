@@ -133,6 +133,28 @@ sek.report.build_report(
 
 <section class="sk-section sk-section--tint">
   <div class="sk-wrap">
+    <p class="sk-eyebrow">Showcase</p>
+    <h2 class="sk-h2">See it on real data</h2>
+    <p class="sk-lede-c">Three official models (nnU-Net, MedFormer, TotalSegmentator) on eight PanTS test CTs,
+      from per-case statistics to the errors on the image. Every figure is an unedited SegEvalKit output.</p>
+    <div class="sk-gallery">
+      <a class="sk-shot sk-shot--main" href="{{ 'analysis/qualitative/' | url }}"><img src="{{ 'assets/showcase/model_comparison.png' | url }}" alt="Three models on one CT slice: pancreas and lesion errors" loading="lazy"><span>Three models, one slice: pancreas and tumour</span></a>
+      <div class="sk-gallery__side">
+        <a class="sk-shot" href="{{ 'analysis/qualitative/' | url }}"><img src="{{ 'assets/showcase/triplanar_pancreas.png' | url }}" alt="Tri-planar pancreas error view" loading="lazy"><span>Errors in three planes</span></a>
+        <a class="sk-shot" href="{{ 'analysis/qualitative/#surface-distance-maps' | url }}"><img src="{{ 'assets/showcase/surface_pancreas.png' | url }}" alt="Signed surface-distance map of the pancreas" loading="lazy"><span>Boundary error in mm, on the surface</span></a>
+      </div>
+    </div>
+    <p class="sk-gallery__note">Violet agreement, orange missed, teal added. Eight cases illustrate the library;
+      they are not a benchmark.</p>
+    <div class="sk-hero__actions">
+      <a class="sk-btn sk-btn--primary" href="{{ 'getting-started/quickstart/' | url }}">Follow the walkthrough</a>
+      <a class="sk-btn sk-btn--ghost" href="{{ 'assets/showcase/report_nnunet.html' | url }}">Open a sample report</a>
+    </div>
+  </div>
+</section>
+
+<section class="sk-section">
+  <div class="sk-wrap">
     <p class="sk-eyebrow">The metrics</p>
     <h2 class="sk-h2">Seven families of metrics, seven questions</h2>
     <div class="sk-families">

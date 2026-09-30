@@ -78,7 +78,8 @@ def metric_distribution(results: Results, metric: str, labels: Optional[Sequence
     methods = _methods(df)
     colors = color_for(methods)
     with theme():
-        fig, ax = _new_ax(ax, figsize or (max(4.5, 1.1 * len(labels) * max(1, len(methods)) + 1.5), 3.6))
+        width = min(11.0, max(4.5, 0.55 * len(labels) * max(1, len(methods)) + 2.2))
+        fig, ax = _new_ax(ax, figsize or (width, 3.6))
         width = 0.8 / len(methods)
         rng = np.random.default_rng(0)
         for mi, m in enumerate(methods):
@@ -347,7 +348,7 @@ def metric_profile(results: Mapping[str, object], metrics: Sequence[str], label:
             ax.set_yticklabels(methods)
             ax.invert_yaxis()
         fig.suptitle("Metric profile (mean, 95 % CI)" + (f": {label}" if label else ""), x=0.01, ha="left",
-                     fontsize=11, fontweight="semibold", color=INK["primary"])
+                     fontsize=11, fontweight="bold", color=INK["primary"])
     return fig
 
 
@@ -379,7 +380,7 @@ def comparison_forest(compare_df: pd.DataFrame, ax=None, figsize=None, name_a: s
         ax.grid(True, axis="x")
         ax.grid(False, axis="y")
         ax.set_xlabel(f"Mean paired difference {name_a} − {name_b} [% of larger mean]")
-        ax.set_title(f"{name_a} vs {name_b}: paired differences (filled = significant)")
+        ax.set_title(f"{name_a} vs {name_b}: paired differences\n(filled = significant after correction)")
     return fig
 
 
@@ -405,7 +406,7 @@ def ranking_stability_plot(stability: Dict, ax=None, figsize=None):
         ax.set_ylim(n + 0.6, 0.4)
         ax.set_ylabel("Rank (1 = best)")
         tau = np.nanmedian(stability["kendall_tau"])
-        ax.set_title(f"Ranking stability over bootstrap samples (median Kendall τ = {tau:.2f})")
+        ax.set_title(f"Ranking stability over bootstrap samples\n(median Kendall τ = {tau:.2f})")
     return fig
 
 
@@ -499,7 +500,7 @@ def failure_quadrants(result, label: str, x: str = "dice", y: str = "hd95", x_th
         ax.set_ylabel(yi.label)
         ax.grid(True, axis="both")
         ax.set_title(f"Failure modes: {label} ({int(bad.sum())}/{len(w)} flagged)")
-        ax.legend(loc="upper left")
+        ax.legend(loc="lower left")  # the upper-left quadrant is where flagged cases fall
     return fig
 
 

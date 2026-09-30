@@ -173,7 +173,7 @@ class Evaluator:
 
         Args:
             pred: Prediction folder (or `Source`).
-            ref: Reference folder (or Source). Defines the case list.
+            ref: Reference folder (or ``Source``). Defines the case list.
             prob: Optional folder of per-structure probability maps
                 (``<case>/<label>.nii.gz``, float in [0, 1]).
             cases: Restrict to these case ids.

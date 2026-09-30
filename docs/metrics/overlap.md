@@ -15,7 +15,7 @@ that use \(TN\) depend on the field of view and sit near 1 in 3D volumes.
 | [Recall](#recall) | `recall` | no | ↑ | no | rewards over-segmentation |
 | [Specificity](#specificity) | `specificity` | yes | ↑ | no | \(\approx 1\) in 3D |
 | [FPR](#fpr) | `fpr` | yes | ↓ | no | \(\approx 0\) in 3D |
-| [FNR](#fnr) | `fnr` | no | ↓ | no | \(1-\) recall |
+| [FNR](#fnr) | `fnr` | no | ↓ | no | \(1-\mathrm{recall}\) |
 | [F\(_\beta\)](#fbeta) | `fbeta` | no | ↑ | if \(\beta=1\) | \(\beta\) must be justified |
 | [Tversky](#tversky) | `tversky` | no | ↑ | if \(\alpha=\beta\) | \(\alpha,\beta\) must be justified |
 | [Accuracy](#accuracy) | `accuracy` | yes | ↑ | yes | background dominates |

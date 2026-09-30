@@ -46,29 +46,138 @@ needed to report results you can defend.
 pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git"
 ```
 
-## Quick start
+## A walkthrough on real data
+
+Every output below is real: three official models (nnU-Net, MedFormer, TotalSegmentator, run from their own code and
+checkpoints) on 8 PanTS test CTs chosen to span tumour sizes and orientations. Eight cases illustrate the library;
+they are not a benchmark.
+
+**1. Describe what to evaluate.** Structures are named once; each side says where to find them. Here the reference
+has one file per structure and nnU-Net writes one multi-label map.
 
 ```python
 import segevalkit as sek
 
 ev = sek.Evaluator(
-    labels={"liver": 1, "tumour": 2},
-    metrics=["default", "detection"],          # Dice, IoU, NSD, HD95, ASSD, PPV, TPR, RVD + lesion-wise
-    params={"nsd": {"tolerance_mm": 2.0}},
+    labels={
+        "pancreas":          {"ref_file": "pancreas.nii.gz+pancreatic_lesion.nii.gz", "pred": [17, 18, 19, 20, 21, 28]},
+        "pancreatic_lesion": {"ref_file": "pancreatic_lesion.nii.gz", "pred": 28, "metrics": ["default", "detection"]},
+        "liver":             {"ref_file": "liver.nii.gz", "pred": 14},
+    },
+    metrics="default", params={"nsd": {"tolerance_mm": 2.0}}, min_lesion_voxels=10,
 )
-res = ev.evaluate("predictions/", "labelsTr/", n_workers=8, out_dir="eval/")
-
-res.summary()                                   # mean, median, IQR, 95 % bootstrap CI per structure and metric
-sek.plotting.metric_distribution(res, "dice").savefig("dice.png")
-sek.report.build_report(res, "eval/report.html", image_source="imagesTr/")
 ```
+
+**2. Evaluate a folder, then summarise.** One call scores every case; `summary()` gives mean, median and a 95 %
+bootstrap confidence interval per structure and metric.
+
+```python
+res = ev.evaluate("predictions/nnunet/", "PanTS/LabelTe/", n_workers=8, out_dir="eval/nnunet")
+res.summary().query("metric in ['dice', 'nsd', 'hd95']")
+```
+
+```text
+            label metric  n    mean  median  ci_low  ci_high
+         pancreas   dice  8   0.889   0.905   0.840    0.927
+         pancreas    nsd  8   0.843   0.887   0.757    0.915
+         pancreas   hd95  8   5.925   2.890   2.575   10.228
+pancreatic_lesion   dice  8   0.350   0.204   0.097    0.619
+pancreatic_lesion    nsd  8   0.311   0.196   0.075    0.561
+pancreatic_lesion   hd95  8 290.878 252.815 100.865  481.879
+            liver   dice  8   0.981   0.981   0.978    0.985
+            liver    nsd  8   0.937   0.948   0.915    0.958
+            liver   hd95  8   6.264   2.394   2.032   11.556
+```
+
+The lesion rows show why the empty-mask policy matters: in tumour-free patients a spurious lesion prediction scores
+Dice 0 and the image-diagonal HD95 penalty, which is what drags the lesion HD95 to hundreds of millimetres.
+
+**3. Find the failures.** Per-case values and the worst cases are one call away.
+
+```python
+res.worst_cases("dice", "pancreas", k=3)
+```
+
+```text
+       case_id  dice
+PanTS_00009746 0.733
+PanTS_00009287 0.862
+PanTS_00009322 0.881
+```
+
+**4. Look at lesions, not voxels.** The lesion table shows what the Dice average hides: nnU-Net detected 3 of the
+7 reference lesions in these cases and missed a 23.7 mL tumour entirely.
+
+```python
+res.lesions.query("kind == 'ref'")[["case_id", "volume_ml", "detected", "dice"]]
+```
+
+```text
+       case_id  volume_ml  detected  dice
+PanTS_00009287      0.145     False 0.000
+PanTS_00009287      0.103     False 0.000
+PanTS_00009760     23.745     False 0.000
+PanTS_00009027      0.181     False 0.000
+PanTS_00009152     15.251      True 0.778
+PanTS_00009329      2.187      True 0.702
+PanTS_00009544      9.765      True 0.666
+```
+
+**5. Compare and rank models** with paired tests (Holm-corrected) and challenge-style rankings.
+
+```python
+from segevalkit.stats import compare, rank_methods
+compare(res_nnunet, res_medformer, metrics=["dice", "nsd", "hd95"], labels=["pancreas"])
+rank_methods({"nnU-Net": res_nnunet, "MedFormer": res_medformer, "TotalSegmentator": res_ts}, "dice", label="pancreas")
+```
+
+```text
+   label metric  n  mean_a  mean_b  mean_diff  frac_a_better  p_adjusted
+pancreas   dice  8   0.889   0.894     -0.005          0.250       0.445
+pancreas    nsd  8   0.843   0.858     -0.016          0.125       0.445
+pancreas   hd95  8   5.925   5.785      0.139          0.250       0.445
+
+          method  mean  rank
+       MedFormer 0.894   1.0
+nnU-Net ResEnc-M 0.889   2.0
+TotalSegmentator 0.863   3.0
+```
+
+With 8 cases no difference is significant (adjusted p = 0.445): exactly what the paired test is for.
+
+**6. Plot and look.** Figures use one colour-vision-safe palette: violet agreement, orange missed, teal added.
+
+```python
+sek.plotting.metric_distribution({"nnU-Net": r1, "MedFormer": r2, "TotalSegmentator": r3}, "dice", labels=organs)
+sek.viz.triplanar(ct, pred_pancreas, ref_pancreas, affine=ref.affine, window="pancreas")
+```
+
+<p align="center">
+  <img src="docs/assets/showcase/model_comparison.png" width="92%" alt="Three models on one slice">
+</p>
+<p align="center">
+  <img src="docs/assets/showcase/dist_dice.png" width="92%" alt="Dice per structure and model">
+</p>
+<p align="center">
+  <img src="docs/assets/showcase/triplanar_pancreas.png" width="92%" alt="Tri-planar error view">
+</p>
+
+**7. Report.** One self-contained HTML file with provenance, tables, figures, the worst cases and a metric glossary:
+[open the sample report](https://aj-das-research.github.io/SegEvalKit/assets/showcase/report_nnunet.html).
+
+```python
+sek.report.build_report(res, "eval/nnunet/report.html", image_source="PanTS/ImageTe/")
+```
+
+The same workflow from the command line:
 
 ```console
-$ segevalkit evaluate --pred predictions/ --ref labelsTr/ --labels liver=1,tumour=2 --out eval/ --report
-$ segevalkit compare eval_A/ eval_B/ --out comparison/
-$ segevalkit recommend --structure tubular --boundary-critical
-$ segevalkit visualize --pred p.nii.gz --ref g.nii.gz --image ct.nii.gz --label 2 --kind triplanar --out case.png
+$ segevalkit evaluate --config eval_nnunet.yaml --report     # the labels above, as YAML
+$ segevalkit compare eval/nnunet eval/medformer --out comparison/
+$ segevalkit recommend --structure small_lesion --multi-instance
 ```
+
+<p align="center"><img src="docs/assets/terminal/recommend.svg" width="92%" alt="segevalkit recommend"></p>
 
 ## Documentation
 

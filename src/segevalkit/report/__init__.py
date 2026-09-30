@@ -40,6 +40,12 @@ def fig_to_base64(fig, dpi: int = 150) -> str:
     return base64.b64encode(buf.getvalue()).decode("ascii")
 
 
+def _short_path(p) -> str:
+    """Last two path components (the report is meant to be shared; hide machine-specific prefixes)."""
+    parts = Path(str(p)).parts
+    return str(Path(*parts[-2:])) if len(parts) > 2 else str(p)
+
+
 def _fmt(v: float, unit: str = "") -> str:
     if v is None or (isinstance(v, float) and math.isnan(v)):
         return "–"
@@ -189,7 +195,9 @@ def build_report(result: "EvaluationResult", path: Union[str, Path], *, title: O
         gal = _gallery(result, image_source, gallery_metric, gallery_k, window)
     ctx = {
         "title": title or f"Segmentation evaluation: {result.name}",
-        "meta": meta, "cfg": cfg,
+        "meta": {**meta, "pred": _short_path(meta["pred"]) if meta.get("pred") else None,
+                 "ref": _short_path(meta["ref"]) if meta.get("ref") else None},
+        "cfg": cfg,
         "n_cases": len(result.cases), "labels": result.labels, "n_metrics": len(metrics),
         "params": {k: v for k, v in cfg.get("params", {}).items()},
         "warnings": warnings_,

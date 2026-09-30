@@ -16,7 +16,7 @@ export TOTALSEG_HOME_DIR=$STORE/checkpoints/totalsegmentator
 export TMPDIR=$STORE/tmp/$SLURM_JOB_ID; mkdir -p "$TMPDIR"
 export OMP_NUM_THREADS=4 MPLCONFIGDIR=$TMPDIR/mpl
 OUT=$STORE/outputs/predictions/totalsegmentator
-N=4
+N=${NGPU:-4}   # one SLURM step per allocated GPU
 for i in $(seq 0 $((N-1))); do
   srun --exact -n1 --gres=gpu:1 --cpus-per-task=8 --mem=58G \
     "$ENV/bin/python" "$HOME/projects/SegEvalKit/benchmarks/pants/run_totalseg.py" \

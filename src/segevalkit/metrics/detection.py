@@ -38,8 +38,10 @@ class InstanceMatch:
     """Result of matching reference and predicted components.
 
     Attributes:
-        n_ref, n_pred: Number of reference / predicted components.
-        ref_sizes, pred_sizes: Voxel counts of each component (index 0 unused).
+        n_ref: Number of reference components.
+        n_pred: Number of predicted components.
+        ref_sizes: Voxel counts of each reference component (index 0 unused).
+        pred_sizes: Voxel counts of each predicted component (index 0 unused).
         inter: ``(n_ref+1, n_pred+1)`` voxel-overlap matrix; row/column 0 is background.
         ref_detected: Boolean per reference component (index ``i-1``).
         pred_matched: Boolean per predicted component (index ``j-1``).

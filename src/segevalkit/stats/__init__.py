@@ -140,8 +140,8 @@ def compare(a: "EvaluationResult", b: "EvaluationResult", *, metrics: Optional[S
 
     Returns:
         One row per (label, metric): means, mean difference ``a − b`` with a
-        bootstrap CI, fraction of cases where *a* is better, the matched-pairs
-        rank-biserial effect size, raw and adjusted p-values.
+            bootstrap CI, fraction of cases where *a* is better, the
+            matched-pairs rank-biserial effect size, raw and adjusted p-values.
     """
     from ..metrics import get_metric
 
@@ -348,8 +348,9 @@ def presence_detection(result, label: str, score: str = "pred_volume_ml", target
     whenever references can be empty.
 
     Returns:
-        dict with ``auc``, ``threshold``, ``sensitivity``, ``specificity``,
-        ``n_pos``, ``n_neg`` and the ROC arrays ``fpr``, ``tpr``, ``thresholds``.
+        Dict with ``auc``, ``threshold``, ``sensitivity``, ``specificity``,
+            ``n_pos``, ``n_neg`` and the ROC arrays ``fpr``, ``tpr``,
+            ``thresholds``.
     """
     w = result.wide()
     w = w[w["label"] == label].dropna(subset=[score, "ref_volume_ml"])

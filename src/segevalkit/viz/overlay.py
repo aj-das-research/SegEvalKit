@@ -153,15 +153,22 @@ def _zoom_box(masks, margin: int = 12):
             (max(cc.min() - margin, 0), min(cc.max() + margin, m.shape[1] - 1)))
 
 
-def _legend(fig, show_pred: bool):
+def _legend(fig, show_pred: bool, style: str = "fill"):
+    from matplotlib.lines import Line2D
     from matplotlib.patches import Patch
 
+    if style == "contour" and show_pred:
+        handles = [Line2D([], [], color=ERROR_COLORS["ref"], lw=1.6, label="Reference"),
+                   Line2D([], [], color=ERROR_COLORS["fp"], lw=1.4, ls="--", label="Prediction")]
+        fig.legend(handles=handles, loc="outside lower center", ncol=2, frameon=False, fontsize=8)
+        return
     handles = [Patch(color=ERROR_COLORS["tp"], label="True positive"),
                Patch(color=ERROR_COLORS["fn"], label="False negative (missed)"),
                Patch(color=ERROR_COLORS["fp"], label="False positive (added)")] if show_pred else \
               [Patch(color=ERROR_COLORS["ref"], label="Reference")]
-    fig.legend(handles=handles, loc="lower center", ncol=len(handles), frameon=False, fontsize=8,
-               bbox_to_anchor=(0.5, -0.02))
+    # "outside" reserves space below the axes in the constrained layout, so the legend
+    # never overlaps an image.
+    fig.legend(handles=handles, loc="outside lower center", ncol=len(handles), frameon=False, fontsize=8)
 
 
 def error_overlay(image: Optional[np.ndarray], pred: Optional[np.ndarray], ref: np.ndarray, *,
@@ -181,7 +188,7 @@ def error_overlay(image: Optional[np.ndarray], pred: Optional[np.ndarray], ref: 
         _draw(ax, s(img), s(p), s(r), _aspect(sp, view), window, style=style, zoom=box,
               title=title or f"{view.capitalize()} slice {index}")
         if legend and ax is not None and len(fig.axes) == 1:
-            _legend(fig, pred is not None)
+            _legend(fig, pred is not None, style)
     return fig
 
 
@@ -200,8 +207,8 @@ def triplanar(image, pred, ref, *, affine=None, window="abdomen", mode: str = "e
             _draw(ax, s(img), s(p), s(r), _aspect(sp, view), window, style=style, zoom=box,
                   title=f"{view.capitalize()} · {idx}")
         if title:
-            fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="semibold", color=INK["primary"])
-        _legend(fig, pred is not None)
+            fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="bold", color=INK["primary"])
+        _legend(fig, pred is not None, style)
     return fig
 
 
@@ -234,7 +241,7 @@ def slice_montage(image, pred, ref, *, affine=None, view: str = "axial", n: int 
             s = lambda a: None if a is None else _slice(a, view, idxs[k])  # noqa: E731
             _draw(ax, s(img), s(p), s(r), _aspect(sp, view), window, style=style, zoom=box, title=f"{idxs[k]}")
         if title:
-            fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="semibold", color=INK["primary"])
+            fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="bold", color=INK["primary"])
         _legend(fig, pred is not None)
     return fig
 
@@ -271,7 +278,7 @@ def error_projection(pred, ref, *, affine=None, title: Optional[str] = None, fig
                 s.set_visible(False)
             ax.set_title(f"{view.capitalize()} projection", fontsize=9, loc="left")
         if title:
-            fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="semibold", color=INK["primary"])
+            fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="bold", color=INK["primary"])
         _legend(fig, True)
     return fig
 
@@ -301,6 +308,6 @@ def case_gallery(items: Sequence[Dict], *, view: str = "axial", window="abdomen"
         for ax in axes.ravel()[n:]:
             ax.axis("off")
         if title:
-            fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="semibold", color=INK["primary"])
+            fig.suptitle(title, x=0.01, ha="left", fontsize=11, fontweight="bold", color=INK["primary"])
         _legend(fig, True)
     return fig
