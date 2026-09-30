@@ -1,0 +1,4 @@
+# Report
+
+::: segevalkit.report
+

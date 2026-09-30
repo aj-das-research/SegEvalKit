@@ -1,0 +1,25 @@
+# data, runs and large artefacts live on Lustre (symlinks), never in git
+/data
+/outputs
+/logs
+/paper/
+/site/
+*.nii
+*.nii.gz
+*.npz
+*.pth
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+# secrets
+.env
+*.git-credentials

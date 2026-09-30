@@ -1,0 +1,163 @@
+site_name: SegEvalKit
+site_description: Holistic, literature-grounded evaluation of volumetric (CT/MR) medical image segmentation.
+site_url: https://aj-das-research.github.io/SegEvalKit/
+repo_url: https://github.com/aj-das-research/SegEvalKit
+repo_name: aj-das-research/SegEvalKit
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 Abhijit Das · Apache-2.0
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - navigation.instant
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/segevalkit.css
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: "#"
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: ["."]
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/gen_pages.py
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_symbol_type_heading: true
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+            merge_init_into_class: true
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - getting-started/index.md
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+      - Data & output format: getting-started/data-format.md
+      - Configuration: getting-started/configuration.md
+      - Command line: getting-started/cli.md
+      - GPU & HPC: getting-started/gpu-hpc.md
+  - Metrics:
+      - metrics/index.md
+      - Overlap: metrics/overlap.md
+      - Volume: metrics/volume.md
+      - Distance & boundary: metrics/distance.md
+      - Topology: metrics/topology.md
+      - Detection & instances: metrics/detection.md
+      - Calibration: metrics/calibration.md
+      - Agreement & information: metrics/agreement.md
+      - Full catalogue: metrics/catalogue.md
+  - Choosing metrics:
+      - guide/index.md
+      - Decision guide: guide/choosing.md
+      - Pitfalls: guide/pitfalls.md
+      - Conventions & conformance: guide/conventions.md
+      - Sensitivity study: guide/sensitivity-study.md
+  - Analysis:
+      - analysis/index.md
+      - Statistics & ranking: analysis/statistics.md
+      - Quantitative plots: analysis/plots.md
+      - Qualitative visualisation: analysis/qualitative.md
+      - HTML report: analysis/report.md
+  - Datasets & benchmarks:
+      - datasets/index.md
+      - Dataset presets: datasets/presets.md
+      - Benchmark: PanTS: datasets/pants-benchmark.md
+  - API reference:
+      - api/index.md
+      - Evaluator & results: api/evaluator.md
+      - Metrics: api/metrics.md
+      - I/O: api/io.md
+      - Statistics: api/stats.md
+      - Plotting: api/plotting.md
+      - Visualisation: api/viz.md
+      - Guide: api/guide.md
+      - Synthetic perturbations: api/synthetic.md
+      - Datasets: api/datasets.md
+      - Report: api/report.md
+  - Research:
+      - research/index.md
+      - Metrics literature review: research/metrics-literature-review.md
+      - Datasets survey: research/datasets-survey.md
+  - About:
+      - about/index.md
+      - Contributing: about/contributing.md
+      - Changelog: about/changelog.md
+      - Citation: about/citation.md
