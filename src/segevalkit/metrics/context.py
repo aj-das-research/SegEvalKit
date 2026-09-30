@@ -59,6 +59,7 @@ class EmptyPolicy:
         ``"brats2023"``: best / 374 mm (BraTS 2023 lesion-wise code).
         ``"metrics_reloaded"``: best / worst (MetricsReloaded aggregation advice).
         ``"nan"`` (nnU-Net / MONAI ``ignore_empty``): exclude undefined cases.
+        ``"topcow"``: best / 90 mm (TopCoW 2024 HD95 cap).
         """
         presets = {
             "segevalkit": cls("best", "worst"),
@@ -66,6 +67,7 @@ class EmptyPolicy:
             "metrics_reloaded": cls("best", "worst"),
             "nan": cls("nan", "nan"),
             "nnunet": cls("nan", "nan"),
+            "topcow": cls("best", 90.0),
         }
         try:
             return presets[name.lower()]

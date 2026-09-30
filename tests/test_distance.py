@@ -51,3 +51,18 @@ def test_distance_monotone_in_error():
     g = sphere(radius=10)
     vals = [compute_metrics(np.roll(g, k, 0), g, ["assd"])["assd"] for k in (0, 1, 2, 4)]
     assert vals == sorted(vals)
+
+
+def test_boundary_iou_thin_width_disjoint():
+    g = cube((30, 30, 30), (2, 2, 2), (8, 8, 8))
+    p = cube((30, 30, 30), (18, 18, 18), (8, 8, 8))
+    r = compute_metrics(p, g, ["boundary_iou"], params={"boundary_iou": {"width_mm": 0.5}})
+    assert r["boundary_iou"] == 0.0
+    assert compute_metrics(g, g, ["boundary_iou"], params={"boundary_iou": {"width_mm": 0.5}})["boundary_iou"] == 1.0
+
+
+def test_hd95_mode_param(pair):
+    p, g = pair
+    a = compute_metrics(p, g, ["hd95"], params={"hd95": {"mode": "pooled"}})["hd95"]
+    b = compute_metrics(p, g, ["hd_percentile"], params={"hd_percentile": {"mode": "pooled"}})["hd_percentile"]
+    assert a == b

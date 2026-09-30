@@ -6,10 +6,12 @@ problem, not from habit. Describe the problem with a :class:`Fingerprint` and
 :func:`recommend` returns a metric set, each with the reason it was chosen and
 the pitfall it guards against.
 
+```python
 >>> from segevalkit.guide import Fingerprint, recommend
 >>> rec = recommend(Fingerprint(structure="small_lesion", multi_instance=True))
 >>> rec.metrics[:4]
 ['dice', 'nsd', 'masd', 'lesion_f1']
+```
 
 The combined rule of thumb from the literature: **one overlap metric + one
 boundary metric**, plus detection metrics when objects are instances,
@@ -113,8 +115,14 @@ class Recommendation:
         return [m for m, _, _ in self.items]
 
     def add(self, metric: str, role: str, reason: str) -> None:
-        if metric not in self.metrics:
-            self.items.append((metric, role, reason))
+        """Add a metric; a later, stronger role (primary > secondary > diagnostic) upgrades an earlier one."""
+        rank = {"primary": 0, "secondary": 1, "diagnostic": 2}
+        for i, (m, r, _) in enumerate(self.items):
+            if m == metric:
+                if rank[role] < rank[r]:
+                    self.items[i] = (metric, role, reason)
+                return
+        self.items.append((metric, role, reason))
 
     def table(self) -> pd.DataFrame:
         rows = []

@@ -157,7 +157,7 @@ def _gallery(result, image_source, metric: str, k: int, window) -> List[Dict]:
     return items
 
 
-def build_report(result, path: Union[str, Path], *, title: Optional[str] = None,
+def build_report(result: "EvaluationResult", path: Union[str, Path], *, title: Optional[str] = None,
                  metrics: Optional[Sequence[str]] = None, image_source: Union[str, Path, None] = None,
                  gallery_metric: str = "dice", gallery_k: int = 3, window="abdomen",
                  max_labels: int = 8, gallery: bool = True) -> Path:

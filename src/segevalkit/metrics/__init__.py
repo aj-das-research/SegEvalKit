@@ -84,6 +84,9 @@ def compute_metrics(
         ``{metric_name: value}``. Metrics that need a probability map are
         skipped (not NaN) when ``prob`` is not given.
     """
+    if isinstance(pred, PairContext) and ref is not None and not isinstance(ref, np.ndarray):
+        # compute_metrics(ctx, ["hd95"]): the second positional argument is the metric list.
+        metrics, ref = ref, None
     ctx = pred if isinstance(pred, PairContext) else PairContext(
         pred, ref, spacing, prob, device=device, empty=empty, **context_kwargs)
     params = params or {}

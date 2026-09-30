@@ -5,10 +5,12 @@ benchmark does*: its label ids and region definitions, the on-disk layout of
 its reference labels, its official metrics and their parameters (e.g. NSD
 tolerance), and its empty-mask convention.
 
+```python
 >>> from segevalkit.datasets import get_dataset
 >>> kits = get_dataset("kits23")
 >>> kits.labels["masses"]
 [2, 3]
+```
 
 .. code-block:: console
 
@@ -69,12 +71,25 @@ class DatasetPreset:
     citation: str = ""
     notes: str = ""
 
+    def label_summary(self) -> str:
+        """Readable label description, e.g. ``liver=1, kidney=2+3 (NSD τ 1.1 mm)``."""
+        if self.labels is None:
+            return "all structure files found per case"
+        if isinstance(self.labels, list):
+            return ", ".join(self.labels)
+        parts = []
+        for k, v in self.labels.items():
+            if isinstance(v, dict):
+                ids = v.get("values", v.get("ref"))
+                tau = v.get("params", {}).get("nsd", {}).get("tolerance_mm")
+                txt = f"{k}={'+'.join(map(str, ids if isinstance(ids, list) else [ids]))}"
+                parts.append(txt + (f" (NSD τ {tau:g} mm)" if tau is not None else ""))
+            else:
+                parts.append(f"{k}={'+'.join(map(str, v if isinstance(v, list) else [v]))}")
+        return ", ".join(parts)
+
     def describe(self) -> str:
-        lab = self.labels if self.labels is not None else "all structure files found per case"
-        if isinstance(lab, dict):
-            lab = ", ".join(f"{k}={v}" for k, v in lab.items())
-        elif isinstance(lab, list):
-            lab = ", ".join(lab)
+        lab = self.label_summary()
         lines = [
             f"{self.title}  [{self.key}]",
             f"  modality   {self.modality}",
@@ -122,11 +137,14 @@ register_dataset(DatasetPreset(
     ref_layout="per_structure", ref_subdir="segmentations",
     cases="36,390 CT volumes (9,000 train / 901 public test; per-voxel annotations)",
     url="https://github.com/MrGiovanni/PanTS",
-    license="CC BY-NC-SA 4.0",
-    citation="Li et al. 2025, PanTS: The Pancreatic Tumor Segmentation Dataset, arXiv:2507.01291",
-    notes="Per-structure files LabelTe/<case>/segmentations/<name>.nii.gz plus combined_labels.nii.gz. "
-          "Lesion structure: pancreatic_lesion; tubular structures (pancreatic_duct, veins, arteries) "
-          "benefit from clDice / Betti errors.",
+    license="CC BY-NC-ND 4.0 (GitHub LICENSE; the HF card says CC BY-NC-SA 4.0): non-commercial",
+    citation="Li et al. 2025, PanTS: The Pancreatic Tumor Segmentation Dataset, NeurIPS Datasets & Benchmarks",
+    notes="Evaluate from LabelTe/<case>/segmentations/<name>.nii.gz, not combined_labels.nii.gz: the "
+          "per-structure masks overlap (pancreas contains head/body/tail, duct and lesion; veins overlap "
+          "organs), so the combined map is lossy. Orientation varies per case. Most test cases are "
+          "tumour-free: report patient-level presence detection (stats.presence_detection) next to lesion "
+          "Dice. The official leaderboard reports patient-wise sensitivity/specificity/AUC, tumour-wise "
+          "sensitivity and lesion DSC; the NSD tolerance and the detection rule are not published.",
 ))
 
 register_dataset(DatasetPreset(
@@ -166,23 +184,27 @@ register_dataset(DatasetPreset(
 register_dataset(DatasetPreset(
     key="flare22", title="FLARE 2022: Fast and Low-resource Abdominal oRgan sEgmentation", modality="CT",
     anatomy="13 abdominal organs",
-    labels={"liver": 1, "right_kidney": 2, "spleen": 3, "pancreas": 4, "aorta": 5, "inferior_vena_cava": 6,
-            "right_adrenal": 7, "left_adrenal": 8, "gallbladder": 9, "esophagus": 10, "stomach": 11,
-            "duodenum": 12, "left_kidney": 13},
-    metrics=["dice", "nsd"], params={"nsd": {"tolerance_mm": 1.0}}, ref_layout="flat",
+    labels={name: {"values": [i], "params": {"nsd": {"tolerance_mm": tau}}} for i, (name, tau) in enumerate([
+        ("liver", 5), ("right_kidney", 3), ("spleen", 3), ("pancreas", 5), ("aorta", 2), ("inferior_vena_cava", 2),
+        ("right_adrenal", 2), ("left_adrenal", 2), ("gallbladder", 2), ("esophagus", 3), ("stomach", 5),
+        ("duodenum", 7), ("left_kidney", 3)], start=1)},
+    metrics=["dice", "nsd"], ref_layout="flat",
     cases="50 labelled + 2,000 unlabelled train; 200 validation; 800 test",
     url="https://flare22.grand-challenge.org/", license="CC BY-NC-SA 4.0",
     citation="Ma et al. 2024, Lancet Digital Health 6(11):e815",
+    notes="Per-organ NSD tolerances from the official code. The official code also forces NSD to 0 when "
+          "DSC < 0.2 and evaluates aorta / IVC / esophagus only on reference-labelled slices; SegEvalKit "
+          "does not replicate these two rules.",
 ))
 
 register_dataset(DatasetPreset(
     key="msd_liver", title="Medical Segmentation Decathlon Task03 Liver", modality="CT",
     anatomy="Liver and liver tumours", labels={"liver": 1, "cancer": 2, "liver_with_tumour": [1, 2]},
     metrics=["dice", "nsd", "hd95", "lesion_f1", "lesion_recall", "relative_volume_difference"],
-    params={"nsd": {"tolerance_mm": 2.0}}, ref_layout="flat",
+    params={"nsd": {"tolerance_mm": 7.0}}, ref_layout="flat",
     cases="131 train / 70 test (test labels withheld)", url="http://medicaldecathlon.com/",
     license="CC BY-SA 4.0", citation="Antonelli et al. 2022, Nat Commun 13:4128",
-    notes="Official MSD ranking used DSC and NSD. Derived from LiTS.",
+    notes="Official MSD ranking used DSC and NSD with a per-task tolerance (Liver: 7 mm). Derived from LiTS.",
 ))
 
 register_dataset(DatasetPreset(
@@ -192,13 +214,14 @@ register_dataset(DatasetPreset(
     params={"nsd": {"tolerance_mm": 4.0}}, ref_layout="flat",
     cases="126 train / 64 test", url="http://medicaldecathlon.com/", license="CC BY-SA 4.0",
     citation="Antonelli et al. 2022, Nat Commun 13:4128",
+    notes="MSD NSD tolerance for Colon: 4 mm.",
 ))
 
 register_dataset(DatasetPreset(
     key="msd_pancreas", title="Medical Segmentation Decathlon Task07 Pancreas", modality="CT",
     anatomy="Pancreas and pancreatic tumour",
     labels={"pancreas": 1, "tumour": 2, "pancreas_with_tumour": [1, 2]},
-    metrics=["dice", "nsd", "hd95", "lesion_f1"], params={"nsd": {"tolerance_mm": 2.0}}, ref_layout="flat",
+    metrics=["dice", "nsd", "hd95", "lesion_f1"], params={"nsd": {"tolerance_mm": 5.0}}, ref_layout="flat",
     cases="281 train / 139 test", url="http://medicaldecathlon.com/", license="CC BY-SA 4.0",
     citation="Antonelli et al. 2022, Nat Commun 13:4128",
 ))
@@ -206,11 +229,14 @@ register_dataset(DatasetPreset(
 register_dataset(DatasetPreset(
     key="kits23", title="KiTS23: Kidney and Kidney Tumor Segmentation", modality="CT",
     anatomy="Kidneys, renal tumours and cysts (hierarchical evaluation classes)",
-    labels={"kidney_and_masses": [1, 2, 3], "masses": [2, 3], "tumor": [2]},
-    metrics=["dice", "nsd", "hd95"], params={"nsd": {"tolerance_mm": 2.0}}, ref_layout="folder",
+    labels={"kidney_and_masses": {"values": [1, 2, 3], "params": {"nsd": {"tolerance_mm": 1.0331}}},
+            "masses": {"values": [2, 3], "params": {"nsd": {"tolerance_mm": 1.1329}}},
+            "tumor": {"values": [2], "params": {"nsd": {"tolerance_mm": 1.1498}}}},
+    metrics=["dice", "nsd", "hd95"], ref_layout="folder",
     ref_file="segmentation.nii.gz", cases="489 train / 110 test", url="https://kits-challenge.org/kits23/",
     license="CC BY-NC-SA 4.0", citation="Heller et al. 2023, arXiv:2307.01984",
-    notes="Hierarchical Evaluation Classes (HECs). The official surface Dice uses DeepMind-style surfel "
+    notes="Hierarchical Evaluation Classes (HECs) with surface-Dice tolerances derived from inter-observer "
+          "variability (1.0331 / 1.1329 / 1.1498 mm). The official surface Dice uses DeepMind-style surfel "
           "weighting; SegEvalKit's voxel NSD agrees closely but not exactly.",
 ))
 
@@ -244,8 +270,9 @@ register_dataset(DatasetPreset(
              "absolute_volume_difference"],
     ref_layout="auto", cases="1,014 studies (autoPET I/II)", url="https://autopet.grand-challenge.org/",
     license="TCIA restricted / CC BY 4.0 (see challenge)", citation="Gatidis et al. 2022, Sci Data 9:601",
-    notes="Official autoPET reports false-positive and false-negative *volumes* (mL) of connected "
-          "components; SegEvalKit's lesion table provides the per-component volumes to reproduce them.",
+    notes="Official autoPET uses 18-connected components (evaluate with connectivity=18) and reports "
+          "false-positive and false-negative *volumes* (mL); SegEvalKit's lesion table provides the "
+          "per-component volumes to reproduce them. Tumour-free studies are scored by FP volume only.",
 ))
 
 # --------------------------------------------------------------- vessels
@@ -255,4 +282,7 @@ register_dataset(DatasetPreset(
     metrics=["dice", "cldice", "betti0_error", "betti1_error", "hd95"], ref_layout="auto",
     cases="125 CTA + 125 MRA (2024)", url="https://topcow24.grand-challenge.org/",
     license="CC BY-NC 4.0", citation="Yang et al. 2023, arXiv:2312.17670",
+    empty_policy="topcow",
+    notes="Official HD95 uses 90 mm for missing classes (the `topcow` empty policy). "
+          "clDice is computed on the merged binary vessel mask; Betti-0 error per class.",
 ))

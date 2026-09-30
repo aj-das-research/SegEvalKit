@@ -61,6 +61,8 @@ def test_recommend_tubular_and_lesions():
     assert {"lesion_f1", "ece", "nsd"} <= set(r.metrics)
     assert r.params["ece"]["roi"] == "band"
     assert "|" in r.to_markdown()
+    r = recommend(structure="large_organ", boundary_critical=True)
+    assert dict((m, role) for m, role, _ in r.items)["hd95"] == "primary"
 
 
 @pytest.mark.parametrize("name", list(synthetic.PERTURBATIONS))

@@ -132,7 +132,8 @@ def compare(a, b, *, metrics: Optional[Sequence[str]] = None, labels: Optional[S
     """Paired comparison of two evaluation results on their common cases.
 
     Args:
-        a, b: :class:`~segevalkit.results.EvaluationResult` objects (or long tables).
+        a: First :class:`~segevalkit.results.EvaluationResult` (or long table).
+        b: Second result, compared with ``a`` on their common cases.
         test: ``"wilcoxon"`` (default; no normality assumption), ``"ttest"`` or
             ``"permutation"`` (sign-flip test of the mean difference).
         correction: Correction across all (label, metric) tests.
@@ -356,7 +357,7 @@ def presence_detection(result, label: str, score: str = "pred_volume_ml", target
     thr = np.unique(np.concatenate([[-np.inf], s, [np.inf]]))
     tpr = np.array([(s[y] > t).mean() if n_pos else np.nan for t in thr])
     fpr = np.array([(s[~y] > t).mean() if n_neg else np.nan for t in thr])
-    order = np.argsort(fpr, kind="stable")
+    order = np.lexsort((tpr, fpr))  # by FPR, then TPR: a monotone ROC path
     auc = float(_trapz(tpr[order], fpr[order])) if n_pos and n_neg else float("nan")
     spec = 1 - fpr
     ok = np.nonzero(spec >= target_specificity)[0]

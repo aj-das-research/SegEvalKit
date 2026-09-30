@@ -1,3 +1,23 @@
+/* Typography: an academic serif in the spirit of the ICLR template (Times family).
+   STIX Two is a Times-compatible design with matching math; JetBrains Mono for code. */
+@import url("https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;600&display=swap");
+:root {
+  --md-text-font: "STIX Two Text";
+  --md-code-font: "JetBrains Mono";
+  --md-text-font-family: "STIX Two Text", "Times New Roman", Times, serif;
+  --md-code-font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+body, input, .md-typeset, .md-nav, .md-header, .md-tabs, .md-footer, .md-search__input {
+  font-family: var(--md-text-font-family);
+  font-feature-settings: "kern", "liga", "onum";
+}
+code, kbd, pre, .md-typeset code, .md-typeset pre { font-family: var(--md-code-font-family); font-feature-settings: normal; }
+.md-typeset { font-size: .86rem; line-height: 1.62; letter-spacing: .002em; }
+.md-typeset h1, .md-typeset h2, .md-typeset h3 { font-family: var(--md-text-font-family); }
+.md-nav { font-size: .74rem; }
+.md-typeset code { font-size: .8em; }
+.MathJax, mjx-container { font-size: 105% !important; }
+
 /* SegEvalKit documentation theme: purple, calm, readable. */
 :root {
   --sek-50: #f5f1fe; --sek-100: #ebe3fd; --sek-200: #d6c7fb; --sek-300: #b89cf5; --sek-400: #9a72ee;
@@ -49,8 +69,8 @@
 .md-tabs__link--active, .md-tabs__link:hover { opacity: 1; }
 
 /* Typography */
-.md-typeset { font-size: .78rem; line-height: 1.7; }
-.md-typeset h1 { font-weight: 800; letter-spacing: -.02em; color: var(--md-typeset-color); }
+
+.md-typeset h1 { font-weight: 700; letter-spacing: -.01em; color: var(--md-typeset-color); }
 .md-typeset h2 { font-weight: 700; letter-spacing: -.01em; margin-top: 2.2em; }
 .md-typeset h2::before {
   content: ""; display: inline-block; width: .32em; height: .95em; margin-right: .5em; border-radius: .2em;
@@ -93,7 +113,7 @@
     linear-gradient(125deg, #1d0f44 0%, #2e1766 30%, #5a2fb8 75%, #7c4ee4 100%);
   box-shadow: 0 10px 30px #2e176633; overflow: hidden;
 }
-.sek-hero h1 { color: #fff; font-size: 2.2rem; margin: 0 0 .4rem; }
+.sek-hero h1 { color: #fff; font-size: 2.6rem; font-weight: 700; margin: 0 0 .4rem; }
 .sek-hero p { font-size: .95rem; opacity: .92; max-width: 44rem; margin: 0 0 1.2rem; }
 .sek-hero .md-button { color: #fff; border-color: #ffffff88; margin: .2rem .4rem .2rem 0; }
 .sek-hero .md-button--primary { background: #fff; color: #2e1766; border-color: #fff; }

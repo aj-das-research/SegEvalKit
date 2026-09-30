@@ -109,3 +109,13 @@ def test_evaluate_arrays():
     g[5:15, 5:15, 5:15] = 1
     res = sek.Evaluator(metrics=["dice"]).evaluate_arrays(g, g, spacing=(1, 1, 1))
     assert res.wide()["dice"].item() == 1.0
+
+
+def test_per_label_metrics(tmp_path):
+    pr, gt = _write_flat(tmp_path, n=2)
+    ev = sek.Evaluator(labels={"organ": {"values": 1, "metrics": ["dice"]},
+                               "lesion": {"values": 2, "metrics": "dice,lesion_f1"}}, metrics="default")
+    res = ev.evaluate(pr, gt, progress=False)
+    got = res.per_case().groupby("label")["metric"].unique().to_dict()
+    assert list(got["organ"]) == ["dice"] and set(got["lesion"]) == {"dice", "lesion_f1"}
+    assert len(res.lesions) and set(res.lesions["label"]) == {"lesion"}

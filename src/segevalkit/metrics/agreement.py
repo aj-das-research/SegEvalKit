@@ -39,7 +39,15 @@ def _mi(ctx: PairContext) -> float:
     reference="Russakoff et al. 2004, ECCV; Taha & Hanbury 2015",
 )
 def mutual_information(ctx: PairContext) -> float:
-    r"""$$\mathrm{MI}(P,G) = H(P) + H(G) - H(P,G)$$"""
+    r"""$$\mathrm{MI}(P,G) = H(P) + H(G) - H(P,G)$$
+
+    MI is bounded by the entropy of the reference, so it is small for small
+    structures even when the prediction is perfect; compare MI only between
+    methods on the same structure. Both masks empty gives MI = 0 (there is no
+    information to share) unless the empty policy is ``"nan"``.
+    """
+    if ctx.both_empty and ctx.empty.both_empty == "nan":
+        return float("nan")
     return float(_mi(ctx)[0])
 
 
@@ -51,6 +59,8 @@ def mutual_information(ctx: PairContext) -> float:
 )
 def variation_of_information(ctx: PairContext) -> float:
     r"""$$\mathrm{VI}(P,G) = H(P) + H(G) - 2\,\mathrm{MI}(P,G)$$"""
+    if ctx.both_empty and ctx.empty.both_empty == "nan":
+        return float("nan")
     mi, hg, hp = _mi(ctx)
     return float(max(hg + hp - 2 * mi, 0.0))
 
@@ -81,14 +91,24 @@ def adjusted_rand_index(ctx: PairContext) -> float:
     "global_consistency_error", display="Global consistency error", abbr="GCE", family="agreement",
     better="lower",
     summary="Degree to which one segmentation is a refinement of the other; 0 when identical.",
-    reference="Martin et al. 2001, ICCV; Taha & Hanbury 2015",
+    reference="Martin et al. 2001, ICCV",
 )
 def global_consistency_error(ctx: PairContext) -> float:
-    r"""$$\mathrm{GCE} = \frac1N\min\Big\{\tfrac{FN(FN+2TP)}{TP+FN} + \tfrac{FP(FP+2TN)}{TN+FP},\;
-    \tfrac{FP(FP+2TP)}{TP+FP} + \tfrac{FN(FN+2TN)}{TN+FN}\Big\}$$"""
+    r"""$$\mathrm{GCE} = \frac1N\min\Big\{\tfrac{2\,TP\cdot FN}{TP+FN} + \tfrac{2\,TN\cdot FP}{TN+FP},\;
+    \tfrac{2\,TP\cdot FP}{TP+FP} + \tfrac{2\,TN\cdot FN}{TN+FN}\Big\}$$
+
+    Derived directly from Martin et al.'s local refinement error
+    :math:`E(S_1,S_2,x) = |R(S_1,x)\setminus R(S_2,x)|/|R(S_1,x)|` summed over
+    the four confusion classes. The closed form printed in Taha & Hanbury
+    (2015, Eq. 11) does not reproduce Martin's definition (it is non-zero for
+    an empty prediction against an empty reference, for example); SegEvalKit
+    follows the original definition, verified by brute force in the tests.
+    """
     tp, fp, fn, tn = (float(x) for x in ctx.counts)
     n = tp + fp + fn + tn
     d = lambda a, b: a / b if b else 0.0  # noqa: E731
-    e1 = d(fn * (fn + 2 * tp), tp + fn) + d(fp * (fp + 2 * tn), tn + fp)
-    e2 = d(fp * (fp + 2 * tp), tp + fp) + d(fn * (fn + 2 * tn), tn + fn)
-    return float(min(e1, e2) / n)
+    e_pg = d(2 * tp * fp, tp + fp) + d(2 * tn * fn, tn + fn)   # E(P, G) summed over voxels
+    e_gp = d(2 * tp * fn, tp + fn) + d(2 * tn * fp, tn + fp)   # E(G, P)
+    if ctx.both_empty and ctx.empty.both_empty == "nan":
+        return float("nan")
+    return float(min(e_pg, e_gp) / n)

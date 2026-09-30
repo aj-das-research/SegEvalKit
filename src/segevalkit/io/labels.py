@@ -46,6 +46,9 @@ class LabelSpec:
         params: Per-structure metric parameter overrides, e.g.
             ``{"nsd": {"tolerance_mm": 1.0}}`` (tolerances should be
             structure-specific; Metrics Reloaded).
+        metrics: Per-structure metric list (names / sets); empty means the
+            evaluator's global list. Lets one run score clDice only on
+            vessels and lesion-wise metrics only on tumours.
     """
 
     name: str
@@ -54,6 +57,7 @@ class LabelSpec:
     ref_file: Optional[str] = None
     pred_file: Optional[str] = None
     params: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    metrics: Tuple[str, ...] = ()
 
     def values(self, side: str) -> Tuple[int, ...]:
         return self.ref_values if side == "ref" else self.pred_values
@@ -92,8 +96,10 @@ def parse_labels(spec: Union[Mapping, Iterable[str], None]) -> List[LabelSpec]:
             if isinstance(v, Mapping):
                 ref = _ids(v.get("ref", v.get("values")))
                 pred = _ids(v.get("pred", v.get("values", v.get("ref"))))
+                mets = v.get("metrics", ())
+                mets = tuple(mets.split(",")) if isinstance(mets, str) else tuple(mets)
                 out.append(LabelSpec(name, ref, pred, v.get("ref_file", v.get("file")),
-                                     v.get("pred_file", v.get("file")), dict(v.get("params", {}))))
+                                     v.get("pred_file", v.get("file")), dict(v.get("params", {})), mets))
             else:
                 ids = _ids(v)
                 out.append(LabelSpec(name, ids, ids))

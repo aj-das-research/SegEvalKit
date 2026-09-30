@@ -74,8 +74,11 @@ _RC = {
     "legend.frameon": False,
     "legend.fontsize": 8.5,
     "legend.title_fontsize": 9,
-    "font.family": "sans-serif",
-    "font.sans-serif": ["Inter", "Helvetica Neue", "Arial", "DejaVu Sans"],
+    # Academic serif matching the ICLR-style Times typography of the paper and docs;
+    # STIXGeneral ships with matplotlib, so this works without system fonts.
+    "font.family": "serif",
+    "font.serif": ["STIX Two Text", "STIXGeneral", "Times New Roman", "Times", "DejaVu Serif"],
+    "mathtext.fontset": "stix",
     "font.size": 9.5,
     "text.color": INK["primary"],
     "lines.linewidth": 2.0,

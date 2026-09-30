@@ -11,9 +11,7 @@ theme:
   custom_dir: docs/overrides
   logo: assets/logo.svg
   favicon: assets/logo.svg
-  font:
-    text: Inter
-    code: JetBrains Mono
+  font: false   # self-hosted choice below: an academic, ICLR-style serif (Times family)
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -139,7 +137,7 @@ nav:
   - Datasets & benchmarks:
       - datasets/index.md
       - Dataset presets: datasets/presets.md
-      - Benchmark: PanTS: datasets/pants-benchmark.md
+      - "PanTS benchmark": datasets/pants-benchmark.md
   - API reference:
       - api/index.md
       - Evaluator & results: api/evaluator.md
@@ -156,6 +154,15 @@ nav:
       - research/index.md
       - Metrics literature review: research/metrics-literature-review.md
       - Datasets survey: research/datasets-survey.md
+  - Developer guide:
+      - developer/index.md
+      - Architecture: developer/architecture.md
+      - Adding a metric: developer/adding-a-metric.md
+      - Adding a dataset preset: developer/adding-a-dataset.md
+      - Plots, themes & visualisation: developer/plots-and-themes.md
+      - Testing & conformance: developer/testing.md
+      - Documentation: developer/documentation.md
+      - Releasing & maintenance: developer/releasing.md
   - About:
       - about/index.md
       - Contributing: about/contributing.md

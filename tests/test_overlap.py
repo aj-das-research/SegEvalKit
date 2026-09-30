@@ -66,3 +66,31 @@ def test_context_caches_counts(pair):
     a = ctx.counts
     assert ctx.counts is a
     assert sum(a) == g.size
+
+
+def test_gce_matches_martin_bruteforce():
+    """GCE against a brute-force evaluation of Martin et al.'s local refinement error."""
+    rng = np.random.default_rng(3)
+    g = rng.random((6, 6, 4)) < 0.4
+    p = rng.random((6, 6, 4)) < 0.5
+    P, G = p.ravel(), g.ravel()
+
+    def e(s1, s2):
+        tot = 0.0
+        for i in range(P.size):
+            r1 = s1 == s1[i]
+            r2 = s2 == s2[i]
+            tot += np.count_nonzero(r1 & ~r2) / np.count_nonzero(r1)
+        return tot
+
+    expected = min(e(P, G), e(G, P)) / P.size
+    got = compute_metrics(p, g, ["global_consistency_error"])["global_consistency_error"]
+    assert got == pytest.approx(expected)
+    z = np.zeros((4, 4, 4), bool)
+    assert compute_metrics(z, z, ["global_consistency_error"])["global_consistency_error"] == 0.0
+
+
+def test_positional_metric_list_with_context(pair):
+    p, g = pair
+    ctx = PairContext(p, g)
+    assert list(compute_metrics(ctx, ["hd95"])) == ["hd95"]

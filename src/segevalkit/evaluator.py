@@ -267,7 +267,8 @@ def _score_label(case_id, lab: LabelSpec, pred, ref, spacing, prob, cfg: EvalCon
     ctx = PairContext(pred, ref, spacing, prob, device=cfg.device, empty=cfg.empty,
                       connectivity=cfg.connectivity, min_component_voxels=cfg.min_lesion_voxels)
     rows = []
-    for name in cfg.metrics:
+    metric_names = resolve_metrics(lab.metrics) if lab.metrics else cfg.metrics
+    for name in metric_names:
         info = get_metric(name)
         if "probabilities" in info.requires and prob is None:
             continue
@@ -283,7 +284,7 @@ def _score_label(case_id, lab: LabelSpec, pred, ref, spacing, prob, cfg: EvalCon
                      ("pred_volume_ml", (ctx.tp + ctx.fp) * vox_ml)):
         rows.append({"case_id": case_id, "label": lab.name, "metric": f"_{key}", "value": val})
     lesions = []
-    if cfg.lesion_table and _DETECTION.intersection(cfg.metrics):
+    if cfg.lesion_table and _DETECTION.intersection(metric_names):
         for r in lesion_table(ctx):
             lesions.append({"case_id": case_id, "label": lab.name, **r})
     return rows, lesions
@@ -331,12 +332,29 @@ class _NullBar:
         pass
 
 
+class _RichBar:
+    """Purple rich progress bar with the same update/close interface as tqdm."""
+
+    def __init__(self, total: int, desc: str):
+        from ._console import progress
+
+        self._p = progress()
+        self._p.start()
+        self._task = self._p.add_task(desc, total=total)
+
+    def update(self, n=1):
+        self._p.advance(self._task, n)
+
+    def close(self):
+        self._p.stop()
+
+
 def _progress(total: int, enabled: bool, desc: str):
     if not enabled:
         return _NullBar()
     try:
+        return _RichBar(total, desc)
+    except ImportError:  # pragma: no cover
         from tqdm.auto import tqdm
 
         return tqdm(total=total, desc=desc, unit="case")
-    except ImportError:  # pragma: no cover
-        return _NullBar()

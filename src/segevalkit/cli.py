@@ -80,6 +80,9 @@ def cmd_evaluate(a) -> int:
         print("error: --pred and --ref (or a config with pred/ref) are required", file=sys.stderr)
         return 2
     out = a.out or cfg.get("out") or "segevalkit_results"
+    from ._console import banner, console, rule
+
+    banner("evaluate")
     ev = Evaluator(
         labels=labels, metrics=metrics, params=params,
         empty=_empty_policy(a.empty_policy or cfg.get("empty_policy") or (preset.empty_policy if preset else None)),
@@ -95,23 +98,35 @@ def cmd_evaluate(a) -> int:
     ref_src = Source(ref, **{k: v for k, v in ref_kw.items() if v is not None})
     pred_src = Source(pred, layout=cfg.get("pred_layout", "auto"), file=cfg.get("pred_file"),
                       subdir=cfg.get("pred_subdir"))
+    console.print(f"[sek.muted]predictions[/]  [sek.key]{pred_src.root}[/] [sek.muted]({pred_src.layout}, "
+                  f"{len(pred_src.case_ids)} cases)[/]")
+    console.print(f"[sek.muted]reference  [/]  [sek.key]{ref_src.root}[/] [sek.muted]({ref_src.layout}, "
+                  f"{len(ref_src.case_ids)} cases)[/]")
+    console.print(f"[sek.muted]metrics    [/]  {', '.join(ev.config.metrics)}")
+    console.print(f"[sek.muted]device     [/]  {ev.config.device}  [sek.muted]workers[/] "
+                  f"{int(a.workers or cfg.get('workers', 1))}\n")
     cases = None
     if a.cases:
         cases = [x.strip() for x in Path(a.cases).read_text().split() if x.strip()]
     res = ev.evaluate(pred_src, ref_src, prob=a.prob or cfg.get("prob"), cases=cases,
                       n_workers=int(a.workers or cfg.get("workers", 1)), out_dir=out,
                       name=a.name or cfg.get("name"))
-    print(res)
-    summ = res.summary()
-    show = summ[summ["metric"].isin(res.metrics[:6])][["label", "metric", "n", "mean", "median", "ci_low", "ci_high"]]
-    with _pd_opts():
-        print(show.to_string(index=False, float_format=lambda x: f"{x:.4f}"))
+    from ._console import summary_table
+
+    rule("results")
+    console.print(summary_table(res.summary(), res.metrics[:7], title=f"{res.name}: {len(res.cases)} cases"))
+    if res.meta.get("missing_pred"):
+        console.print(f"[sek.warn]⚠ {len(res.meta['missing_pred'])} cases without prediction scored as empty[/]")
+    if res.meta.get("errors"):
+        console.print(f"[sek.warn]⚠ {len(res.meta['errors'])} cases failed (see meta.json)[/]")
     if a.report or cfg.get("report"):
         from .report import build_report
 
-        rp = build_report(res, Path(out) / "report.html", image_source=a.images or cfg.get("images"))
-        print(f"report: {rp}")
-    print(f"results: {Path(out).resolve()}")
+        with console.status("[sek.brand]building HTML report…", spinner="dots12"):
+            rp = build_report(res, Path(out) / "report.html", image_source=a.images or cfg.get("images"))
+        console.print(f"[sek.ok]✓[/] report   [sek.key]{rp}[/]")
+    console.print(f"[sek.ok]✓[/] results  [sek.key]{Path(out).resolve()}[/]  "
+                  f"[sek.muted]({res.meta.get('seconds', 0):.1f} s)[/]")
     return 0
 
 
@@ -130,10 +145,14 @@ def cmd_report(a) -> int:
     from .report import build_report
     from .results import load_results
 
+    from ._console import banner, console
+
+    banner("report", compact=True)
     res = load_results(a.results)
-    out = build_report(res, a.out or Path(a.results) / "report.html", image_source=a.images,
-                       gallery_metric=a.gallery_metric, window=a.window)
-    print(out)
+    with console.status("[sek.brand]rendering figures and overlays…", spinner="dots12"):
+        out = build_report(res, a.out or Path(a.results) / "report.html", image_source=a.images,
+                           gallery_metric=a.gallery_metric, window=a.window)
+    console.print(f"[sek.ok]✓[/] report  [sek.key]{out}[/]")
     return 0
 
 
@@ -141,10 +160,27 @@ def cmd_compare(a) -> int:
     from .results import load_results
     from .stats import compare
 
+    from rich.table import Table
+
+    from ._console import P, banner, console, fmt
+    from .metrics import get_metric
+
+    banner("compare", compact=True)
     ra, rb = load_results(a.a), load_results(a.b)
+    na, nb = a.name_a or ra.name, a.name_b or rb.name
     df = compare(ra, rb, metrics=a.metrics.split(",") if a.metrics else None, test=a.test, correction=a.correction)
-    with _pd_opts():
-        print(df.to_string(index=False, float_format=lambda x: f"{x:.4g}"))
+    t = Table(title=f"[sek.brand]{na}[/] vs [sek.brand]{nb}[/]  [sek.muted](paired {a.test}, {a.correction})[/]",
+              border_style=P["800"], header_style=f"bold {P['200']}")
+    for c in ("structure", "metric", "n", na, nb, "Δ (95% CI)", f"{na} better", "p adj", ""):
+        t.add_column(c, justify="left" if c in ("structure", "metric") else "right")
+    for _, r in df.iterrows():
+        info = get_metric(r["metric"])
+        win = r["frac_a_better"]
+        sig = "[sek.ok]●[/]" if r.get("significant") else "[sek.muted]○[/]"
+        t.add_row(str(r["label"]), f"{info.abbr} [sek.arrow]{info.arrow}[/]", str(int(r["n"])), fmt(r["mean_a"]),
+                  fmt(r["mean_b"]), f"{fmt(r['mean_diff'])} [sek.muted]({fmt(r['diff_ci_low'])}, "
+                  f"{fmt(r['diff_ci_high'])})[/]", f"{100 * win:.0f}%", f"{r['p_adjusted']:.2g}", sig)
+    console.print(t)
     if a.out:
         Path(a.out).mkdir(parents=True, exist_ok=True)
         df.to_csv(Path(a.out) / "comparison.csv", index=False)
@@ -152,7 +188,7 @@ def cmd_compare(a) -> int:
 
         fig = plotting.comparison_forest(df, name_a=a.name_a or ra.name, name_b=a.name_b or rb.name)
         fig.savefig(Path(a.out) / "comparison_forest.png")
-        print(f"written to {Path(a.out).resolve()}")
+        console.print(f"[sek.ok]✓[/] written to [sek.key]{Path(a.out).resolve()}[/]")
     return 0
 
 
@@ -160,35 +196,53 @@ def cmd_rank(a) -> int:
     from .results import load_results
     from .stats import rank_methods, ranking_stability
 
-    res = {Path(p).name: load_results(p) for p in a.results}
-    for scheme in ("aggregate-then-rank", "rank-then-aggregate"):
-        print(f"\n{scheme}:")
-        print(rank_methods(res, a.metric, a.label, scheme).to_string(index=False))
-    stab = ranking_stability(res, a.metric, a.label, n_boot=a.n_boot)
-    print(f"\nbootstrap ranking stability: median Kendall tau = {float(__import__('numpy').nanmedian(stab['kendall_tau'])):.3f}")
+    import numpy as np
+    from rich.table import Table
+
+    from ._console import P, banner, console, fmt
+
+    banner("rank", compact=True)
+    res = {load_results(p).name: load_results(p) for p in a.results}
+    t = Table(title=f"[sek.brand]Ranking by {a.metric}[/]" + (f" [sek.muted]· {a.label}[/]" if a.label else ""),
+              border_style=P["800"], header_style=f"bold {P['200']}")
+    t.add_column("method", style="sek.key")
+    t.add_column("aggregate→rank", justify="right")
+    t.add_column("mean", justify="right")
+    t.add_column("rank→aggregate", justify="right")
+    t.add_column("mean rank", justify="right")
+    r1 = rank_methods(res, a.metric, a.label, "aggregate-then-rank").set_index("method")
+    r2 = rank_methods(res, a.metric, a.label, "rank-then-aggregate").set_index("method")
+    medal = {1: "🥇", 2: "🥈", 3: "🥉"}
+    for m in r1.sort_values("rank").index:
+        k1, k2 = int(r1.loc[m, "rank"]), int(r2.loc[m, "rank"])
+        t.add_row(m, f"{medal.get(k1, '')} {k1}", fmt(r1.loc[m, "mean"]), f"{medal.get(k2, '')} {k2}",
+                  fmt(r2.loc[m, "mean_rank"]))
+    console.print(t)
+    with console.status("[sek.brand]bootstrapping rankings…", spinner="dots12"):
+        stab = ranking_stability(res, a.metric, a.label, n_boot=a.n_boot)
+    tau = float(np.nanmedian(stab["kendall_tau"]))
+    console.print(f"bootstrap stability ({a.n_boot} samples): median Kendall τ = [sek.num]{tau:.3f}[/]")
     if a.out:
         from . import plotting
 
         plotting.ranking_stability_plot(stab).savefig(a.out)
-        print(a.out)
+        console.print(f"[sek.ok]✓[/] [sek.key]{a.out}[/]")
     return 0
 
 
 def cmd_metrics(a) -> int:
+    from ._console import banner, console, metric_table, rule
     from .metrics import FAMILIES, list_metrics
 
+    banner(f"{len(list_metrics())} metrics in {len(FAMILIES)} families", compact=True)
     for fam, title in FAMILIES.items():
         if a.family and fam != a.family:
             continue
         ms = list_metrics(fam)
         if not ms:
             continue
-        print(f"\n{title}")
-        for m in ms:
-            unit = f" [{m.unit}]" if m.unit else ""
-            print(f"  {m.name:<28} {m.arrow:<3} {m.display}{unit}")
-            if a.verbose:
-                print(f"  {'':<32}{m.summary}")
+        rule(title)
+        console.print(metric_table(ms, verbose=a.verbose))
     return 0
 
 
@@ -200,26 +254,52 @@ def cmd_recommend(a) -> int:
                      fp_fn_asymmetric=a.asymmetric, noisy_reference=a.noisy_reference,
                      tolerance_mm=a.tolerance, ranking=a.ranking)
     r = recommend(fp)
-    print(r.to_markdown() if a.markdown else r)
-    if not a.markdown:
-        print("\nparameters:", json.dumps(r.params))
-        print("empty policy:", r.empty_policy)
-        for s in r.statistics:
-            print("statistics:", s)
-        for n in r.notes:
-            print("note:", n)
+    if a.markdown:
+        print(r.to_markdown())
+        return 0
+    from rich.console import Group
+    from rich.table import Table
+    from rich.text import Text
+
+    from ._console import P, banner, console, panel
+    from .metrics import get_metric
+
+    banner("metric recommendation", compact=True)
+    flags = [k for k, v in vars(fp).items() if v is True]
+    console.print(f"[sek.muted]fingerprint[/]  [sek.key]{fp.structure}[/]" + (f"  +  {', '.join(flags)}" if flags else ""))
+    t = Table(border_style=P["800"], header_style=f"bold {P['200']}", expand=True)
+    t.add_column("metric", style="sek.key", no_wrap=True)
+    t.add_column("role", no_wrap=True)
+    t.add_column("why", ratio=1)
+    role_style = {"primary": "sek.ok", "secondary": "sek.accent", "diagnostic": "sek.muted"}
+    for m, role, why in r.items:
+        t.add_row(f"{get_metric(m).display}\n[sek.muted]{m}[/]", f"[{role_style[role]}]{role}[/]", why)
+    console.print(t)
+    extra = [Text.from_markup(f"[sek.muted]parameters  [/]{json.dumps(r.params)}"),
+             Text.from_markup(f"[sek.muted]empty policy[/] {r.empty_policy}")]
+    extra += [Text.from_markup(f"[sek.muted]statistics  [/]{s}") for s in r.statistics]
+    extra += [Text.from_markup(f"[sek.warn]note[/]        {n}") for n in r.notes]
+    console.print(panel(Group(*extra), "how to report"))
     return 0
 
 
 def cmd_datasets(a) -> int:
+    from rich.table import Table
+
+    from ._console import P, banner, console, panel
     from .datasets import DATASETS, get_dataset
 
     if a.name:
         d = get_dataset(a.name)
-        print(d.describe())
+        console.print(panel(d.describe(), d.title))
         return 0
+    banner(f"{len(DATASETS)} dataset presets", compact=True)
+    t = Table(border_style=P["800"], header_style=f"bold {P['200']}")
+    for c in ("key", "modality", "dataset", "official metrics"):
+        t.add_column(c, style="sek.key" if c == "key" else None)
     for key, d in DATASETS.items():
-        print(f"  {key:<22} {d.modality:<8} {d.title}")
+        t.add_row(key, d.modality, d.title, ", ".join(d.metrics[:4]) + ("…" if len(d.metrics) > 4 else ""))
+    console.print(t)
     return 0
 
 
@@ -251,18 +331,58 @@ def cmd_visualize(a) -> int:
     else:
         fig = viz.error_overlay(img, p, r, affine=ref_v.affine, window=window, view=a.view, title=a.title)
     fig.savefig(a.out)
-    print(a.out)
+    from ._console import console
+
+    console.print(f"[sek.ok]✓[/] [sek.key]{a.out}[/]")
+    return 0
+
+
+def cmd_home(a) -> int:
+    from rich.table import Table
+
+    from ._console import P, banner, console
+    from .metrics import list_metrics
+
+    banner(f"{len(list_metrics())} metrics · GPU surface distances · statistics · plots · reports")
+    t = Table(show_header=False, box=None, pad_edge=False, padding=(0, 2))
+    t.add_column(style="sek.key", no_wrap=True)
+    t.add_column(style="grey78")
+    for cmd, desc in (("evaluate", "score a prediction folder against a reference folder"),
+                      ("report", "self-contained HTML report from a results folder"),
+                      ("compare", "paired statistical comparison of two results folders"),
+                      ("rank", "rank methods with bootstrap stability"),
+                      ("recommend", "which metrics to report for your problem"),
+                      ("visualize", "error overlays, projections, 3D surface-distance maps"),
+                      ("metrics", "list every metric with direction and unit"),
+                      ("datasets", "benchmark presets with official protocols")):
+        t.add_row(f"segevalkit {cmd}", desc)
+    console.print(t)
+    console.print(f"\n[sek.muted]docs[/] [link=https://aj-das-research.github.io/SegEvalKit]"
+                  f"[{P['300']}]https://aj-das-research.github.io/SegEvalKit[/][/link]   "
+                  "[sek.muted]help[/] segevalkit <command> -h")
     return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
     from . import __version__
 
-    p = argparse.ArgumentParser(prog="segevalkit", description="Evaluate volumetric medical image segmentation.")
-    p.add_argument("--version", action="version", version=f"segevalkit {__version__}")
-    sub = p.add_subparsers(dest="cmd", required=True)
+    try:
+        from rich_argparse import RichHelpFormatter
 
-    e = sub.add_parser("evaluate", help="evaluate a prediction folder against a reference folder")
+        RichHelpFormatter.styles.update({
+            "argparse.args": "bold #b89cf5", "argparse.groups": "bold #9a72ee", "argparse.metavar": "#1fb3a1",
+            "argparse.prog": "bold #d6c7fb", "argparse.help": "default", "argparse.text": "default",
+        })
+        fmt_cls = RichHelpFormatter
+    except ImportError:  # pragma: no cover
+        fmt_cls = argparse.HelpFormatter
+    p = argparse.ArgumentParser(prog="segevalkit", formatter_class=fmt_cls,
+                                description="Evaluate volumetric medical image segmentation.")
+    p.add_argument("--version", action="version", version=f"segevalkit {__version__}")
+    p.set_defaults(fn=cmd_home)
+    sub = p.add_subparsers(dest="cmd")
+
+    e = sub.add_parser("evaluate", formatter_class=fmt_cls, help="evaluate a prediction folder against a reference folder")
     e.add_argument("--pred", help="prediction folder")
     e.add_argument("--ref", help="reference folder")
     e.add_argument("--prob", help="folder of per-structure probability maps (<case>/<label>.nii.gz)")
@@ -284,7 +404,7 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("--images", help="image folder for report overlays")
     e.set_defaults(fn=cmd_evaluate)
 
-    r = sub.add_parser("report", help="build an HTML report from a results folder")
+    r = sub.add_parser("report", formatter_class=fmt_cls, help="build an HTML report from a results folder")
     r.add_argument("results")
     r.add_argument("--out")
     r.add_argument("--images")
@@ -292,7 +412,7 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--window", default="abdomen")
     r.set_defaults(fn=cmd_report)
 
-    c = sub.add_parser("compare", help="paired statistical comparison of two results folders")
+    c = sub.add_parser("compare", formatter_class=fmt_cls, help="paired statistical comparison of two results folders")
     c.add_argument("a")
     c.add_argument("b")
     c.add_argument("--metrics")
@@ -303,7 +423,7 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--out")
     c.set_defaults(fn=cmd_compare)
 
-    k = sub.add_parser("rank", help="rank several results folders with bootstrap stability")
+    k = sub.add_parser("rank", formatter_class=fmt_cls, help="rank several results folders with bootstrap stability")
     k.add_argument("results", nargs="+")
     k.add_argument("--metric", default="dice")
     k.add_argument("--label")
@@ -311,12 +431,12 @@ def build_parser() -> argparse.ArgumentParser:
     k.add_argument("--out", help="blob-plot PNG path")
     k.set_defaults(fn=cmd_rank)
 
-    m = sub.add_parser("metrics", help="list available metrics")
+    m = sub.add_parser("metrics", formatter_class=fmt_cls, help="list available metrics")
     m.add_argument("--family")
     m.add_argument("-v", "--verbose", action="store_true")
     m.set_defaults(fn=cmd_metrics)
 
-    g = sub.add_parser("recommend", help="recommend metrics for a problem fingerprint")
+    g = sub.add_parser("recommend", formatter_class=fmt_cls, help="recommend metrics for a problem fingerprint")
     g.add_argument("--structure", default="large_organ",
                    choices=["large_organ", "small_structure", "small_lesion", "large_lesion", "tubular", "hollow"])
     g.add_argument("--multi-instance", action="store_true")
@@ -331,11 +451,11 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--markdown", action="store_true")
     g.set_defaults(fn=cmd_recommend)
 
-    d = sub.add_parser("datasets", help="list dataset presets or show one")
+    d = sub.add_parser("datasets", formatter_class=fmt_cls, help="list dataset presets or show one")
     d.add_argument("name", nargs="?")
     d.set_defaults(fn=cmd_datasets)
 
-    v = sub.add_parser("visualize", help="render a qualitative error figure for one case")
+    v = sub.add_parser("visualize", formatter_class=fmt_cls, help="render a qualitative error figure for one case")
     v.add_argument("--pred")
     v.add_argument("--ref", required=True)
     v.add_argument("--image")

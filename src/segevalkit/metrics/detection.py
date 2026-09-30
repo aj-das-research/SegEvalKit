@@ -108,7 +108,10 @@ def _match(ctx, criterion, iou_threshold, min_overlap) -> InstanceMatch:
             frac = core / rs[1:, None]
             hit = (core > 0) & (frac >= min_overlap) if min_overlap > 0 else core > 0
             ref_detected = hit.any(axis=1)
-            pred_matched = (core > 0).any(axis=0)
+            # A predicted component is a true positive only if it takes part in
+            # a qualifying overlap; a component that merely grazes a lesion below
+            # ``min_overlap`` counts as a false positive.
+            pred_matched = hit.any(axis=0)
             pairs = [(int(i + 1), int(j + 1), float(iou[i, j])) for i, j in zip(*np.nonzero(hit))]
         elif criterion == "iou":
             from scipy.optimize import linear_sum_assignment
@@ -190,7 +193,7 @@ def lesion_count_difference(ctx: PairContext) -> float:
     "false_positive_lesions", display="False-positive lesion count", abbr="FP_les", family="detection",
     better="lower", value_range=(0.0, float("inf")),
     summary="Number of predicted components that overlap no reference lesion.",
-    reference="Maier-Hein et al. 2024 (Metrics Reloaded); Chakravarty & Sivaswamy (FROC)",
+    reference="Maier-Hein et al. 2024 (Metrics Reloaded); Chakraborty & Berbaum 2004, Med Phys 31(8) (FROC)",
     defaults=_MATCH_DOC,
 )
 def false_positive_lesions(ctx: PairContext, **kw) -> float:
@@ -252,7 +255,7 @@ def panoptic_quality(ctx: PairContext, iou_threshold: float = 0.5) -> float:
     "lesionwise_dice", display="Lesion-wise Dice (BraTS 2023)", abbr="LW-DSC", family="detection",
     better="higher",
     summary="Dice averaged over lesions, with missed and spurious lesions each scoring 0; small lesions count as much as large.",
-    reference="Kazerooni et al. 2023, arXiv:2305.17033 (BraTS 2023 lesion-wise metrics)",
+    reference="Kazerooni et al. 2023, arXiv:2305.17033; BraTS-2023-Metrics code (github.com/rachitsaluja/BraTS-2023-Metrics)",
 )
 def lesionwise_dice(ctx: PairContext) -> float:
     r"""$$\mathrm{LW\text{-}DSC} = \frac{1}{N_G + FP_{les}}\sum_{i=1}^{N_G}

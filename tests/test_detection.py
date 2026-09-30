@@ -63,3 +63,11 @@ def test_min_component_voxels_filters_noise():
     p[30, 30, 30] = True
     assert compute_metrics(p, g, ["false_positive_lesions"])["false_positive_lesions"] == 1
     assert compute_metrics(p, g, ["false_positive_lesions"], min_component_voxels=2)["false_positive_lesions"] == 0
+
+
+def test_min_overlap_grazing_component_is_false_positive():
+    g = lesions(((5, 5, 5), (10, 10, 10)))
+    p = lesions(((14, 5, 5), (6, 6, 6)))          # overlaps 1 slab of 10x... only a sliver of the lesion
+    r = compute_metrics(p, g, ["lesion_recall", "lesion_precision", "lesion_f1"],
+                        params={k: {"min_overlap": 0.5} for k in ("lesion_recall", "lesion_precision", "lesion_f1")})
+    assert r["lesion_recall"] == 0.0 and r["lesion_precision"] == 0.0 and r["lesion_f1"] == 0.0

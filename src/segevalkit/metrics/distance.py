@@ -81,10 +81,14 @@ def hd_percentile(ctx: PairContext, q: float = 95.0, mode: str = "directed") -> 
     better="lower", value_range=(0.0, float("inf")), unit="mm", requires=("spacing",),
     summary="Near-worst boundary error, ignoring the 5 % most extreme surface points (BraTS, KiTS, TopCoW...).",
     reference="Huttenlocher et al. 1993; Bakas et al. 2018, arXiv:1811.02629 (BraTS)",
+    defaults={"mode": "directed"},
 )
-def hd95(ctx: PairContext) -> float:
-    r"""$$\mathrm{HD}_{95} = \max\Big(P_{95}(D_{P\to G}),\; P_{95}(D_{G\to P})\Big)$$"""
-    return hd_percentile(ctx, q=95.0)
+def hd95(ctx: PairContext, mode: str = "directed") -> float:
+    r"""$$\mathrm{HD}_{95} = \max\Big(P_{95}(D_{P\to G}),\; P_{95}(D_{G\to P})\Big)$$
+
+    ``mode="pooled"`` gives the MedPy convention (see :func:`hd_percentile`).
+    """
+    return hd_percentile(ctx, q=95.0, mode=mode)
 
 
 @register_metric(
@@ -142,9 +146,15 @@ def nsd(ctx: PairContext, tolerance_mm: float = 2.0) -> float:
 
 
 def _inner_band(mask: np.ndarray, width_mm: float, spacing) -> np.ndarray:
-    """Foreground voxels within ``width_mm`` of the background (the inner boundary band)."""
+    """Inner boundary band: the surface voxels plus every foreground voxel within ``width_mm`` of the background.
+
+    The surface voxels are always included, so the band is never empty for a
+    non-empty mask, even when ``width_mm`` is smaller than the voxel size.
+    """
+    from .context import surface
+
     inside = ndimage.distance_transform_edt(mask, sampling=spacing)
-    return mask & (inside <= width_mm)
+    return surface(mask) | (mask & (inside <= width_mm))
 
 
 @register_metric(

@@ -66,12 +66,7 @@ with mkdocs_gen_files.open("datasets/presets.md", "w") as fh:
         fh.write(f"<div class=\"sek-meta\"><span class=\"sek-chip\">{d.modality}</span>"
                  f"<span class=\"sek-chip teal\">{d.cases}</span><span class=\"sek-chip orange\">{d.license}</span></div>\n\n")
         fh.write(f"**Anatomy:** {d.anatomy}  \n")
-        if isinstance(d.labels, dict):
-            fh.write("**Labels:** " + ", ".join(f"`{n}` = {v}" for n, v in d.labels.items()) + "  \n")
-        elif isinstance(d.labels, list):
-            fh.write("**Structures:** " + ", ".join(f"`{n}`" for n in d.labels) + "  \n")
-        else:
-            fh.write("**Structures:** every per-structure file found in the reference folder  \n")
+        fh.write(f"**Labels:** {d.label_summary()}  \n")
         lay = d.ref_layout or "auto"
         extra = d.ref_subdir or d.ref_file
         fh.write(f"**Reference layout:** `{lay}`" + (f" (`{extra}`)" if extra else "") + "  \n")
