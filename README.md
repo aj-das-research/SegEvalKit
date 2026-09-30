@@ -1,50 +1,65 @@
 <p align="center">
-  <img src="docs/assets/icon.svg" width="88" alt="SegEvalKit logo">
-</p>
-
-<h1 align="center">SegEvalKit</h1>
-
-<p align="center">
-  <b>Holistic, literature-grounded evaluation of volumetric (CT / MR) medical image segmentation.</b><br>
-  50+ metrics · explicit conventions · GPU surface distances · statistics & ranking · purple-themed plots, overlays and reports
+  <a href="https://aj-das-research.github.io/SegEvalKit/"><img src="docs/assets/banner.png" alt="SegEvalKit: explicit, tested evaluation of volumetric medical image segmentation" width="100%"></a>
 </p>
 
 <p align="center">
-  <a href="https://aj-das-research.github.io/SegEvalKit/"><img alt="docs" src="https://img.shields.io/badge/docs-SegEvalKit-6d3fd6?style=flat-square"></a>
-  <img alt="python" src="https://img.shields.io/badge/python-3.9%2B-7c4ee4?style=flat-square">
-  <img alt="license" src="https://img.shields.io/badge/license-Apache--2.0-9a72ee?style=flat-square">
-  <img alt="tests" src="https://img.shields.io/badge/conformance-MONAI%20%C2%B7%20MedPy%20%C2%B7%20DeepMind-5a2fb8?style=flat-square">
+  <a href="https://aj-das-research.github.io/SegEvalKit/"><img alt="docs" src="https://img.shields.io/badge/docs-aj--das--research.github.io-6d3fd6?style=for-the-badge&labelColor=2e1766"></a>
+  <a href="https://github.com/aj-das-research/SegEvalKit/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/aj-das-research/SegEvalKit/tests.yml?branch=main&style=for-the-badge&label=tests&labelColor=2e1766&color=7c4ee4"></a>
+  <img alt="python" src="https://img.shields.io/badge/python-3.9%2B-9a72ee?style=for-the-badge&labelColor=2e1766">
+  <img alt="license" src="https://img.shields.io/badge/license-Apache--2.0-b89cf5?style=for-the-badge&labelColor=2e1766">
 </p>
 
----
+<p align="center">
+  <a href="https://aj-das-research.github.io/SegEvalKit/getting-started/quickstart/"><b>Quickstart</b></a> &nbsp;·&nbsp;
+  <a href="https://aj-das-research.github.io/SegEvalKit/metrics/"><b>Metrics</b></a> &nbsp;·&nbsp;
+  <a href="https://aj-das-research.github.io/SegEvalKit/guide/choosing/"><b>Choosing metrics</b></a> &nbsp;·&nbsp;
+  <a href="https://aj-das-research.github.io/SegEvalKit/guide/sensitivity-study/"><b>Sensitivity study</b></a> &nbsp;·&nbsp;
+  <a href="https://aj-das-research.github.io/SegEvalKit/analysis/plots/"><b>Plot gallery</b></a> &nbsp;·&nbsp;
+  <a href="https://aj-das-research.github.io/SegEvalKit/api/"><b>API</b></a>
+</p>
 
-A Dice score alone does not tell you whether a model finds small tumours, breaks vessels, draws clinically
-acceptable boundaries, outputs trustworthy probabilities, or really beats the baseline. Answering those questions
-takes many metrics, and the existing tools disagree on how to compute them: HD95 has two definitions in use,
-"ASSD" means different things in different libraries, and empty masks are handled in at least four ways.
-**SegEvalKit** brings the metrics together behind one standard input/output interface, makes every convention
-explicit and configurable, tests them against the reference implementations, and adds the statistics and figures
-needed to report results you can defend.
+<br>
 
-## Highlights
+A Dice score alone does not say whether a model finds small tumours, breaks vessels, draws acceptable boundaries,
+produces trustworthy probabilities, or really beats the baseline, and the tools that compute the other metrics
+disagree silently: HD95 has two definitions in use, MedPy changed what its `assd` computes between versions, and
+empty masks are handled in at least four ways. **SegEvalKit** puts 53 metrics behind one standard input/output
+interface, makes every convention explicit, tests them against the reference implementations, and adds the
+statistics and figures needed to report results you can defend.
 
-| | |
-|---|---|
-| **Metrics** | 51 metrics in 7 families: overlap, volume, surface distance, topology, lesion-wise detection, calibration, agreement. One cached computation context per pair. |
-| **Standard I/O** | Reads the three layouts used by virtually every dataset and model (flat, folder, per-structure NIfTI), checks geometry, writes one documented results format (`per_case.csv`, `summary.csv`, `lesions.csv`, `meta.json`). |
-| **Conventions** | Explicit empty-mask policies (incl. BraTS 2023 / Metrics Reloaded presets), directed vs pooled HD95, ASSD vs MASD, connectivity, NSD tolerance, all recorded with the results. |
-| **Conformance** | Test-suite checks agreement with MONAI, MedPy and DeepMind `surface-distance`, and CPU ≡ GPU. |
-| **Statistics** | Bootstrap CIs, paired Wilcoxon/t/permutation tests with Holm/BH correction and effect sizes, challenge-style rankings with bootstrap stability, Bland–Altman, ICC, size stratification, patient-level presence detection. |
-| **Figures** | Raincloud plots, ECDFs, heatmaps, metric-vs-size, metric correlation, volume agreement, comparison forests, ranking blob plots, reliability diagrams, detection-by-size, failure quadrants. |
-| **Qualitative** | Colour-vision-safe TP/FN/FP overlays, contours, tri-planar views, montages, 3D error projections, surface-distance meshes (static and interactive), worst-case galleries. |
-| **Guidance** | A Metrics-Reloaded-style recommender (`segevalkit recommend`), a pitfalls catalogue, and a sensitivity study on real CT anatomy. |
-| **Datasets** | Presets with official protocols for PanTS, TotalSegmentator, BTCV, AMOS, FLARE22, MSD, KiTS23, BraTS 2023, ISLES'22, autoPET, TopCoW. |
+<p align="center">
+  <img src="docs/assets/showcase/model_comparison.png" width="88%" alt="Three official models, one CT slice, errors colour-coded">
+</p>
+<p align="center"><sub><i>Three official models on one PanTS CT slice. Violet: agreement · orange: missed · teal: added.</i></sub></p>
+
+<table>
+<tr>
+<td width="33%" valign="top"><b>Every metric family</b><br>Overlap, volume, surface distance, topology, lesion-wise detection, calibration and agreement: 53 metrics sharing one cached computation context.</td>
+<td width="33%" valign="top"><b>Explicit, tested conventions</b><br>Empty-mask policies (BraTS, Metrics Reloaded, nnU-Net presets), directed vs pooled HD95, ASSD vs MASD, tolerances; conformance-tested against MONAI, MedPy and DeepMind.</td>
+<td width="33%" valign="top"><b>Knows which metric to use</b><br>A Metrics Reloaded-style recommender, a pitfalls catalogue, and a sensitivity study on real CT anatomy showing what each metric notices.</td>
+</tr>
+<tr>
+<td valign="top"><b>A standard interface</b><br>Flat, folder and per-structure NIfTI layouts, geometry checks, structure unions, and one plain-CSV results format.</td>
+<td valign="top"><b>Statistics you can defend</b><br>Bootstrap CIs, paired tests with Holm/BH, effect sizes, rankings with bootstrap stability, Bland–Altman, ICC, presence detection.</td>
+<td valign="top"><b>See the errors</b><br>Overlays, tri-planar views, montages, 3D surface-distance maps, worst-case galleries, a self-contained HTML report, and a rich terminal UI.</td>
+</tr>
+</table>
+
+<p align="center">
+  <img src="docs/assets/figures/sensitivity_matrix.png" width="70%" alt="Which metric notices which error">
+</p>
+<p align="center"><sub><i>Which metric notices which error? Measured on 70 real PanTS structures: every metric is blind to something.
+<a href="https://aj-das-research.github.io/SegEvalKit/guide/sensitivity-study/">Read the study →</a></i></sub></p>
 
 ## Install
 
 ```bash
 pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git"
 ```
+
+Extras: `gpu` (PyTorch surface distances) · `sitk` (MHA / NRRD) · `interactive` (plotly 3D maps) · `dev` · `docs`.
+Datasets: 25 presets with official protocols (MSD ×10, FLARE22, KiTS19/23, BraTS 2023, AMOS, BTCV, ISLES'22,
+autoPET, TopCoW, ACDC, M&Ms, LiTS, SegTHOR, PanTS, TotalSegmentator).
 
 ## A walkthrough on real data
 
