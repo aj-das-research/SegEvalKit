@@ -17,21 +17,14 @@ CK=$STORE/checkpoints/medformer_pants
 OUT=$STORE/outputs/predictions/medformer_pants
 export TMPDIR=$STORE/tmp/$SLURM_JOB_ID; mkdir -p "$TMPDIR" "$OUT"
 export OMP_NUM_THREADS=4 MPLCONFIGDIR=$TMPDIR/mpl
+SEK=${SLURM_SUBMIT_DIR:-$HOME/projects/SegEvalKit}
 cd "$STORE/third_party/R-Super/rsuper_train"
 # Upstream bug (R-Super fa8fdce, pad_to_training_size): F.pad lists the *last* axis first, so a scan with
 # fewer slices than the training patch is padded along x while the offsets are recorded for z; unpadding
-# then drops slices and postprocess fails ("FAILED postprocess", 25 PanTS test cases, all < 128 slices).
+# then drops slices and postprocess fails ("FAILED postprocess", 25 PanTS test cases, all shorter than the patch).
 # Run a copy with the two 3D pad tuples swapped; cases with enough slices are unaffected (the code path
 # is only taken when z or x is smaller than the patch). The official file is left untouched.
-"$ENV/bin/python" - <<'PY'
-s = open("predict_abdomenatlas.py").read()
-z, x = "F.pad(tensor_img, (diff, diff, 0,0, 0,0))", "F.pad(tensor_img, (0,0, 0,0, diff, diff))"
-head, tail = s.split("def pad_to_training_size", 1)
-body, rest = tail.split("elif args.dimension == '2d'", 1)
-assert body.count(z) == 1 and body.count(x) == 1, "upstream pad_to_training_size changed; re-check the fix"
-body = body.replace(z, "@@Z@@").replace(x, z).replace("@@Z@@", x)
-open("predict_abdomenatlas_sek.py", "w").write(head + "def pad_to_training_size" + body + "elif args.dimension == '2d'" + rest)
-PY
+"$ENV/bin/python" "$SEK/benchmarks/pants/patch_medformer.py"
 # The official script needs an ids CSV (BDMAP_ID column) to read <case>/ct.nii.gz folders.
 IDS=$STORE/data/pants_test_ids.csv
 { echo BDMAP_ID; ls "$STORE/data/raw/PanTS/ImageTe" | sort; } > "$IDS"
