@@ -58,6 +58,10 @@ Issues = "https://github.com/aj-das-research/SegEvalKit/issues"
 [tool.hatch.version]
 path = "src/segevalkit/__init__.py"
 
+[tool.hatch.build.targets.sdist]
+include = ["src/segevalkit", "tests", "README.md", "LICENSE", "pyproject.toml"]
+exclude = ["tests/**/__pycache__"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/segevalkit"]
 
