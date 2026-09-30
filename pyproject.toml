@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "segevalkit"
 dynamic = ["version"]
-description = "A holistic, literature-grounded toolkit for evaluating volumetric (CT/MR) medical image segmentation."
+description = "Evaluation of volumetric (CT/MR) medical image segmentation: 53 metrics with explicit, tested conventions, statistics, plots and reports."
 readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.9"

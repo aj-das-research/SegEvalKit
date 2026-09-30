@@ -61,11 +61,10 @@ Extras: `gpu` (PyTorch surface distances) · `sitk` (MHA / NRRD) · `interactive
 Datasets: 25 presets with official protocols (MSD ×10, FLARE22, KiTS19/23, BraTS 2023, AMOS, BTCV, ISLES'22,
 autoPET, TopCoW, ACDC, M&Ms, LiTS, SegTHOR, PanTS, TotalSegmentator).
 
-## A walkthrough on real data
+## How to use
 
-Every output below is real: three official models (nnU-Net, MedFormer, TotalSegmentator, run from their own code and
-checkpoints) on 8 PanTS test CTs chosen to span tumour sizes and orientations. Eight cases illustrate the library;
-they are not a benchmark.
+Seven steps from a folder of predictions to a report. The outputs shown are real: three official models
+(nnU-Net, MedFormer, TotalSegmentator) on 8 PanTS test CTs, chosen to illustrate the library rather than to benchmark it.
 
 **1. Describe what to evaluate.** Structures are named once; each side says where to find them. Here the reference
 has one file per structure and nnU-Net writes one multi-label map.

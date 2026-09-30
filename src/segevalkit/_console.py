@@ -1,4 +1,4 @@
-"""Terminal presentation: a purple-themed console built on `rich`.
+"""Terminal presentation: the SegEvalKit console, built on `rich`.
 
 Everything user-facing on the command line goes through this module so the
 look is consistent: the gradient banner, section rules, metric tables with
