@@ -137,6 +137,7 @@ nav:
       - Sensitivity study: guide/sensitivity-study.md
   - Analysis:
       - analysis/index.md
+      - Evaluation levels: analysis/levels.md
       - Statistics & ranking: analysis/statistics.md
       - Quantitative plots: analysis/plots.md
       - Qualitative visualisation: analysis/qualitative.md

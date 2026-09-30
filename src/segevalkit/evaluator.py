@@ -39,7 +39,7 @@ from . import __version__
 from .io.cases import Case, Source, discover_cases
 from .io.labels import LabelSpec, labels_from_map, parse_labels
 from .io.volume import Volume, check_alignment, resample_to
-from .metrics import EmptyPolicy, PairContext, get_metric, lesion_table, resolve_metrics
+from .metrics import EmptyPolicy, PairContext, get_metric, lesion_table, match_instances, resolve_metrics
 from .results import EvaluationResult
 
 __all__ = ["Evaluator", "EvalConfig"]
@@ -279,14 +279,20 @@ def _score_label(case_id, lab: LabelSpec, pred, ref, spacing, prob, cfg: EvalCon
             val = math.nan
         rows.append({"case_id": case_id, "label": lab.name, "metric": name, "value": val})
     vox_ml = ctx.voxel_volume_mm3 / 1000.0
-    for key, val in (("ref_empty", float(ctx.ref_empty)), ("pred_empty", float(ctx.pred_empty)),
-                     ("ref_volume_ml", (ctx.tp + ctx.fn) * vox_ml),
-                     ("pred_volume_ml", (ctx.tp + ctx.fp) * vox_ml)):
-        rows.append({"case_id": case_id, "label": lab.name, "metric": f"_{key}", "value": val})
+    # Descriptive flags and raw counts (prefixed "_"): the counts make dataset-level
+    # pooled ("micro") metrics possible, e.g. aggregated Dice = 2ΣTP / (2ΣTP + ΣFP + ΣFN).
+    flags = [("ref_empty", float(ctx.ref_empty)), ("pred_empty", float(ctx.pred_empty)),
+             ("ref_volume_ml", (ctx.tp + ctx.fn) * vox_ml), ("pred_volume_ml", (ctx.tp + ctx.fp) * vox_ml),
+             ("tp", float(ctx.tp)), ("fp", float(ctx.fp)), ("fn", float(ctx.fn)), ("tn", float(ctx.tn))]
     lesions = []
     if cfg.lesion_table and _DETECTION.intersection(metric_names):
+        m = match_instances(ctx, criterion="overlap")
+        flags += [("n_ref_lesions", float(m.n_ref)), ("n_pred_lesions", float(m.n_pred)),
+                  ("tp_ref_lesions", float(m.tp_ref)), ("tp_pred_lesions", float(m.tp_pred))]
         for r in lesion_table(ctx):
             lesions.append({"case_id": case_id, "label": lab.name, **r})
+    for key, val in flags:
+        rows.append({"case_id": case_id, "label": lab.name, "metric": f"_{key}", "value": val})
     return rows, lesions
 
 

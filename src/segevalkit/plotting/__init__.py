@@ -7,6 +7,7 @@ palette and its colour-vision-deficiency validation.
 
 from .quantitative import (
     bland_altman_plot,
+    cohort_plot,
     comparison_forest,
     detection_by_size,
     ecdf,
@@ -30,6 +31,7 @@ __all__ = [
     "ERROR_COLORS",
     "PURPLE",
     "bland_altman_plot",
+    "cohort_plot",
     "comparison_forest",
     "detection_by_size",
     "ecdf",

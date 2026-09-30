@@ -101,6 +101,12 @@ class EvaluationResult:
 
         return summarize(self.per_case(), ci=ci, n_boot=n_boot, seed=seed)
 
+    def pooled(self, **kw) -> pd.DataFrame:
+        """Dataset-level pooled ("micro") metrics; see :func:`segevalkit.cohort.pooled_metrics`."""
+        from .cohort import pooled_metrics
+
+        return pooled_metrics(self, **kw)
+
     def filter(self, labels: Optional[Sequence[str]] = None, metrics: Optional[Sequence[str]] = None,
                cases: Optional[Sequence[str]] = None) -> "EvaluationResult":
         """Subset by labels / metrics / cases (flags are kept for the selected rows)."""
@@ -144,6 +150,10 @@ class EvaluationResult:
             self.lesions.to_csv(out / "lesions.csv", index=False)
         if summary and len(self.long):
             self.summary().to_csv(out / "summary.csv", index=False)
+            if "_tp" in set(self.long["metric"]):
+                from .cohort import pooled_metrics
+
+                pooled_metrics(self, n_boot=500).to_csv(out / "pooled.csv", index=False)
         meta = {"results_format": RESULTS_FORMAT_VERSION, **self.meta}
         (out / "meta.json").write_text(json.dumps(meta, indent=2, default=_json_default))
         return out

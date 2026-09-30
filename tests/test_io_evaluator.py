@@ -132,3 +132,26 @@ def test_per_structure_file_union(tmp_path):
     ev = sek.Evaluator(labels={"organ_with_lesion": {"ref_file": "organ.nii.gz+lesion.nii.gz", "pred": [1, 2]}},
                        metrics=["dice"])
     assert ev.evaluate(pr, tmp_path / "ref", progress=False).wide()["dice"].item() == 1.0
+
+
+def test_pooled_and_cohort(tmp_path):
+    import pandas as pd
+
+    from segevalkit.cohort import cohort_summary, cohort_tests, pooled_metrics
+
+    pr, gt = _write_flat(tmp_path, n=8)
+    ev = sek.Evaluator(labels={"organ": 1, "lesion": {"values": 2, "metrics": ["dice", "lesion_f1"]}},
+                       metrics=["dice"])
+    res = ev.evaluate(pr, gt, progress=False, out_dir=tmp_path / "out")
+    assert (tmp_path / "out" / "pooled.csv").exists()
+    w = res.wide()
+    org = w[w.label == "organ"]
+    pm = pooled_metrics(res).set_index(["label", "metric"])["value"]
+    expected = 2 * org.tp.sum() / (2 * org.tp.sum() + org.fp.sum() + org.fn.sum())
+    assert pm[("organ", "pooled_dice")] == pytest.approx(expected)
+    assert ("lesion", "pooled_lesion_sensitivity") in pm.index
+    md = pd.DataFrame({"id": [f"case{i}" for i in range(8)], "site": ["A"] * 4 + ["B"] * 4})
+    cs = cohort_summary(res, md, "site", metrics=["dice"], labels=["organ"], min_n=2)
+    assert set(cs.group) == {"A", "B"} and (cs.n == 4).all()
+    ct = cohort_tests(res, md, "site", metrics=["dice"], labels=["organ"], min_n=2)
+    assert ct.test.item() == "mann-whitney" and 0 <= ct.p_value.item() <= 1

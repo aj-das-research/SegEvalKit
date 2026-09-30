@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Evaluation levels:** dataset-level pooled ("micro") metrics (`res.pooled()`, `pooled.csv`: aggregated Dice,
+  pooled lesion sensitivity / precision / F1, false-positive lesions per scan) from raw per-case counts now kept
+  in the results; cohort analysis from case metadata (`segevalkit.cohort.cohort_summary`, `cohort_tests`,
+  `plotting.cohort_plot`, `segevalkit cohort`).
+- Union of per-structure files in label specs (`"a.nii.gz+b.nii.gz"`).
+
 ## 0.1.0 (2026-09-30)
 
 First public release. Install with

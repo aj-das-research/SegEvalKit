@@ -230,6 +230,47 @@ def cmd_rank(a) -> int:
     return 0
 
 
+def cmd_cohort(a) -> int:
+    from rich.table import Table
+
+    from ._console import P, banner, console, fmt
+    from .cohort import cohort_summary, cohort_tests, pooled_metrics
+    from .results import load_results
+
+    banner("cohort analysis", compact=True)
+    res = load_results(a.results)
+    by = [x.strip() for x in a.by.split(",") if x.strip()]
+    metrics = [x.strip() for x in a.metrics.split(",")]
+    labels = [x.strip() for x in a.labels.split(",")] if a.labels else None
+    summ = cohort_summary(res, a.metadata, by, metrics=metrics, labels=labels, id_column=a.id_column,
+                          min_n=a.min_n)
+    tests = cohort_tests(res, a.metadata, by, metrics=metrics, labels=labels, id_column=a.id_column,
+                         min_n=a.min_n)
+    out = Path(a.out or Path(a.results) / "cohorts")
+    out.mkdir(parents=True, exist_ok=True)
+    summ.to_csv(out / "cohort_summary.csv", index=False)
+    tests.to_csv(out / "cohort_tests.csv", index=False)
+    try:
+        pooled_metrics(res, labels=labels).to_csv(out / "pooled.csv", index=False)
+    except ValueError as exc:
+        console.print(f"[sek.warn]pooled metrics skipped: {exc}[/]")
+    for f in by:
+        t = Table(title=f"[sek.brand]{f}[/]", border_style=P["800"], header_style=f"bold {P['200']}")
+        for col in ("label", "group", "n", *[m for m in metrics]):
+            t.add_column(col, justify="left" if col in ("label", "group") else "right")
+        s = summ[summ.factor == f]
+        for (label, g), d in s.groupby(["label", "group"], sort=False):
+            vals = {r.metric: f"{fmt(r['mean'])}" + (" [sek.muted]*[/]" if r["small"] else "") for _, r in d.iterrows()}
+            t.add_row(label, g, str(int(d["n"].max())), *[vals.get(m, "–") for m in metrics])
+        console.print(t)
+    if len(tests):
+        sig = tests[tests.significant]
+        console.print(f"[sek.muted]{len(sig)} of {len(tests)} subgroup tests significant after "
+                      f"Holm correction[/]  ·  [sek.muted]* fewer than {a.min_n} cases[/]")
+    console.print(f"[sek.ok]✓[/] written to [sek.key]{out}[/]")
+    return 0
+
+
 def cmd_metrics(a) -> int:
     from ._console import banner, console, metric_table, rule
     from .metrics import FAMILIES, list_metrics
@@ -354,6 +395,7 @@ def cmd_home(a) -> int:
                       ("rank", "rank methods with bootstrap stability"),
                       ("recommend", "which metrics to report for your problem"),
                       ("visualize", "error overlays, projections, 3D surface-distance maps"),
+                      ("cohort", "subgroup statistics from case metadata (site, phase, sex...)"),
                       ("metrics", "list every metric with direction and unit"),
                       ("datasets", "benchmark presets with official protocols")):
         t.add_row(f"segevalkit {cmd}", desc)
@@ -431,6 +473,18 @@ def build_parser() -> argparse.ArgumentParser:
     k.add_argument("--n-boot", type=int, default=1000)
     k.add_argument("--out", help="blob-plot PNG path")
     k.set_defaults(fn=cmd_rank)
+
+    h = sub.add_parser("cohort", formatter_class=fmt_cls,
+                       help="subgroup statistics and tests from a results folder plus case metadata")
+    h.add_argument("results")
+    h.add_argument("--metadata", required=True, help="CSV or Excel file, one row per case")
+    h.add_argument("--by", required=True, help="comma-separated metadata columns, e.g. 'ct phase,sex'")
+    h.add_argument("--id-column", help="case-id column in the metadata (default: first column)")
+    h.add_argument("--metrics", default="dice,nsd,hd95")
+    h.add_argument("--labels", help="comma-separated structures (default: all)")
+    h.add_argument("--min-n", type=int, default=5)
+    h.add_argument("--out", help="output folder (default: <results>/cohorts)")
+    h.set_defaults(fn=cmd_cohort)
 
     m = sub.add_parser("metrics", formatter_class=fmt_cls, help="list available metrics")
     m.add_argument("--family")

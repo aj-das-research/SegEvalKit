@@ -55,6 +55,6 @@ def __getattr__(name):
     # Heavy optional sub-packages (matplotlib, jinja2) load on first access.
     import importlib
 
-    if name in {"plotting", "viz", "stats", "guide", "datasets", "synthetic", "report", "io"}:
+    if name in {"plotting", "viz", "stats", "guide", "datasets", "synthetic", "report", "io", "cohort"}:
         return importlib.import_module(f".{name}", __name__)
     raise AttributeError(f"module 'segevalkit' has no attribute {name!r}")

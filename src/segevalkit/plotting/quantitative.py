@@ -31,6 +31,7 @@ __all__ = [
     "detection_by_size",
     "failure_quadrants",
     "sensitivity_curves",
+    "cohort_plot",
 ]
 
 Results = Union[object, Mapping[str, object]]
@@ -533,4 +534,44 @@ def sensitivity_curves(df: pd.DataFrame, metrics: Sequence[str], perturbation: O
             ax.grid(True, axis="both")
         axes[0][0].set_ylabel("Metric value (median, IQR)")
         axes[0][-1].legend(loc="upper left", bbox_to_anchor=(1.0, 1.0))
+    return fig
+
+
+def cohort_plot(summary: pd.DataFrame, metric: str, label: str, factor: Optional[str] = None,
+                ax=None, figsize=None):
+    """Subgroup means with 95 % CIs from :func:`segevalkit.cohort.cohort_summary`, one row per group.
+
+    Groups smaller than ``min_n`` are drawn hollow; the dashed line is the overall mean.
+    """
+    info = get_metric(metric)
+    d = summary[(summary["metric"] == metric) & (summary["label"] == label)]
+    if factor is not None:
+        d = d[d["factor"] == factor]
+    factors = list(dict.fromkeys(d["factor"]))
+    d = d.reset_index(drop=True)
+    with theme():
+        fig, ax = _new_ax(ax, figsize or (5.2, 0.5 + 0.32 * len(d) + 0.3 * len(factors)))
+        y, ticks, labels = 0, [], []
+        for f in factors:
+            for _, r in d[d["factor"] == f].iterrows():
+                c = CATEGORICAL[0]
+                ax.plot([r["ci_low"], r["ci_high"]], [y, y], color=c, lw=2, solid_capstyle="round")
+                ax.plot(r["mean"], y, "o", ms=6.5, color=INK["surface"] if r["small"] else c, mec=c, mew=1.6)
+                ticks.append(y)
+                labels.append(f"{r['group']}  (n={int(r['n'])})")
+                y += 1
+            ax.axhline(y - 0.5, color=INK["grid"], lw=0.8)
+            ax.text(1.0, y - 1, f, transform=ax.get_yaxis_transform(), ha="right", va="bottom", fontsize=7.5,
+                    color=INK["muted"])
+            y += 0.4
+        allv = (d["mean"] * d["n"]).sum() / max(d["n"].sum(), 1) if len(factors) == 1 else None
+        if allv is not None:
+            ax.axvline(allv, color=INK["muted"], ls="--", lw=1)
+        ax.set_yticks(ticks)
+        ax.set_yticklabels(labels, fontsize=8)
+        ax.invert_yaxis()
+        ax.grid(True, axis="x")
+        ax.grid(False, axis="y")
+        ax.set_xlabel(info.label)
+        ax.set_title(f"{info.abbr} by subgroup: {label}")
     return fig
