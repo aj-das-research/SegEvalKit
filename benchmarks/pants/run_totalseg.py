@@ -22,7 +22,14 @@ def main():
         if (out / "liver.nii.gz").exists():
             continue
         t = time.time()
-        totalsegmentator(str(Path(a.images) / c / "ct.nii.gz"), str(out), task="total", quiet=True, device="gpu")
+        for attempt in range(3):  # worker pools can die if the node's /dev/shm is cleaned under us
+            try:
+                totalsegmentator(str(Path(a.images) / c / "ct.nii.gz"), str(out), task="total", quiet=True,
+                                 device="gpu")
+                break
+            except (RuntimeError, FileNotFoundError, OSError) as exc:
+                print(f"retry {attempt + 1} for {c}: {type(exc).__name__}: {exc}", flush=True)
+                time.sleep(10)
         print(f"[{i + 1}/{len(cases)}] {c} {time.time() - t:.1f}s", flush=True)
 
 

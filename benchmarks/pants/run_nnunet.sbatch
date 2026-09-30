@@ -28,12 +28,19 @@ ls "$STORE/data/pants_nnunet/imagesTs" | sort | awk -v n=$N -v d="$STORE/data/pa
   '{ print d "/imagesTs/" $0, d "/shard" (NR-1)%n "/" $0 }' | while read src dst; do
   [ -e "$dst" ] || ln -s "$(readlink -f "$src")" "$dst"
 done
-for i in $(seq 0 $((N-1))); do
-  srun --exact -n1 --gres=gpu:1 --cpus-per-task=8 --mem=58G \
+run_part() {  # relaunch a crashed step up to 5 times; every pipeline skips finished cases
+  local i=$1 k
+  for k in 1 2 3 4 5; do
+    srun --exact -n1 --gres=gpu:1 --cpus-per-task=8 --mem=58G \
     "$ENV/bin/nnUNetv2_predict_from_modelfolder" -m "$STORE/checkpoints/nnunet_pants_regions" \
       -i "$STORE/data/pants_nnunet/shard$i" -o "$OUT" -f all -chk checkpoint_best.pth \
       -npp 3 -nps 3 --disable_progress_bar --continue_prediction \
-      > "$STORE/logs/nnunet-part$i-$SLURM_JOB_ID.log" 2>&1 &
+      > "$STORE/logs/nnunet-part$i-$SLURM_JOB_ID-try$k.log" 2>&1 && return 0
+    echo "part $i attempt $k failed; relaunching" >&2
+  done
+}
+for i in $(seq 0 $((N-1))); do
+  run_part $i &
 done
 wait
 ls "$OUT"/*.nii.gz | wc -l
