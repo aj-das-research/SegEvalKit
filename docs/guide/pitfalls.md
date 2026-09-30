@@ -1,7 +1,7 @@
 # Metric pitfalls
 
 A metric value means little without the task, the data and the way it was computed and aggregated. This page
-lists the thirteen pitfalls that most often distort 3D segmentation results, following the taxonomy of
+lists the fourteen pitfalls that most often distort 3D segmentation results, following the taxonomy of
 Reinke et al. (2024): poor metric *selection* (P2) and poor metric *application* (P3). Each worked example was
 computed with SegEvalKit on 1 mm isotropic voxels unless stated otherwise.
 
@@ -20,6 +20,7 @@ computed with SegEvalKit on 1 mm isotropic voxels unless stated otherwise.
 | [Background-dominated calibration](#calibration-background) | Easy background makes ECE, Brier, NLL look good | `roi="band"` for [calibration](../metrics/calibration.md) metrics |
 | [Convention mismatches](#conventions) | Same name, different formula across libraries | Unambiguous keys; [conventions page](conventions.md) |
 | [Annotation conventions](#annotation-conventions) | The reference defines a structure differently from the model | Evaluate a region both sides agree on (`ref_file="a+b"`) |
+| [Unreliable label headers](#header-mismatch) | A label file's affine disagrees with its image although the voxels align | `segevalkit audit`; then `alignment="ignore"` when shapes match |
 
 ## Size and small-structure bias {#size-bias}
 
@@ -303,6 +304,23 @@ notes say the same).
 
     All pancreas results in the [quickstart walkthrough](../getting-started/quickstart.md) use this union
     (the top row of the three-model comparison shows it on one slice).
+
+## Unreliable label headers {#header-mismatch}
+
+Label files are sometimes written with an orientation or origin that disagrees with their own image, while the
+voxel data is aligned with the image. Resampling "by the header" then moves a correct prediction into the wrong
+place and a good model scores zero. In the PanTS test set, 227 of 901 cases have at least one such label file (the
+aorta in 218). Audit a dataset once before evaluating, and use voxel correspondence when shapes match.
+
+??? example "Worked example"
+    ```console
+    $ segevalkit audit --ref PanTS/LabelTe --images PanTS/ImageTe
+    ⚠ 227 of 901 cases have reference files whose header differs from the image
+    ```
+
+    TotalSegmentator's aorta on these cases: mean Dice 0.67 with 71 empty predictions under
+    `alignment="resample"` (trusting the broken headers), versus 0.88 mean / 0.92 median and no empty prediction
+    under `alignment="ignore"` (voxel correspondence), on the same 521 predictions.
 
 ## References
 
