@@ -1,0 +1,28 @@
+# PanTS test cases on which the unpatched R-Super predict_abdomenatlas.py failed in postprocess
+# (no output after two full runs; each has fewer than 128 voxels along z or x after the 1 mm resampling, the size of the training patch: 23 along z, 2 along x). Rerun with benchmarks/pants/patch_medformer.py.
+# case_id,z,y,x  (network input shape in the patched run, after 1 mm resampling and padding to >= 128; from logs/medformer-part0-288252-try1.log)
+PanTS_00009068,130,243,355
+PanTS_00009078,130,270,356
+PanTS_00009106,129,258,359
+PanTS_00009153,129,277,344
+PanTS_00009210,130,259,358
+PanTS_00009239,129,266,362
+PanTS_00009310,130,281,400
+PanTS_00009390,130,270,356
+PanTS_00009407,130,254,354
+PanTS_00009609,130,217,316
+PanTS_00009636,130,284,411
+PanTS_00009654,130,304,343
+PanTS_00009657,130,316,414
+PanTS_00009674,130,279,365
+PanTS_00009700,130,320,511
+PanTS_00009703,130,315,510
+PanTS_00009735,130,224,330
+PanTS_00009769,130,210,326
+PanTS_00009776,130,233,360
+PanTS_00009798,240,185,130
+PanTS_00009812,129,132,211
+PanTS_00009833,129,259,347
+PanTS_00009855,294,146,130
+PanTS_00009883,130,283,408
+PanTS_00009895,130,297,376

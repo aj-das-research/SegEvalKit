@@ -20,8 +20,9 @@ export OMP_NUM_THREADS=4 MPLCONFIGDIR=$TMPDIR/mpl
 SEK=${SLURM_SUBMIT_DIR:-$HOME/projects/SegEvalKit}
 cd "$STORE/third_party/R-Super/rsuper_train"
 # Upstream bug (R-Super fa8fdce, pad_to_training_size): F.pad lists the *last* axis first, so a scan with
-# fewer slices than the training patch is padded along x while the offsets are recorded for z; unpadding
-# then drops slices and postprocess fails ("FAILED postprocess", 25 PanTS test cases, all shorter than the patch).
+# fewer slices than the training patch is padded along x while the offsets are recorded for z (and vice versa
+# for a narrow scan); unpadding then cuts the wrong axis and postprocess fails ("FAILED postprocess",
+# 25 PanTS test cases: 23 short along z, 2 narrow along x after the 1 mm resampling).
 # Run a copy with the two 3D pad tuples swapped; cases with enough slices are unaffected (the code path
 # is only taken when z or x is smaller than the patch). The official file is left untouched.
 "$ENV/bin/python" "$SEK/benchmarks/pants/patch_medformer.py"
