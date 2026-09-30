@@ -53,9 +53,15 @@ statistics and figures needed to report results you can defend.
 
 ## Install
 
+Python 3.10–3.12 (3.11 recommended), in a fresh environment:
+
 ```bash
-pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git@v0.1.0"
+conda create -n segevalkit python=3.11 pip -y && conda activate segevalkit
+python -m pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git@v0.1.0"
 ```
+
+Behind a firewall that blocks HTTPS to GitHub, use `git+ssh://git@github.com/...` instead; see
+[Installation](https://aj-das-research.github.io/SegEvalKit/getting-started/installation/) for venv, HPC and troubleshooting.
 
 Extras: `gpu` (PyTorch surface distances) · `sitk` (MHA / NRRD) · `interactive` (plotly 3D maps) · `dev` · `docs`.
 Datasets: 25 presets with official protocols (MSD ×10, FLARE22, KiTS19/23, BraTS 2023, AMOS, BTCV, ISLES'22,

@@ -24,6 +24,22 @@ distances are computed on the union bounding box of both masks plus one voxel, s
 | Metrics | Topology (skeletons, Betti numbers) is the most expensive family; request it only for tubular or hollow structures. |
 | Memory | Peak ≈ two copies of the largest label volume per worker, plus crop-level distance maps. |
 
+## Environment on a cluster
+
+Create the environment once on a large project file system, with an explicit Python version, and install over
+SSH if the cluster blocks HTTPS to GitHub. The first line loads the cluster's conda; its path is site-specific.
+
+```console
+$ source /apps/local/conda_init.sh              # your cluster's conda setup
+$ conda create -p /path/to/envs/segevalkit python=3.11 pip -y
+$ conda activate /path/to/envs/segevalkit
+$ python -V                                     # check before installing
+$ python -m pip install "segevalkit[all] @ git+ssh://git@github.com/aj-das-research/SegEvalKit.git@v0.1.0"
+```
+
+Install large environments (PyTorch wheels are several GB) from a CPU batch job rather than a login node, and
+install the PyTorch build that matches the nodes' driver first (see [Installation](installation.md)).
+
 ## SLURM template
 
 ```bash title="evaluate.sbatch"
