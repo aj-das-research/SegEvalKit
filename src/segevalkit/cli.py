@@ -271,6 +271,32 @@ def cmd_cohort(a) -> int:
     return 0
 
 
+def cmd_audit(a) -> int:
+    from ._console import banner, console
+    from .io import Source, audit_geometry
+
+    banner("geometry audit", compact=True)
+    ref = Source(a.ref)
+    img = Source(a.images, kind="image")
+    with console.status("[sek.brand]checking headers…", spinner="dots12"):
+        df = audit_geometry(ref, img, n_workers=a.workers)
+    n = len(ref.case_ids)
+    if df.empty:
+        console.print(f"[sek.ok]✓[/] all {n} cases: every reference file matches its image grid")
+        return 0
+    bad = df.case_id.nunique()
+    console.print(f"[sek.warn]⚠ {bad} of {n} cases have reference files whose header differs from the image[/]")
+    console.print(df.groupby("structure").size().sort_values(ascending=False).head(15).to_string())
+    same = df.same_shape.all()
+    console.print(("[sek.muted]All mismatching files have the image's shape: if the voxel data is aligned, "
+                   "evaluate with --alignment ignore.[/]") if same else
+                  "[sek.warn]Some files also differ in shape: resampling is required.[/]")
+    if a.out:
+        df.to_csv(a.out, index=False)
+        console.print(f"[sek.ok]✓[/] {a.out}")
+    return 1
+
+
 def cmd_metrics(a) -> int:
     from ._console import banner, console, metric_table, rule
     from .metrics import FAMILIES, list_metrics
@@ -396,6 +422,7 @@ def cmd_home(a) -> int:
                       ("recommend", "which metrics to report for your problem"),
                       ("visualize", "error overlays, projections, 3D surface-distance maps"),
                       ("cohort", "subgroup statistics from case metadata (site, phase, sex...)"),
+                      ("audit", "check reference headers against images before evaluating"),
                       ("metrics", "list every metric with direction and unit"),
                       ("datasets", "benchmark presets with official protocols")):
         t.add_row(f"segevalkit {cmd}", desc)
@@ -485,6 +512,14 @@ def build_parser() -> argparse.ArgumentParser:
     h.add_argument("--min-n", type=int, default=5)
     h.add_argument("--out", help="output folder (default: <results>/cohorts)")
     h.set_defaults(fn=cmd_cohort)
+
+    au = sub.add_parser("audit", formatter_class=fmt_cls,
+                        help="check that reference label headers match their images before evaluating")
+    au.add_argument("--ref", required=True)
+    au.add_argument("--images", required=True)
+    au.add_argument("--workers", type=int, default=8)
+    au.add_argument("--out", help="CSV of mismatching files")
+    au.set_defaults(fn=cmd_audit)
 
     m = sub.add_parser("metrics", formatter_class=fmt_cls, help="list available metrics")
     m.add_argument("--family")

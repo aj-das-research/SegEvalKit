@@ -155,3 +155,18 @@ def test_pooled_and_cohort(tmp_path):
     assert set(cs.group) == {"A", "B"} and (cs.n == 4).all()
     ct = cohort_tests(res, md, "site", metrics=["dice"], labels=["organ"], min_n=2)
     assert ct.test.item() == "mann-whitney" and 0 <= ct.p_value.item() <= 1
+
+
+def test_audit_geometry_flags_header_mismatch(tmp_path):
+    from segevalkit.io import audit_geometry
+
+    img_dir = tmp_path / "img" / "c0"; img_dir.mkdir(parents=True)
+    ref_dir = tmp_path / "ref" / "c0" / "segmentations"; ref_dir.mkdir(parents=True)
+    ct = np.zeros((8, 8, 8), np.float32)
+    save_volume(ct, img_dir / "ct.nii.gz", AFF)
+    m = np.zeros((8, 8, 8), np.uint8); m[2:5, 2:5, 2:5] = 1
+    save_volume(m, ref_dir / "ok.nii.gz", AFF)
+    flipped = AFF.copy(); flipped[0, 0] *= -1
+    save_volume(m, ref_dir / "bad.nii.gz", flipped)
+    df = audit_geometry(Source(tmp_path / "ref"), Source(tmp_path / "img", kind="image"))
+    assert list(df.structure) == ["bad"] and df.same_shape.all()

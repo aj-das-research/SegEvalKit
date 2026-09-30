@@ -118,8 +118,11 @@ def main():
             cases = [c for c in cases if c in keep]
         if a.limit:
             cases = cases[: a.limit]
+        # PanTS label headers disagree with their CT in 227 of 901 test cases (the aorta in 218), while the
+        # voxel data is aligned with the CT (see `segevalkit audit`). All predictions are written on the CT
+        # grid, so voxel correspondence is the correct pairing; "resample" would trust the broken headers.
         ev = sek.Evaluator(labels=labels_for(m), metrics=ORGAN, params=PARAMS, device=a.device,
-                           min_lesion_voxels=10, alignment="resample")
+                           min_lesion_voxels=10, alignment="ignore")
         prob = None
         if s.get("prob_subdir"):  # lesion probabilities -> calibration metrics
             prob = Source(s["root"], layout="per_structure", subdir=s["prob_subdir"], kind="prob")

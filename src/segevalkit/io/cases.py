@@ -235,3 +235,55 @@ def discover_cases(
         "extra_pred": sorted(pred_ids - set(ref_ids)) if cases is None else [],
     }
     return out, report
+
+
+def audit_geometry(ref: "Source", image: "Source", cases: Optional[Sequence[str]] = None,
+                   atol_mm: float = 1e-2, n_workers: int = 1):
+    """Check that every reference file lives on the same grid as its image.
+
+    Label files are sometimes written with a header (affine / orientation /
+    spacing) that disagrees with the image although the voxel data is aligned
+    with it. Evaluating with ``alignment="resample"`` then moves the prediction
+    to a wrong place; ``alignment="ignore"`` (voxel correspondence) is correct
+    when shapes match. Run this audit once per dataset before choosing.
+
+    Returns:
+        DataFrame with one row per mismatching file: ``case_id, structure,
+        issues, same_shape, same_spacing``. An empty frame means all consistent.
+    """
+    import pandas as pd
+
+    from .volume import check_alignment
+
+    def one(cid):
+        rows = []
+        if cid not in image._index:
+            return rows
+        img = load_volume(image.path(cid) if image.layout != "flat" else image._index[cid], kind="image")
+        files = ([(s, ref.path(cid) / f"{s}.nii.gz") for s in ref.structures(cid)] if ref.layout == "per_structure"
+                 else [("(label map)", ref.path(cid))])
+        for name, f in files:
+            import nibabel as nib
+
+            hdr = nib.load(str(f))
+            vol = Volume(np.zeros(1), tuple(float(z) for z in hdr.header.get_zooms()[:3]), hdr.affine, str(f))
+            vol.data = np.empty(hdr.shape[:3], dtype=np.uint8)
+            issues = check_alignment(vol, img, atol_mm=atol_mm)
+            if issues:
+                rows.append({"case_id": cid, "structure": name, "issues": "; ".join(issues),
+                             "same_shape": tuple(hdr.shape[:3]) == img.shape,
+                             "same_spacing": bool(np.allclose(vol.spacing, img.spacing, atol=1e-4))})
+        return rows
+
+    ids = list(cases) if cases is not None else ref.case_ids
+    out = []
+    if n_workers > 1:
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(n_workers) as ex:
+            for r in ex.map(one, ids):
+                out += r
+    else:
+        for cid in ids:
+            out += one(cid)
+    return pd.DataFrame(out, columns=["case_id", "structure", "issues", "same_shape", "same_spacing"])

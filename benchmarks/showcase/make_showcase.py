@@ -82,7 +82,7 @@ def evaluate(cases):
         pred = Source(s["root"], layout=s["layout"], subdir=s.get("subdir"))
         prob = Source(s["root"], layout="per_structure", subdir=s["prob_subdir"], kind="prob") if s.get("prob_subdir") else None
         ev = sek.Evaluator(labels=labels_for(m), metrics=ORGAN, params=PARAMS, min_lesion_voxels=10,
-                           alignment="resample")
+                           alignment="ignore")  # PanTS label headers are unreliable; see evaluate_models.py
         r = ev.evaluate(pred, ref, prob=prob, cases=cases, n_workers=8, out_dir=EVAL / m, name=s["name"],
                         progress=False)
         res[s["name"]] = r

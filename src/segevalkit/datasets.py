@@ -145,7 +145,10 @@ register_dataset(DatasetPreset(
     url="https://github.com/MrGiovanni/PanTS",
     license="CC BY-NC-ND 4.0 (GitHub LICENSE; the HF card says CC BY-NC-SA 4.0): non-commercial",
     citation="Li et al. 2025, PanTS: The Pancreatic Tumor Segmentation Dataset, NeurIPS Datasets & Benchmarks",
-    notes="Evaluate from LabelTe/<case>/segmentations/<name>.nii.gz, not combined_labels.nii.gz: the "
+    notes="Label headers are unreliable: in 227 of 901 test cases at least one label file (the aorta in 218) has "
+          "an affine that disagrees with its CT although the voxel data is aligned with it; evaluate with "
+          "alignment='ignore' and check with `segevalkit audit`. "
+          "Evaluate from LabelTe/<case>/segmentations/<name>.nii.gz, not combined_labels.nii.gz: the "
           "per-structure masks overlap (pancreas contains head/body/tail and duct; veins overlap "
           "organs), so the combined map is lossy. The lesion is annotated inconsistently relative to the "
           "pancreas mask (sometimes inside it, sometimes outside), so evaluate the pancreas as pancreas "
