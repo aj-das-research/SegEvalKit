@@ -104,11 +104,6 @@ plugins:
             show_signature_annotations: true
             merge_init_into_class: true
 
-# Pages whose results are still being computed are kept out of the published site
-# until their figures are generated from real runs (no placeholders online).
-exclude_docs: |
-  datasets/pants-benchmark.md
-
 nav:
   - Home: index.md
   - Getting started:
@@ -145,6 +140,7 @@ nav:
   - Datasets & benchmarks:
       - datasets/index.md
       - Dataset presets: datasets/presets.md
+      - PanTS benchmark: datasets/pants-benchmark.md
   - API reference:
       - api/index.md
       - Evaluator & results: api/evaluator.md
