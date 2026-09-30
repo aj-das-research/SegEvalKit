@@ -126,7 +126,7 @@ def _paired(a: np.ndarray, b: np.ndarray, test: str, n_perm: int, seed: int) -> 
     raise ValueError("test must be 'wilcoxon', 'ttest' or 'permutation'")
 
 
-def compare(a, b, *, metrics: Optional[Sequence[str]] = None, labels: Optional[Sequence[str]] = None,
+def compare(a: "EvaluationResult", b: "EvaluationResult", *, metrics: Optional[Sequence[str]] = None, labels: Optional[Sequence[str]] = None,
             test: str = "wilcoxon", correction: str = "holm", n_perm: int = 10000,
             seed: int = 0) -> pd.DataFrame:
     """Paired comparison of two evaluation results on their common cases.

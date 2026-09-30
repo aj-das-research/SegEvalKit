@@ -19,8 +19,9 @@ Lesions (instances)
 `criterion="overlap"` (default)
 :   Many-to-many, as in the ISLES, autoPET and BraTS lesion-wise evaluations. A reference lesion is **detected** if
     at least one predicted component overlaps it by at least `min_overlap` of the reference lesion's volume (any
-    overlap when `min_overlap = 0`). A predicted component is a **false positive** if it overlaps no reference
-    lesion at all.
+    overlap when `min_overlap = 0`). A predicted component is a true positive only if it takes part in such a
+    qualifying overlap; otherwise, including when it merely grazes a lesion below `min_overlap`, it is a
+    **false positive**.
 
 `criterion="iou"`
 :   One-to-one. Components are paired by maximum-IoU assignment (Hungarian algorithm) and a pair counts as a match
@@ -31,12 +32,6 @@ Metrics that accept `criterion`, `iou_threshold` and `min_overlap`: `lesion_reca
 `lesion_f1`, `false_positive_lesions`, `false_negative_lesions`. The others use a fixed rule: `split_count`,
 `merge_count` and `lesionwise_dice` always use "overlap" with any overlap; `panoptic_quality` always uses "iou"
 with its own `iou_threshold`; `lesion_count_difference` only counts components.
-
-!!! warning "`min_overlap` is one-sided"
-    Under the "overlap" criterion, `min_overlap` applies to reference lesions only. A predicted component that
-    touches a lesion below the threshold leaves that lesion undetected (a false negative) but is not counted as
-    a false positive either. With `min_overlap > 0`, lesion precision can therefore stay at 1 while lesion
-    recall drops to 0.
 
 ## Notation
 

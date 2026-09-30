@@ -30,7 +30,11 @@ STRUCTURES = {
     "pancreatic_lesion": "lesion",
 }
 METRICS = ["dice", "iou", "nsd", "boundary_iou", "hd", "hd95", "assd", "masd", "relative_volume_difference",
-           "cldice", "betti0_error", "betti1_error", "lesion_f1", "centroid_distance"]
+           "lesion_f1", "centroid_distance"]
+# Topology metrics (skeletons, Betti numbers) are the expensive family; they are
+# computed where the literature says they matter plus one compact and one large
+# organ as controls (Betti numbers are cheap, skeletons are not).
+TOPOLOGY = {"aorta", "veins", "pancreatic_lesion", "kidney_left", "gall_bladder", "pancreas"}
 PERTURBATIONS = {
     "erode": [0, 1, 2, 3, 5], "dilate": [0, 1, 2, 3, 5], "shift": [0, 1, 2, 4, 8],
     "boundary_noise": [0, 1, 2, 3, 5], "islands": [0, 1, 2, 4, 8], "holes": [0, 1, 2, 4, 8],
@@ -39,7 +43,10 @@ PERTURBATIONS = {
 
 
 def _one(args):
-    case_id, structure, ref_root = args
+    case_id, structure, ref_root, out = args
+    part = Path(out) / "parts" / f"{structure}__{case_id}.csv"
+    if part.exists():
+        return pd.read_csv(part)
     from segevalkit.io import load_volume
     from segevalkit.metrics.context import bbox
     from segevalkit.synthetic import sensitivity_study
@@ -54,10 +61,14 @@ def _one(args):
     # Work in a crop with an 80 mm margin: perturbations stay inside, EDTs stay small.
     margin = int(np.ceil(80 / min(v.spacing)))
     m = m[bbox(m, margin)]
-    df = sensitivity_study([(case_id, m, v.spacing)], METRICS, perturbations=PERTURBATIONS,
+    metrics = METRICS + (["cldice", "betti0_error", "betti1_error"] if structure in TOPOLOGY else [])
+    df = sensitivity_study([(case_id, m, v.spacing)], metrics, perturbations=PERTURBATIONS,
                            params={"nsd": {"tolerance_mm": 2.0}, "boundary_iou": {"width_mm": 2.0}}, seed=7)
     df["structure"] = structure
     df["ref_volume_ml"] = float(m.sum() * np.prod(v.spacing) / 1000)
+    part.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(part, index=False)
+    print(f"done {structure} {case_id}", flush=True)
     return df
 
 
@@ -89,7 +100,7 @@ def main():
                 if len(nonempty) >= a.n_cases:
                     break
             pool_cases = nonempty
-        jobs += [(c, s, a.ref_root) for c in pool_cases]
+        jobs += [(c, s, a.ref_root, str(out)) for c in pool_cases]
     with ProcessPoolExecutor(a.workers) as ex:
         frames = [d for d in ex.map(_one, jobs) if d is not None]
     df = pd.concat(frames, ignore_index=True)

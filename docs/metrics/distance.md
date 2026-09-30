@@ -25,8 +25,8 @@ Directed distances
 
 Percentile Hausdorff
 :   `hd95` is the maximum of the two directed 95th percentiles (MetricsReloaded, MONAI, DeepMind
-    `surface-distance`, BraTS). `hd_percentile` with `mode="pooled"` gives the MedPy convention (percentile of the
-    pooled distances), which is never larger than the directed form.
+    `surface-distance`, BraTS). `mode="pooled"` (accepted by both `hd95` and `hd_percentile`) gives the MedPy
+    convention (percentile of the pooled distances), which is never larger than the directed form.
 
 ASSD vs MASD
 :   `assd` is the mean over the **pooled** distances of both surfaces (MONAI; MedPy ≥ 0.5.2). `masd` is the mean
@@ -65,11 +65,11 @@ page except Boundary IoU and centroid distance is a summary of these two sets. \
 |---|---|---|---|---|---|
 | [HD](#hd) | `hd` | maximum | mm | extreme: one voxel sets it | – |
 | [HD\(_q\)](#hd_percentile) | `hd_percentile` | \(q\)-th percentile | mm | moderate | `q`, `mode` |
-| [HD95](#hd95) | `hd95` | max of directed 95th percentiles | mm | moderate | – |
+| [HD95](#hd95) | `hd95` | 95th percentile (directed max by default) | mm | moderate | `mode` |
 | [ASSD](#assd) | `assd` | pooled mean | mm | low | – |
 | [MASD](#masd) | `masd` | mean of directed means | mm | low | – |
 | [NSD](#nsd) | `nsd` | fraction \(\le \tau\) | – | none beyond \(\tau\) | `tolerance_mm` |
-| [Boundary IoU](#boundary_iou) | `boundary_iou` | IoU of inner bands | – | low | `width_mm` |
+| [Boundary IoU](#boundary_iou) | `boundary_iou` | IoU of boundary bands | – | low | `width_mm` |
 | [Centroid distance](#centroid_distance) | `centroid_distance` | centres of mass | mm | low (shape-blind) | – |
 
 ## Metrics
@@ -120,7 +120,8 @@ diagonal in mm by default).
 **In plain words:** a near-worst-case boundary error that ignores the most extreme \((100-q)\) % of surface
 points.
 
-**Use it when:** you need a percentile other than 95, or you must reproduce numbers from MedPy (`mode="pooled"`).
+**Use it when:** you need a percentile other than 95. For the 95th percentile, `hd95` is equivalent and accepts
+the same `mode`.
 
 **Watch out for:** the two modes give different numbers; always state `q` and `mode`. The directed form (default)
 matches MetricsReloaded, MONAI, DeepMind and BraTS. For small structures with few surface voxels, any
@@ -144,6 +145,8 @@ convention of DeepMind `surface-distance` ([code](https://github.com/google-deep
 
 \[
 \mathrm{HD}_{95} = \max\Big(P_{95}(D_{P\to G}),\; P_{95}(D_{G\to P})\Big)
+\qquad\text{or, with } \texttt{mode="pooled"},\qquad
+\mathrm{HD}_{95}^{\text{pooled}} = P_{95}\big(D_{P\to G}\cup D_{G\to P}\big)
 \]
 
 **In plain words:** 95 % of the surface points of each mask lie within this distance of the other mask's surface.
@@ -152,13 +155,13 @@ convention of DeepMind `surface-distance` ([code](https://github.com/google-deep
 many radiotherapy auto-contouring studies, and part of the `default` metric set.
 
 **Watch out for:** it is still sensitive to clusters of outliers larger than 5 % of the surface, and it tells
-nothing about how much of the surface is acceptable (use [NSD](#nsd)). `hd95` always uses the directed
-convention and takes no parameters; for the MedPy (pooled) convention use
-`hd_percentile` with `{"q": 95, "mode": "pooled"}`.
+nothing about how much of the surface is acceptable (use [NSD](#nsd)). The default directed form matches
+MetricsReloaded, MONAI, DeepMind and BraTS; `{"hd95": {"mode": "pooled"}}` reproduces MedPy's `hd95`. The two
+differ (7.14 mm vs 7.07 mm for a 10-voxel cube inside a 20-voxel cube), so state the mode.
 
 **Empty masks:** as [HD](#hd). Under the `brats2023` preset, one empty mask gives 374 mm.
 
-**Parameters:** none (fixed \(q = 95\), directed).
+**Parameters:** `mode = "directed"` (or `"pooled"`).
 
 **Reference:** Huttenlocher et al. 1993, [doi:10.1109/34.232073](https://doi.org/10.1109/34.232073). Bakas S,
 Reyes M, Jakab A, et al. Identifying the best machine learning algorithms for brain tumor segmentation,
@@ -274,9 +277,16 @@ e26151 (2021). [doi:10.2196/26151](https://doi.org/10.2196/26151)
 \mathrm{BIoU}_d = \frac{\lvert (P_d\cap P)\cap(G_d\cap G)\rvert}{\lvert (P_d\cap P)\cup(G_d\cap G)\rvert}
 \]
 
-\(X_d \cap X\) is the inner boundary band of \(X\): the foreground voxels whose Euclidean distance (mm) to the
-nearest background voxel is at most \(d\) (`width_mm`). At 1 mm isotropic spacing, \(d = 2\) mm is the two
-outermost voxel layers.
+\(X_d \cap X\) is the inner boundary band of \(X\): its surface voxels \(\partial X\) (6-connected boundary
+voxels, as for all distance metrics) together with every voxel \(x \in X\) whose Euclidean distance transform inside
+the mask, \(\mathrm{EDT}_X(x)\) (distance in mm to the nearest background voxel), is at most \(d\) (`width_mm`):
+
+\[
+X_d \cap X = \partial X \,\cup\, \{\, x\in X : \mathrm{EDT}_X(x) \le d \,\}.
+\]
+
+The band is never empty for a non-empty mask. At 1 mm isotropic spacing, \(d = 2\) mm is the two outermost voxel
+layers; for \(d\) below the spacing it is the surface alone.
 
 **In plain words:** IoU measured only in a thin band along each boundary, so it rewards precise contours rather
 than bulk overlap.
@@ -284,10 +294,9 @@ than bulk overlap.
 **Use it when:** comparing boundary quality of large objects, where Dice saturates near 1. It is less sensitive
 to outliers than HD.
 
-**Watch out for:** it depends on the band width. For objects thinner than about \(2d\) it approaches IoU. Choose
-`width_mm` at least as large as the **largest** voxel spacing: a surface voxel whose only background neighbour
-lies along a 5 mm axis is 5 mm from the background, and with `width_mm` below the smallest spacing both bands
-are empty and SegEvalKit returns 1.0 whatever the masks.
+**Watch out for:** it depends on the band width. For objects thinner than about \(2d\) it approaches IoU. On
+anisotropic grids the band is thicker, in voxels, along the fine axes than along the coarse one; state `width_mm`
+together with the spacing.
 
 **Empty masks:** both empty: 1 (`"best"`) or NaN. Exactly one empty: 0.
 

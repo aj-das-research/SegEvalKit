@@ -120,8 +120,9 @@ prediction of a 64-voxel lesion in a \(64^3\) volume scores 0.0023 nats, while a
 structure filling half the volume scores \(\ln 2 = 0.693\). Unnormalised values are therefore not comparable
 across structures or images, and have no clinical reading.
 
-**Empty masks:** not governed by the `EmptyPolicy`. Both masks empty gives 0 (both entropies are 0), which is the
-*worst* value on this scale.
+**Empty masks:** both empty: 0 (`"best"`, the value of the zero-entropy partitions) or NaN (`"nan"`). Note that 0
+is the lowest value on this scale, so under `"best"` a correctly absent structure does not score a "best" MI;
+use `"nan"` to exclude such cases.
 
 **Parameters:** none.
 
@@ -152,7 +153,7 @@ from merge errors.
 **Watch out for:** like MI, its scale depends on the foreground fraction and on the field of view. For binary masks
 it is bounded by \(2\ln 2\) nats.
 
-**Empty masks:** not governed by the `EmptyPolicy`. Both masks empty gives 0.
+**Empty masks:** both empty: 0 (`"best"`) or NaN (`"nan"`).
 
 **Parameters:** none.
 
@@ -199,30 +200,36 @@ floating point.
 <div class="sek-meta"><span class="sek-chip">key: <code>global_consistency_error</code></span><span class="sek-chip">range [0, 1]</span><span class="sek-chip teal">lower is better</span><span class="sek-chip orange">dimensionless</span></div>
 
 \[
-\mathrm{GCE} = \frac1N\min\Big\{\tfrac{FN(FN+2TP)}{TP+FN} + \tfrac{FP(FP+2TN)}{TN+FP},\;
-\tfrac{FP(FP+2TP)}{TP+FP} + \tfrac{FN(FN+2TN)}{TN+FN}\Big\}
+\mathrm{GCE} = \frac1N\min\Big\{\tfrac{2\,TP\cdot FP}{TP+FP} + \tfrac{2\,TN\cdot FN}{TN+FN},\;
+\tfrac{2\,TP\cdot FN}{TP+FN} + \tfrac{2\,TN\cdot FP}{TN+FP}\Big\}
 \]
 
-Terms with a zero denominator are taken as 0.
+This is Martin et al.'s definition,
+\(rac1N\min\{\sum_x E(P,G,x),\ \sum_x E(G,P,x)\}\) with the local refinement error
+\(E(S_1,S_2,x) = \lvert R(S_1,x)\setminus R(S_2,x)
+vert / \lvert R(S_1,x)
+vert\) (\(R(S,x)\) is the region of
+\(S\) containing \(x\)), evaluated in closed form for two binary partitions. Terms with a zero denominator are
+taken as 0.
 
 **In plain words:** how far one segmentation is from being a refinement of the other. 0 when identical.
 
 **Use it when:** only for completeness and comparability with EvaluateSegmentation and pymia.
 
 **Watch out for:** GCE was designed to forgive differences in granularity between human segmentations of natural
-images, so it is rarely appropriate for binary medical segmentation. SegEvalKit implements the binary closed form
-as published by Taha & Hanbury (2015); this form does not coincide with a direct evaluation of Martin et al.'s
-local refinement error (under which, for example, an empty prediction scores 0). Do not compare GCE values across
-tools without checking the formula.
+images: if one segmentation is a refinement of the other it scores 0. For binary masks this means an empty (or
+all-foreground) prediction scores 0, a perfect value. It is rarely appropriate for binary medical segmentation.
+The binary closed form printed by Taha & Hanbury (2015, Eq. 11) does not reproduce Martin's definition (it adds
+\(FN^2/(TP+FN)\)-type terms), so values from tools that implement that printed form differ from SegEvalKit's.
 
-**Empty masks:** not governed by the `EmptyPolicy`. Both masks empty gives 0.
+**Empty masks:** both empty: 0 (`"best"`) or NaN (`"nan"`). An empty prediction with a non-empty reference
+gives 0 (see above).
 
 **Parameters:** none.
 
 **Reference:** Martin D, Fowlkes C, Tal D, Malik J. A database of human segmented natural images and its
 application to evaluating segmentation algorithms and measuring ecological statistics. *ICCV 2001*, 416–423.
-[doi:10.1109/ICCV.2001.937655](https://doi.org/10.1109/ICCV.2001.937655). Taha & Hanbury 2015,
-[doi:10.1186/s12880-015-0068-x](https://doi.org/10.1186/s12880-015-0068-x).
+[doi:10.1109/ICCV.2001.937655](https://doi.org/10.1109/ICCV.2001.937655)
 
 </div>
 
@@ -251,7 +258,7 @@ mcc                        0.8730
 adjusted_rand_index        0.8695
 variation_of_information   0.0400
 mutual_information         0.0605
-global_consistency_error   0.0076
+global_consistency_error   0.0073
 ```
 
 Kappa, MCC and ARI all sit within 0.006 of Dice. The information quantities are small numbers whose scale is set

@@ -1,0 +1,159 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+{{ super() }}
+<section class="sk-hero">
+  <div class="sk-wrap sk-hero__inner">
+    <img class="sk-hero__logo" src="{{ 'assets/logo.svg' | url }}" alt="SegEvalKit logo">
+    <h1 class="sk-hero__title">SegEvalKit</h1>
+    <p class="sk-hero__tagline">Evaluation of volumetric medical image segmentation,<br>done carefully.</p>
+    <p class="sk-hero__lede">Fifty-three metrics with written definitions and tested conventions, a standard
+      input&nbsp;/&nbsp;output format, statistics you can defend, and figures you can publish. For CT and MR, in Python.</p>
+    <div class="sk-hero__actions">
+      <a class="sk-btn sk-btn--primary" href="{{ 'getting-started/quickstart/' | url }}">Get started</a>
+      <a class="sk-btn sk-btn--ghost" href="{{ 'metrics/' | url }}">Browse the metrics</a>
+      <a class="sk-btn sk-btn--ghost" href="{{ config.repo_url }}">GitHub</a>
+    </div>
+    <div class="sk-install"><span class="sk-install__prompt">$</span><code>pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git"</code></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="sk-section">
+  <div class="sk-wrap">
+    <p class="sk-eyebrow">Key features</p>
+    <h2 class="sk-h2">Everything an evaluation needs, in one place</h2>
+    <div class="sk-features">
+      <div class="sk-feature">
+        <div class="sk-feature__icon">{% include ".icons/material/shape-outline.svg" %}</div>
+        <h3>Every family of metric</h3>
+        <p>Overlap, volume, surface distance, topology, lesion-wise detection, calibration and agreement,
+          computed from one cached context per pair.</p>
+      </div>
+      <div class="sk-feature">
+        <div class="sk-feature__icon">{% include ".icons/material/scale-balance.svg" %}</div>
+        <h3>Explicit, tested conventions</h3>
+        <p>Empty masks, HD95 variants, ASSD vs MASD, tolerances and connectivity are arguments, recorded with the
+          results and checked against MONAI, MedPy and DeepMind.</p>
+      </div>
+      <div class="sk-feature">
+        <div class="sk-feature__icon">{% include ".icons/material/compass-outline.svg" %}</div>
+        <h3>Knows which metric to use</h3>
+        <p>A Metrics Reloaded-style recommender, a pitfalls catalogue, and a sensitivity study on real CT anatomy
+          that shows what each metric sees.</p>
+      </div>
+      <div class="sk-feature">
+        <div class="sk-feature__icon">{% include ".icons/material/folder-table-outline.svg" %}</div>
+        <h3>A standard interface</h3>
+        <p>Reads flat, folder and per-structure NIfTI layouts, checks geometry, and writes one documented,
+          plain-CSV results format.</p>
+      </div>
+      <div class="sk-feature">
+        <div class="sk-feature__icon">{% include ".icons/material/sigma.svg" %}</div>
+        <h3>Statistics you can defend</h3>
+        <p>Bootstrap confidence intervals, paired tests with multiplicity correction, effect sizes, and
+          challenge-style rankings with bootstrap stability.</p>
+      </div>
+      <div class="sk-feature">
+        <div class="sk-feature__icon">{% include ".icons/material/image-filter-center-focus-weak.svg" %}</div>
+        <h3>See the errors</h3>
+        <p>Colour-vision-safe error overlays, tri-planar views, 3D surface-distance maps and a self-contained
+          HTML report; GPU-accelerated surface distances.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sk-section sk-section--tint">
+  <div class="sk-wrap">
+    <p class="sk-eyebrow">Get started</p>
+    <h2 class="sk-h2">From predictions to conclusions in three steps</h2>
+    <div class="sk-steps">
+      <div class="sk-step">
+        <div class="sk-step__num">1</div>
+        <h3>Describe what to evaluate</h3>
+        <p>Name the structures, their label ids, and the metrics. Unsure which metrics? Ask <code>segevalkit&nbsp;recommend</code>.</p>
+<div class="sk-code">{% filter trim %}
+<pre><span class="k">import</span> segevalkit <span class="k">as</span> sek
+
+ev = sek.Evaluator(
+    labels={<span class="s">"liver"</span>: <span class="n">1</span>, <span class="s">"tumour"</span>: <span class="n">2</span>},
+    metrics=[<span class="s">"default"</span>, <span class="s">"detection"</span>],
+)</pre>{% endfilter %}</div>
+      </div>
+      <div class="sk-step">
+        <div class="sk-step__num">2</div>
+        <h3>Evaluate the folders</h3>
+        <p>The reference defines the case list; missing predictions score as empty. Runs in parallel, or on the GPU.</p>
+<div class="sk-code">{% filter trim %}
+<pre>res = ev.evaluate(
+    <span class="s">"predictions/"</span>, <span class="s">"labelsTr/"</span>,
+    n_workers=<span class="n">8</span>, out_dir=<span class="s">"eval/"</span>,
+)
+res.summary()   <span class="c"># mean, IQR, 95% CI</span></pre>{% endfilter %}</div>
+      </div>
+      <div class="sk-step">
+        <div class="sk-step__num">3</div>
+        <h3>Analyse and report</h3>
+        <p>Compare methods with paired tests, draw the figures, and write a single-file HTML report.</p>
+<div class="sk-code">{% filter trim %}
+<pre><span class="k">from</span> segevalkit.stats <span class="k">import</span> compare
+compare(res_a, res_b, metrics=[<span class="s">"dice"</span>, <span class="s">"hd95"</span>])
+sek.plotting.metric_distribution(res, <span class="s">"dice"</span>)
+sek.report.build_report(res, <span class="s">"report.html"</span>)</pre>{% endfilter %}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sk-section">
+  <div class="sk-wrap sk-split">
+    <div class="sk-split__text">
+      <p class="sk-eyebrow">Command line</p>
+      <h2 class="sk-h2">A terminal interface that explains itself</h2>
+      <p>Every command prints what it is doing and why: evaluation progress, summary tables with the better
+        direction of each metric, paired comparisons, rankings and metric recommendations with their rationale.</p>
+      <ul class="sk-list">
+        <li><code>segevalkit evaluate</code>: score a folder, optionally with an HTML report</li>
+        <li><code>segevalkit compare</code> and <code>rank</code>: paired statistics and ranking stability</li>
+        <li><code>segevalkit recommend</code>: which metrics for your problem</li>
+        <li><code>segevalkit visualize</code>: overlays, projections and 3D surface maps</li>
+      </ul>
+      <a class="sk-link" href="{{ 'getting-started/cli/' | url }}">Command-line reference →</a>
+    </div>
+    <div class="sk-split__media">
+      <img src="{{ 'assets/terminal/recommend.svg' | url }}" alt="segevalkit recommend output">
+    </div>
+  </div>
+</section>
+
+<section class="sk-section sk-section--tint">
+  <div class="sk-wrap">
+    <p class="sk-eyebrow">The metrics</p>
+    <h2 class="sk-h2">Seven families of metrics, seven questions</h2>
+    <div class="sk-families">
+      <a class="sk-family" href="{{ 'metrics/overlap/' | url }}"><strong>Overlap</strong><span>How much of the structure is right?</span><em>Dice · IoU · precision · recall · F&#8209;beta · Tversky</em></a>
+      <a class="sk-family" href="{{ 'metrics/distance/' | url }}"><strong>Distance</strong><span>Where is the boundary wrong, in millimetres?</span><em>HD · HD95 · ASSD · MASD · NSD · boundary IoU</em></a>
+      <a class="sk-family" href="{{ 'metrics/volume/' | url }}"><strong>Volume</strong><span>Is the amount right?</span><em>RVD · AVD · volumetric similarity</em></a>
+      <a class="sk-family" href="{{ 'metrics/topology/' | url }}"><strong>Topology</strong><span>Is the shape connected correctly?</span><em>clDice · Betti&#8209;0/1/2 · Euler</em></a>
+      <a class="sk-family" href="{{ 'metrics/detection/' | url }}"><strong>Detection</strong><span>Were the lesions found, and only them?</span><em>lesion F1 · lesion-wise Dice · PQ · splits / merges</em></a>
+      <a class="sk-family" href="{{ 'metrics/calibration/' | url }}"><strong>Calibration</strong><span>Can the probabilities be trusted?</span><em>ECE · Brier · NLL · AUPRC · soft Dice</em></a>
+      <a class="sk-family" href="{{ 'metrics/agreement/' | url }}"><strong>Agreement</strong><span>How do the partitions agree overall?</span><em>MCC · kappa · MI · VI · ARI · GCE</em></a>
+      <a class="sk-family sk-family--cta" href="{{ 'guide/choosing/' | url }}"><strong>Which ones should I report?</strong><span>The decision guide derives a metric set from your problem.</span><em>Open the guide →</em></a>
+    </div>
+  </div>
+</section>
+
+<section class="sk-section sk-cta">
+  <div class="sk-wrap">
+    <h2 class="sk-h2">Evaluate like the benchmark does</h2>
+    <p>Presets reproduce the official protocols of 25 datasets and challenges: MSD, FLARE22, KiTS, BraTS 2023,
+      AMOS, BTCV, ISLES'22, autoPET, TopCoW, PanTS and more.</p>
+    <div class="sk-hero__actions">
+      <a class="sk-btn sk-btn--primary" href="{{ 'datasets/presets/' | url }}">Dataset presets</a>
+      <a class="sk-btn sk-btn--ghost-dark" href="{{ 'developer/' | url }}">Developer guide</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

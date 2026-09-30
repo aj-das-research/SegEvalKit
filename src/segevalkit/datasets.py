@@ -153,7 +153,7 @@ register_dataset(DatasetPreset(
     labels=None, metrics=["dice", "nsd", "hd95", "assd"],
     params={"nsd": {"tolerance_mm": 3.0}},
     ref_layout="per_structure", ref_subdir="segmentations",
-    cases="1,228 CT (v2)", url="https://github.com/wasserth/TotalSegmentator",
+    cases="1,228 CT (v2); v3 (2026-09): 1,939 CT + 1,296 MR", url="https://github.com/wasserth/TotalSegmentator",
     license="CC BY 4.0 (dataset); model weights: see repository",
     citation="Wasserthal et al. 2023, Radiology: AI 5(5):e230024",
     notes="<case>/ct.nii.gz and <case>/segmentations/<structure>.nii.gz. The paper reports Dice and NSD.",
@@ -177,8 +177,9 @@ register_dataset(DatasetPreset(
             "stomach": 7, "aorta": 8, "postcava": 9, "pancreas": 10, "right_adrenal": 11, "left_adrenal": 12,
             "duodenum": 13, "bladder": 14, "prostate_uterus": 15},
     metrics=["dice", "nsd", "hd95"], params={"nsd": {"tolerance_mm": 1.0}}, ref_layout="flat",
-    cases="500 CT + 100 MR", url="https://amos22.grand-challenge.org/",
-    license="CC BY 4.0", citation="Ji et al. 2022, NeurIPS Datasets & Benchmarks",
+    cases="Tr 200 CT + 40 MR, Va 100 CT + 20 MR, Ts 240", url="https://amos22.grand-challenge.org/",
+    license="CC BY 4.0 (Zenodo; dataset.json says CC BY-SA 4.0)", citation="Ji et al. 2022, NeurIPS Datasets & Benchmarks",
+    notes="Case id < 500 is CT, >= 500 is MR. dataset.json spells aorta 'arota'. Rank-then-aggregate ranking.",
 ))
 
 register_dataset(DatasetPreset(
@@ -197,33 +198,84 @@ register_dataset(DatasetPreset(
           "does not replicate these two rules.",
 ))
 
+# Medical Segmentation Decathlon: labels from each task's dataset.json, NSD
+# tolerances from Antonelli et al. 2022 (Nat Commun 13:4128).
+_MSD = [
+    ("msd_brain", "Task01 BrainTumour", "MR", "Glioma (MSD numbering: 1 edema, 2 non-enhancing, 3 enhancing; not the BraTS ids)",
+     {"edema": 1, "non_enhancing_tumor": 2, "enhancing_tumor": 3, "tumor_core": [2, 3], "whole_tumor": [1, 2, 3]},
+     5.0, "484 train / 266 test"),
+    ("msd_heart", "Task02 Heart", "MR", "Left atrium", {"left_atrium": 1}, 4.0, "20 train / 10 test"),
+    ("msd_liver", "Task03 Liver", "CT", "Liver and liver tumours",
+     {"liver": 1, "cancer": 2, "liver_with_tumour": [1, 2]}, 7.0, "131 train / 70 test"),
+    ("msd_hippocampus", "Task04 Hippocampus", "MR", "Anterior and posterior hippocampus",
+     {"anterior": 1, "posterior": 2}, 1.0, "260 train / 130 test"),
+    ("msd_prostate", "Task05 Prostate", "MR", "Peripheral and transition zones",
+     {"peripheral_zone": 1, "transition_zone": 2}, 4.0, "32 train / 16 test"),
+    ("msd_lung", "Task06 Lung", "CT", "Lung cancer", {"cancer": 1}, 2.0, "63 train / 32 test"),
+    ("msd_pancreas", "Task07 Pancreas", "CT", "Pancreas and pancreatic tumour",
+     {"pancreas": 1, "tumour": 2, "pancreas_with_tumour": [1, 2]}, 5.0, "281 train / 139 test"),
+    ("msd_hepaticvessel", "Task08 HepaticVessel", "CT", "Hepatic vessels and tumours",
+     {"vessel": 1, "tumour": 2}, 3.0, "303 train / 140 test"),
+    ("msd_spleen", "Task09 Spleen", "CT", "Spleen", {"spleen": 1}, 3.0, "41 train / 20 test"),
+    ("msd_colon", "Task10 Colon", "CT", "Primary colon cancer", {"colon_cancer": 1}, 4.0, "126 train / 64 test"),
+]
+for _key, _task, _mod, _anat, _labels, _tau, _cases in _MSD:
+    _lesion = any(w in _anat.lower() for w in ("tumour", "cancer", "glioma"))
+    register_dataset(DatasetPreset(
+        key=_key, title=f"Medical Segmentation Decathlon {_task}", modality=_mod, anatomy=_anat, labels=_labels,
+        metrics=["dice", "nsd", "hd95", "relative_volume_difference"] + (["lesion_f1", "lesion_recall"] if _lesion else []),
+        params={"nsd": {"tolerance_mm": _tau}}, ref_layout="flat", cases=_cases + " (test labels withheld)",
+        url="http://medicaldecathlon.com/", license="CC BY-SA 4.0",
+        citation="Antonelli et al. 2022, Nat Commun 13:4128",
+        notes=f"Official MSD ranking used DSC and NSD with a task-specific tolerance ({_tau:g} mm), with "
+              "Wilcoxon-based significance ranking per region. Labels in labelsTr/<prefix>_<id>.nii.gz.",
+    ))
+
 register_dataset(DatasetPreset(
-    key="msd_liver", title="Medical Segmentation Decathlon Task03 Liver", modality="CT",
-    anatomy="Liver and liver tumours", labels={"liver": 1, "cancer": 2, "liver_with_tumour": [1, 2]},
-    metrics=["dice", "nsd", "hd95", "lesion_f1", "lesion_recall", "relative_volume_difference"],
-    params={"nsd": {"tolerance_mm": 7.0}}, ref_layout="flat",
-    cases="131 train / 70 test (test labels withheld)", url="http://medicaldecathlon.com/",
-    license="CC BY-SA 4.0", citation="Antonelli et al. 2022, Nat Commun 13:4128",
-    notes="Official MSD ranking used DSC and NSD with a per-task tolerance (Liver: 7 mm). Derived from LiTS.",
+    key="lits", title="LiTS 2017: Liver Tumor Segmentation", modality="CT", anatomy="Liver and liver tumours",
+    labels={"liver": 1, "tumour": 2, "liver_with_tumour": [1, 2]},
+    metrics=["dice", "voe", "relative_volume_difference", "assd", "hd", "lesion_f1", "lesion_recall"],
+    ref_layout="flat", cases="131 train / 70 test", url="https://competitions.codalab.org/competitions/17094",
+    license="see challenge terms", citation="Bilic et al. 2023, Medical Image Analysis 84:102680",
+    notes="The official code scores ASSD / MSD as 0 when either mask is empty (not penalised); SegEvalKit's "
+          "default policy penalises it. Files: volume-N.nii / segmentation-N.nii.",
 ))
 
 register_dataset(DatasetPreset(
-    key="msd_colon", title="Medical Segmentation Decathlon Task10 Colon", modality="CT",
-    anatomy="Primary colon cancer", labels={"colon_cancer": 1},
-    metrics=["dice", "nsd", "hd95", "lesion_f1", "lesion_recall", "relative_volume_difference"],
-    params={"nsd": {"tolerance_mm": 4.0}}, ref_layout="flat",
-    cases="126 train / 64 test", url="http://medicaldecathlon.com/", license="CC BY-SA 4.0",
-    citation="Antonelli et al. 2022, Nat Commun 13:4128",
-    notes="MSD NSD tolerance for Colon: 4 mm.",
+    key="acdc", title="ACDC: Automated Cardiac Diagnosis Challenge", modality="MR",
+    anatomy="Right ventricle, myocardium, left ventricle (ED and ES frames)",
+    labels={"right_ventricle": 1, "myocardium": 2, "left_ventricle": 3},
+    metrics=["dice", "hd", "hd95", "assd", "absolute_volume_difference"], ref_layout="flat",
+    cases="100 train / 50 test", url="https://www.creatis.insa-lyon.fr/Challenge/acdc/",
+    license="CC BY-NC-SA 4.0", citation="Bernard et al. 2018, IEEE TMI 37(11):2514",
+    notes="Label order 1 RV, 2 MYO, 3 LV: the REVERSE of M&Ms (use the mnms preset there).",
 ))
 
 register_dataset(DatasetPreset(
-    key="msd_pancreas", title="Medical Segmentation Decathlon Task07 Pancreas", modality="CT",
-    anatomy="Pancreas and pancreatic tumour",
-    labels={"pancreas": 1, "tumour": 2, "pancreas_with_tumour": [1, 2]},
-    metrics=["dice", "nsd", "hd95", "lesion_f1"], params={"nsd": {"tolerance_mm": 5.0}}, ref_layout="flat",
-    cases="281 train / 139 test", url="http://medicaldecathlon.com/", license="CC BY-SA 4.0",
-    citation="Antonelli et al. 2022, Nat Commun 13:4128",
+    key="mnms", title="M&Ms: Multi-Centre, Multi-Vendor & Multi-Disease Cardiac Segmentation", modality="MR",
+    anatomy="Left ventricle, myocardium, right ventricle",
+    labels={"left_ventricle": 1, "myocardium": 2, "right_ventricle": 3},
+    metrics=["dice", "hd", "hd95", "assd"], ref_layout="flat", cases="375 subjects",
+    url="https://www.ub.edu/mnms/", license="see challenge terms",
+    citation="Campello et al. 2021, IEEE TMI 40(12):3543",
+    notes="Label order 1 LV, 2 MYO, 3 RV: the REVERSE of ACDC.",
+))
+
+register_dataset(DatasetPreset(
+    key="segthor", title="SegTHOR: Segmentation of THoracic Organs at Risk", modality="CT",
+    anatomy="Thoracic organs at risk", labels={"esophagus": 1, "heart": 2, "trachea": 3, "aorta": 4},
+    metrics=["dice", "hd95", "assd", "masd", "cldice"], ref_layout="folder", ref_file="GT.nii.gz",
+    cases="40 train / 20 test", url="https://competitions.codalab.org/competitions/21145",
+    license="see challenge terms", citation="Lambert et al. 2020, IPTA",
+    notes="The official distance is the 'average Hausdorff' (max of the directed mean distances).",
+))
+
+register_dataset(DatasetPreset(
+    key="kits19", title="KiTS19: Kidney Tumor Segmentation 2019", modality="CT", anatomy="Kidneys and renal tumours",
+    labels={"kidney_and_tumour": [1, 2], "tumour": [2]}, metrics=["dice", "nsd", "hd95"], ref_layout="folder",
+    ref_file="segmentation.nii.gz", cases="210 train / 90 test", url="https://kits19.grand-challenge.org/",
+    license="CC BY-NC-SA 4.0", citation="Heller et al. 2021, Medical Image Analysis 67:101821",
+    notes="The official ranking uses the mean of the composite (kidney+tumour) and tumour Dice.",
 ))
 
 register_dataset(DatasetPreset(

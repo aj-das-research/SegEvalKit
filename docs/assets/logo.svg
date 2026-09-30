@@ -1,12 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SegEvalKit">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 15.4 48 33.2" role="img" aria-label="SegEvalKit">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b89cf5"/>
-      <stop offset="1" stop-color="#6d3fd6"/>
+    <linearGradient id="sk-lens" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9a72ee"/>
+      <stop offset="1" stop-color="#472594"/>
     </linearGradient>
   </defs>
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="#2e1766"/>
-  <circle cx="27" cy="30" r="15" fill="none" stroke="url(#g)" stroke-width="5"/>
-  <circle cx="37" cy="34" r="15" fill="none" stroke="#e9e1ff" stroke-width="3" stroke-dasharray="4 3.2"/>
-  <path d="M22 50 l6 -6 l5 4 l9 -11" fill="none" stroke="#f0834a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="25" cy="32" r="15" fill="none" stroke="#472594" stroke-width="3.2"/>
+  <circle cx="39" cy="32" r="15" fill="none" stroke="#b89cf5" stroke-width="3.2"/>
+  <path d="M32 18.73 A15 15 0 0 1 32 45.27 A15 15 0 0 1 32 18.73 Z" fill="url(#sk-lens)"/>
 </svg>

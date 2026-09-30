@@ -275,10 +275,11 @@ def cmd_recommend(a) -> int:
     for m, role, why in r.items:
         t.add_row(f"{get_metric(m).display}\n[sek.muted]{m}[/]", f"[{role_style[role]}]{role}[/]", why)
     console.print(t)
-    extra = [Text.from_markup(f"[sek.muted]parameters  [/]{json.dumps(r.params)}"),
-             Text.from_markup(f"[sek.muted]empty policy[/] {r.empty_policy}")]
-    extra += [Text.from_markup(f"[sek.muted]statistics  [/]{s}") for s in r.statistics]
-    extra += [Text.from_markup(f"[sek.warn]note[/]        {n}") for n in r.notes]
+    lab = lambda k, style="sek.muted": f"[{style}]{k:<13}[/]"  # noqa: E731
+    extra = [Text.from_markup(lab("parameters") + json.dumps(r.params)),
+             Text.from_markup(lab("empty policy") + r.empty_policy)]
+    extra += [Text.from_markup(lab("statistics") + s) for s in r.statistics]
+    extra += [Text.from_markup(lab("note", "sek.warn") + n) for n in r.notes]
     console.print(panel(Group(*extra), "how to report"))
     return 0
 

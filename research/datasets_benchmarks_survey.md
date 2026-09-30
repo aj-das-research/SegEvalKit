@@ -171,7 +171,7 @@ These were computed by streaming the official tars and reading every NIfTI heade
 - **Labels are stored as float32** (the images are float32 too). Cast them to an integer type before comparing labels.
 - **All 126 training labels contain `{0, 1}`, so no training case has an empty tumour mask.**
 
-**Task03_Liver:** _LIVER_STATS_PLACEHOLDER_
+**Task03_Liver:** Not computed. Streaming the 27 GB tar hit the 1-hour background limit, so this scan did not finish. The LiTS paper (Bilic et al.) reports in-plane spacing of about 0.56–1.0 mm and slice thickness of about 0.45–6.0 mm [UNVERIFIED]. Some LiTS/Task03 training cases are known to have **no tumour (label 2 absent)**, so the empty-GT policy affects the cancer DSC [UNVERIFIED count; re-run `msdstats.py` locally to confirm].
 
 ---
 

@@ -40,6 +40,10 @@ _PER_STRUCTURE_SUBDIRS = ("segmentations", "predictions", "masks", "labels")
 
 
 def _stem(name: str) -> Optional[str]:
+    # Hidden files are never volumes: the official MSD tarballs ship macOS
+    # AppleDouble metadata ("._liver_0.nii.gz") next to every real file.
+    if name.startswith("."):
+        return None
     low = name.lower()
     for suf in _SUFFIXES:
         if low.endswith(suf):

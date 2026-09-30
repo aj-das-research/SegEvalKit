@@ -213,8 +213,7 @@ Dice is unchanged; every distance changes several-fold.
 
 **How to avoid it.** Always pass the spacing (`compute_metrics(..., spacing=...)`); the `Evaluator` reads it from
 the image header and, with `alignment="strict"` (default), refuses prediction/reference pairs on different grids.
-Choose [Boundary IoU](../metrics/distance.md#boundary_iou) band widths at least as large as the largest spacing,
-and resample thin tubular structures to isotropic spacing before [clDice](../metrics/topology.md#cldice) if the
+State [Boundary IoU](../metrics/distance.md#boundary_iou) band widths together with the spacing, and resample thin tubular structures to isotropic spacing before [clDice](../metrics/topology.md#cldice) if the
 skeleton matters. Report the spacing (or the resampling) with the results.
 
 ## 8. Connectivity and lesion definition {#connectivity}
@@ -342,8 +341,8 @@ anisotropic grids. Lesion-wise Dice in BraTS 2023 dilates reference lesions befo
 [lesion-wise Dice](../metrics/detection.md#lesionwise_dice) does not.
 
 **How to avoid it.** Name the exact variant (SegEvalKit keys are unambiguous: [`assd`](../metrics/distance.md#assd)
-vs [`masd`](../metrics/distance.md#masd), [`hd95`](../metrics/distance.md#hd95) vs
-[`hd_percentile`](../metrics/distance.md#hd_percentile) with `mode="pooled"`), and report the empty-mask policy
+vs [`masd`](../metrics/distance.md#masd), and [`hd95`](../metrics/distance.md#hd95) states its `mode`:
+`"directed"` by default, `"pooled"` for MedPy), and report the empty-mask policy
 and all parameters. The [conventions page](conventions.md) lists the conformance of each metric with other
 libraries.
 

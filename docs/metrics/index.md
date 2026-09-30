@@ -100,8 +100,8 @@ the `PairContext`.
 Most metrics share expensive intermediates: confusion counts, surfaces, directed surface distances, connected
 components, skeletons, Betti numbers and lesion matchings. A `PairContext` computes each of them lazily, once,
 and caches it, so asking for twenty metrics costs little more than asking for the most expensive one.
-`compute_metrics` creates a context internally; create one yourself to reuse it across calls (pass `metrics` by
-keyword, since the second positional argument is `ref`):
+`compute_metrics` creates a context internally; create one yourself to reuse it across calls (passing `metrics`
+by keyword is clearest, though `compute_metrics(ctx, ["hd95"])` also works):
 
 ```python
 from segevalkit.metrics import PairContext
@@ -242,8 +242,9 @@ Rules that hold independently of the policy:
 - Bounded overlap-type scores (Dice, IoU, F\(_\beta\), Tversky, VS, NSD, Boundary IoU, clDice, lesion F1, PQ,
   lesion-wise Dice, MCC, kappa, ARI) are 0 when exactly one mask is empty.
 - Some metrics never consult the policy because they are defined for empty masks: volumes and volume
-  differences, specificity, FPR, accuracy, lesion counts, split and merge counts, MI, VI and GCE (specificity and
-  FPR are NaN only if the reference fills the whole image). Calibration metrics return NaN when their
+  differences, specificity, FPR, accuracy, lesion counts, and split and merge counts (specificity and FPR are NaN
+  only if the reference fills the whole image).
+- MI, VI and GCE return 0 when both masks are empty under `"best"`, and NaN under `"nan"`. Calibration metrics return NaN when their
   region contains no voxels (or, for AUROC and AUPRC, no foreground).
 
 The table below summarises the behaviour; "best / NaN" means the value depends on `both_empty`.
@@ -261,6 +262,7 @@ The table below summarises the behaviour; "best / NaN" means the value depends o
 | `nsd`, `boundary_iou`, `cldice` | 1 / NaN | 0 | 0 |
 | `betti0_error` ... `euler_error` | 0 / NaN | \(\beta_k(G)\) | \(\beta_k(P)\) |
 | `mcc`, `cohen_kappa`, `adjusted_rand_index` | 1 / NaN | 0 | 0 |
+| `mutual_information`, `variation_of_information`, `global_consistency_error` | 0 / NaN | computed | computed |
 | `lesion_recall` | 1 / NaN | 0 | NaN |
 | `lesion_precision` | 1 / NaN | NaN | 0 |
 | `lesion_f1`, `panoptic_quality`, `lesionwise_dice` | 1 / NaN | 0 | 0 |

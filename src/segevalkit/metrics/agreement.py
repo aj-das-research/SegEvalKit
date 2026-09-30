@@ -62,7 +62,7 @@ def variation_of_information(ctx: PairContext) -> float:
     if ctx.both_empty and ctx.empty.both_empty == "nan":
         return float("nan")
     mi, hg, hp = _mi(ctx)
-    return float(max(hg + hp - 2 * mi, 0.0))
+    return float(max(hg + hp - 2 * mi, 0.0)) + 0.0  # never -0.0
 
 
 @register_metric(

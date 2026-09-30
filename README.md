@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/logo.svg" width="96" alt="SegEvalKit logo">
+  <img src="docs/assets/icon.svg" width="88" alt="SegEvalKit logo">
 </p>
 
 <h1 align="center">SegEvalKit</h1>
