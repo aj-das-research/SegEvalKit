@@ -22,6 +22,8 @@ cd "$STORE/third_party/R-Super/rsuper_train"
 IDS=$STORE/data/pants_test_ids.csv
 { echo BDMAP_ID; ls "$STORE/data/raw/PanTS/ImageTe" | sort; } > "$IDS"
 N=${NGPU:-4}   # one SLURM step per allocated GPU
+# The official script filters finished cases *before* splitting into parts, so a part that restarts
+# later sees a shifted split and some cases fall between parts (25 in job 287287). Finish with NGPU=1.
 run_part() {  # relaunch a crashed step up to 5 times; every pipeline skips finished cases
   local i=$1 k
   for k in 1 2 3 4 5; do
