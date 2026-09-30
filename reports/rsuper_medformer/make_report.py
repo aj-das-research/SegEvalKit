@@ -1,20 +1,25 @@
 """Figures, tables and number macros for the R-Super MedFormer / PanTS report.
 
 Every number in report.tex is written here from files produced by the benchmark
-scripts; nothing is typed into the LaTeX by hand.
+scripts; nothing is typed into the LaTeX by hand, except the numbers R-Super
+reports on GitHub (REPORTED below, read off documents/demo_results.png).
 
 Inputs
-    outputs/eval/pants/medformer/          per-case results of MedFormer (evaluate_models.py)
-    outputs/eval/pants/totalseg/           per-case results of TotalSegmentator (reference comparator)
-    outputs/eval/pants/report/             macro / pooled / presence / compare / ranking / cohorts (benchmark_report.py)
-    generated/audit_pants_test.csv         `segevalkit audit` of the PanTS test labels
-    patched_cases.txt                      the 25 cases that needed the upstream padding fix
+    outputs/eval/pants/medformer/                  per-case results (evaluate_models.py)
+    outputs/eval/pants/medformer/rsuper_detection.csv
+                                                   R-Super's own detection volume per case (rsuper_detection.py)
+    outputs/eval/pants/totalseg/                   comparator
+    outputs/eval/pants/report/                     test-set tables (benchmark_report.py)
+    third_party/R-Super/rsuper_train/metadata_pants.csv   R-Super's patient-level ground truth
+    generated/audit_pants_test.csv                 `segevalkit audit` of the test labels
+    patched_cases.txt                              the 25 cases that needed the padding fix
 
-    python reports/rsuper_medformer/make_report.py      # then: tectonic -X compile report.tex
+    srun -p cscc-cpu-p ... python reports/rsuper_medformer/make_report.py   # reads NIfTI for Fig. 4
 """
 
 from __future__ import annotations
 
+import csv
 import json
 import subprocess
 from pathlib import Path
@@ -28,23 +33,34 @@ import pandas as pd  # noqa: E402
 
 import segevalkit as sek  # noqa: E402
 from segevalkit import plotting as P  # noqa: E402
-from segevalkit.cohort import cohort_summary  # noqa: E402
-from segevalkit.plotting.theme import CATEGORICAL, ERROR_COLORS, INK, PURPLE, theme  # noqa: E402
+from segevalkit import viz  # noqa: E402
+from segevalkit.io import load_volume  # noqa: E402
+from segevalkit.plotting.theme import CATEGORICAL, INK, theme  # noqa: E402
 from segevalkit.stats import presence_detection  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 STORE = Path("/l/users/abhijit.das/SegEvalKit")
 EVAL = STORE / "outputs/eval/pants"
 REPORT = EVAL / "report"
+RS = STORE / "third_party/R-Super"
+PANTS = STORE / "data/raw/PanTS"
+PRED = STORE / "outputs/predictions/medformer_pants/abdomenatlas/pants_pancreas_release"
 GEN, FIG = HERE / "generated", HERE / "figures"
 MF, TS = "MedFormer", "TotalSegmentator"
 
+# R-Super GitHub, rsuper_train/Merlin_demo.md, figure documents/demo_results.png, "PanTS test" panel (%).
+REPORTED = {"baseline": {"sens": 76, "spec": 91, "f1": 69},   # AbdomenAtlas/MedFormerPanTS (this checkpoint)
+            "rsuper": {"sens": 80, "spec": 93, "f1": 74}}     # AbdomenAtlas/R-SuperPanTSMerlin (not run)
+# Volume thresholds of calculate_sensitivity_specificity.py (voxels at 1 mm, i.e. mm^3).
+RS_THRESHOLDS = ([i * 10 for i in range(1, 10)] + [i * 10 for i in range(10, 100)] +
+                 [i * 100 for i in range(1, 100)] + [i * 1000 for i in range(1, 100)])
+
 NAME = {"pancreas": "Pancreas", "pancreatic_lesion": "Pancreatic lesion", "liver": "Liver", "spleen": "Spleen",
-        "kidney_left": "Kidney (left)", "kidney_right": "Kidney (right)", "stomach": "Stomach",
+        "kidney_left": "Kidney (L)", "kidney_right": "Kidney (R)", "stomach": "Stomach",
         "gall_bladder": "Gallbladder", "duodenum": "Duodenum", "colon": "Colon",
-        "adrenal_gland_left": "Adrenal (left)", "adrenal_gland_right": "Adrenal (right)", "aorta": "Aorta",
-        "postcava": "Inferior vena cava", "superior_mesenteric_artery": "Sup. mesenteric artery",
-        "veins": "Veins", "common_bile_duct": "Common bile duct"}
+        "adrenal_gland_left": "Adrenal (L)", "adrenal_gland_right": "Adrenal (R)", "aorta": "Aorta",
+        "postcava": "IVC", "superior_mesenteric_artery": "SMA", "veins": "Veins",
+        "common_bile_duct": "Common bile duct"}
 ORGANS10 = ["pancreas", "liver", "spleen", "kidney_left", "kidney_right", "stomach", "gall_bladder", "duodenum",
             "aorta", "postcava"]
 
@@ -56,10 +72,9 @@ def cmd(name: str, value) -> None:
 
 
 def f3(v) -> str:
-    """Score with three decimals ('.864'); '--' for missing."""
     if v is None or not np.isfinite(v):
         return "--"
-    return "1.000" if v >= 0.9995 else f"{v:.3f}".replace("0.", ".", 1) if v >= 0 else f"{v:.3f}"
+    return "1.000" if v >= 0.9995 else f"{v:.3f}".replace("0.", ".", 1)
 
 
 def f1(v) -> str:
@@ -70,21 +85,20 @@ def pct(v) -> str:
     return f"{100 * v:.0f}"
 
 
-def tex_group(g: str) -> str:
-    return (g.replace("%", "\\%").replace("–", "--").replace("≤ ", "$\\le$\\,").replace("> ", "$>$\\,")
-            .replace("< ", "$<$\\,"))
-
-
 def ptex(p) -> str:
     if not np.isfinite(p):
         return "--"
     return "$<\\!10^{-3}$" if p < 1e-3 else f"{p:.3f}"
 
 
+def tex_group(g: str) -> str:
+    return (g.replace("%", "\\%").replace("–", "--").replace("≤ ", "$\\le$\\,").replace("> ", "$>$\\,")
+            .replace("< ", "$<$\\,"))
+
+
 def retitle(ax, text: str) -> None:
-    """Replace the library's left-aligned title (and clear any centred one)."""
     ax.set_title("", loc="center")
-    ax.set_title(text, loc="left")
+    ax.set_title(text, loc="left", fontsize=9)
 
 
 def save(fig, name: str) -> None:
@@ -93,12 +107,49 @@ def save(fig, name: str) -> None:
     print("figure", name)
 
 
-def table(name: str, colspec: str, header: str, rows: list[str], note: str = "") -> None:
-    body = "\n".join(rows)
-    tail = f"\\multicolumn{{{colspec.count('l') + colspec.count('r') + colspec.count('c')}}}{{l}}{{\\footnotesize {note}}}\\\\\n" if note else ""
+def table(name: str, colspec: str, header: str, rows: list[str]) -> None:
     (GEN / f"{name}.tex").write_text(
         f"% generated by make_report.py\n\\begin{{tabular}}{{{colspec}}}\n\\toprule\n{header} \\\\\n\\midrule\n"
-        f"{body}\n\\bottomrule\n{tail}\\end{{tabular}}\n")
+        + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
+
+
+# ------------------------------------------------------------------ patient-level detection
+def confusion(score, y, t):
+    pos = score >= t
+    tp, fp = int((pos & y).sum()), int((pos & ~y).sum())
+    fn, tn = int((~pos & y).sum()), int((~pos & ~y).sum())
+    return tp, fp, fn, tn
+
+
+def op_point(score, y, thresholds, target_spec):
+    """Threshold of the grid whose specificity is closest to ``target_spec`` (ties: higher sensitivity)."""
+    best = None
+    for t in thresholds:
+        tp, fp, fn, tn = confusion(score, y, t)
+        sens, spec = tp / (tp + fn), tn / (tn + fp)
+        key = (abs(spec - target_spec), -sens)
+        if best is None or key < best[0]:
+            best = (key, t, sens, spec, 2 * tp / (2 * tp + fp + fn))
+    return {"t": best[1], "sens": best[2], "spec": best[3], "f1": best[4]}
+
+
+def roc_auc(score, y):
+    thr = np.unique(np.concatenate([[-np.inf], score, [np.inf]]))
+    tpr = np.array([(score[y] > t).mean() for t in thr])
+    fpr = np.array([(score[~y] > t).mean() for t in thr])
+    o = np.lexsort((tpr, fpr))
+    return float(np.trapezoid(tpr[o], fpr[o])), fpr[o], tpr[o]
+
+
+def boot(score, y, thresholds, target_spec, n=1000, seed=0):
+    rng = np.random.default_rng(seed)
+    out = []
+    idx = np.arange(len(y))
+    for _ in range(n):
+        b = rng.choice(idx, len(idx), replace=True)
+        out.append(op_point(score[b], y[b], thresholds, target_spec))
+    d = pd.DataFrame(out)
+    return {k: np.quantile(d[k], [0.025, 0.975]) for k in ("sens", "spec", "f1")}
 
 
 def main() -> None:
@@ -107,366 +158,320 @@ def main() -> None:
     mf = sek.load_results(EVAL / "medformer")
     ts = sek.load_results(EVAL / "totalseg")
     mf.meta["name"], ts.meta["name"] = MF, TS
-    wide = mf.wide()
-    tsw = ts.wide()
+    wide, tsw = mf.wide(), ts.wide()
     macro = pd.read_csv(REPORT / "macro.csv")
     pooled = pd.read_csv(REPORT / "pooled.csv")
-    pres = pd.read_csv(REPORT / "presence.csv").set_index("model")
     comp = pd.read_csv(REPORT / f"compare_{MF}_vs_{TS}.csv")
     rank = pd.read_csv(REPORT / "ranking.csv")
     coh = pd.read_csv(REPORT / "cohorts_MedFormer.csv")
     coht = pd.read_csv(REPORT / "cohort_tests_MedFormer.csv")
-    numbers = json.loads((REPORT / "numbers.json").read_text())
     meta = json.loads((EVAL / "medformer/meta.json").read_text())
     audit = pd.read_csv(GEN / "audit_pants_test.csv")
-    patched = [l.split(",") for l in (HERE / "patched_cases.txt").read_text().splitlines() if l.startswith("PanTS")]
+    patched = [l.split(",")[0] for l in (HERE / "patched_cases.txt").read_text().splitlines() if l.startswith("PanTS")]
+    mm = macro[macro.model == MF].set_index(["label", "metric"])
+    tm = macro[macro.model == TS].set_index(["label", "metric"])
+    pl = pooled[pooled.model == MF].set_index(["label", "metric"])
 
     # ---------------------------------------------------------------- provenance
-    cmd("nCases", numbers["n_cases"][MF])
-    cmd("nCasesTS", numbers["n_cases"][TS])
-    cmd("nStructures", wide["label"].nunique())
+    cmd("nCases", meta["n_cases"])
     cmd("sekVersion", meta["segevalkit_version"])
     cmd("evalDate", meta["created"][:10])
     cmd("nsdTol", f"{meta['config']['params']['nsd']['tolerance_mm']:g}")
     cmd("minLesionVox", meta["config"]["min_lesion_voxels"])
-    cmd("connectivity", meta["config"]["connectivity"])
-    rsuper = subprocess.run(["git", "-C", str(STORE / "third_party/R-Super"), "log", "-1", "--format=%h|%cs"],
-                            capture_output=True, text=True).stdout.strip().split("|")
-    cmd("rsuperCommit", rsuper[0])
-    cmd("rsuperDate", rsuper[1])
+    rs = subprocess.run(["git", "-C", str(RS), "log", "-1", "--format=%h|%cs"], capture_output=True,
+                        text=True).stdout.strip().split("|")
+    cmd("rsuperCommit", rs[0])
+    cmd("rsuperDate", rs[1])
     cmd("nPatched", len(patched))
-    cmd("nPatchedZ", sum(int(p[1]) in (129, 130) for p in patched))
-    cmd("nPatchedX", sum(int(p[3]) in (129, 130) for p in patched))
-    cmd("nAuditCases", audit["case_id"].nunique())
-    cmd("nAuditFiles", len(audit))
-    cmd("nAuditAorta", int((audit["structure"] == "aorta").sum()))
-    cmd("auditSameShape", "all" if audit["same_shape"].all() else "not all")
+    cmd("nAuditCases", audit.case_id.nunique())
+    cmd("nAuditAorta", int((audit.structure == "aorta").sum()))
+    cmd("nStructures", wide.label.nunique())
 
-    # ---------------------------------------------------------------- per-structure table
-    mm = macro[macro.model == MF].set_index(["label", "metric"])
-    order = [s for s in NAME if s in set(wide["label"])]
+    # ---------------------------------------------------------------- reported vs reproduced
+    lw = wide[wide.label == "pancreatic_lesion"].set_index("case_id")
+    gt_rows = {r["BDMAP ID"].strip(): r for r in csv.DictReader(open(RS / "rsuper_train/metadata_pants.csv",
+                                                                   encoding="utf-8-sig"))}
+    cases = lw.index.to_list()
+    y_rs = np.array([float(gt_rows[c]["number of pancreatic lesion instances"] or 0) >= 1 for c in cases])
+    y_sek = (lw.ref_volume_ml > 0).to_numpy()
+    cmd("nPos", int(y_rs.sum()))
+    cmd("nNeg", int((~y_rs).sum()))
+    cmd("nGTagree", int((y_rs == y_sek).sum()))
+    det = pd.read_csv(EVAL / "medformer/rsuper_detection.csv").set_index("BDMAP_ID").loc[cases]
+    v_rs = det["pancreatic tumor volume predicted"].to_numpy(float)       # mm^3 after R-Super's opening
+    v_sek = lw.pred_volume_ml.to_numpy(float) * 1000.0                     # mm^3, no post-processing
+    target = REPORTED["baseline"]["spec"] / 100
+    rows_cmp, pts = [], {}
+    for key, score, y, grid, lab in (
+            ("A", v_rs, y_rs, RS_THRESHOLDS, "R-Super protocol (their volume, their thresholds)"),
+            ("B", v_sek, y_sek, np.unique(v_sek), "SegEvalKit protocol (raw predicted volume)")):
+        op = op_point(score, y, grid, target)
+        ci = boot(score, y, grid, target)
+        auc, fpr, tpr = roc_auc(score, y)
+        pts[key] = (op, auc, fpr, tpr, ci)
+        rows_cmp.append(f"{lab} & {pct(op['sens'])} {{\\scriptsize [{pct(ci['sens'][0])}, {pct(ci['sens'][1])}]}} & "
+                        f"{pct(op['spec'])} & {pct(op['f1'])} {{\\scriptsize [{pct(ci['f1'][0])}, {pct(ci['f1'][1])}]}} & "
+                        f"{auc:.3f} \\\\")
+        for k, kn in (("sens", "Sens"), ("spec", "Spec"), ("f1", "Fone")):
+            cmd(f"our{key}{kn}", pct(op[k]))
+            cmd(f"our{key}{kn}Lo", pct(ci[k][0]))
+            cmd(f"our{key}{kn}Hi", pct(ci[k][1]))
+        cmd(f"our{key}AUC", f"{auc:.3f}")
+        cmd(f"our{key}ThrML", f"{op['t'] / 1000:.2f}")
+    r = REPORTED["baseline"]
+    rows = [f"R-Super GitHub, this checkpoint\\textsuperscript{{a}} & {r['sens']} & {r['spec']} & {r['f1']} & -- \\\\",
+            *rows_cmp,
+            f"\\textcolor{{skmuted}}{{R-Super GitHub, R-Super model (not run)}} & \\textcolor{{skmuted}}{{{REPORTED['rsuper']['sens']}}} & "
+            f"\\textcolor{{skmuted}}{{{REPORTED['rsuper']['spec']}}} & \\textcolor{{skmuted}}{{{REPORTED['rsuper']['f1']}}} & -- \\\\"]
+    table("t_reported", "lrrrr", "Patient level, PanTS test (\\%) & Sensitivity & Specificity & F1 & AUC", rows)
+    p90 = presence_detection(mf, "pancreatic_lesion")
+    cmd("sensAtNinety", f"{p90['sensitivity']:.3f}")
+    cmd("specAtNinety", f"{p90['specificity']:.3f}")
+    cmd("thrAtNinety", f"{p90['threshold']:.2f}")
+    cmd("reportedSens", r["sens"])
+    cmd("reportedSpec", r["spec"])
+    cmd("reportedFone", r["f1"])
+    ciA = pts["A"][4]
+    cmd("sensInCI", "within" if ciA["sens"][0] <= r["sens"] / 100 <= ciA["sens"][1] else "outside")
+    cmd("fInCI", "within" if ciA["f1"][0] <= r["f1"] / 100 <= ciA["f1"][1] else "outside")
+    # patched cases: do they matter for detection?
+    pm = np.isin(np.array(cases), patched)
+    cmd("nPatchedPos", int(y_rs[pm].sum()))
+
+    with theme():
+        fig, ax = plt.subplots(figsize=(3.25, 2.55), constrained_layout=True)
+        for key, c, lab in (("A", CATEGORICAL[0], "R-Super protocol"), ("B", CATEGORICAL[1], "SegEvalKit protocol")):
+            op, auc, fpr, tpr, _ = pts[key]
+            ax.plot(fpr, tpr, color=c, lw=1.6, label=f"{lab} (AUC {auc:.3f})")
+            ax.plot(1 - op["spec"], op["sens"], "o", color=c, ms=5, zorder=5)
+        ax.plot(1 - r["spec"] / 100, r["sens"] / 100, "*", color=CATEGORICAL[2], ms=11, zorder=6,
+                label="reported on GitHub")
+        ax.plot([0, 1], [0, 1], color=INK["muted"], ls="--", lw=0.8)
+        ax.set_xlim(-0.01, 0.5)
+        ax.set_ylim(0.4, 1.0)
+        ax.set_xlabel("1 $-$ specificity", fontsize=8)
+        ax.set_ylabel("Sensitivity", fontsize=8)
+        ax.tick_params(labelsize=7.5)
+        ax.grid(True, axis="both")
+        ax.legend(loc="lower right", fontsize=7)
+        retitle(ax, "Patient level: tumour or not")
+    save(fig, "f_roc")
+
+    # ---------------------------------------------------------------- organ table (+ paired vs TS)
+    order = [s for s in NAME if s in set(wide.label)]
     rows = []
     for s in order:
-        cells = []
-        for m, fmt in (("dice", f3), ("nsd", f3), ("hd95", f1)):
-            r = mm.loc[(s, m)]
-            cells += [f"{fmt(r['mean'])} {{\\scriptsize [{fmt(r.ci_low)}, {fmt(r.ci_high)}]}}", fmt(r["median"])]
+        cells = [f"{f3(mm.loc[(s, 'dice'), 'mean'])} / {f3(mm.loc[(s, 'dice'), 'median'])}",
+                 f"{f3(mm.loc[(s, 'nsd'), 'mean'])} / {f3(mm.loc[(s, 'nsd'), 'median'])}",
+                 f"{f1(mm.loc[(s, 'hd95'), 'mean'])} / {f1(mm.loc[(s, 'hd95'), 'median'])}"]
+        if s in ORGANS10:
+            c = comp[(comp.label == s) & (comp.metric == "dice")].iloc[0]
+            cells += [f3(tm.loc[(s, "dice"), "mean"]), f"{pct(c.frac_a_better)}\\%"]
+        else:
+            cells += ["--", "--"]
         rows.append(f"{NAME[s]} & " + " & ".join(cells) + " \\\\")
-    table("t_structures", "lrrrrrr",
-          " & \\multicolumn{2}{c}{Dice $\\uparrow$} & \\multicolumn{2}{c}{NSD (\\nsdTol\\,mm) $\\uparrow$} & "
-          "\\multicolumn{2}{c}{HD95 (mm) $\\downarrow$} \\\\\n & mean [95\\% CI] & median & mean [95\\% CI] & median & "
-          "mean [95\\% CI] & median", rows)
+    table("t_organs", "lrrrrr", "Structure & Dice mean / median & NSD mean / median & HD95 (mm) mean / median & "
+          "TS Dice & MF better", rows)
     for s, k in (("pancreas", "Panc"), ("liver", "Liver"), ("spleen", "Spleen"), ("kidney_left", "KidL"),
-                 ("duodenum", "Duod"), ("pancreatic_lesion", "Les"), ("common_bile_duct", "CBD")):
-        for m, key in (("dice", "Dice"), ("nsd", "NSD")):
-            cmd(f"mf{k}{key}", f3(mm.loc[(s, m), "mean"]))
-            cmd(f"mf{k}{key}Med", f3(mm.loc[(s, m), "median"]))
+                 ("duodenum", "Duod"), ("gall_bladder", "Gall"), ("common_bile_duct", "CBD")):
+        cmd(f"mf{k}Dice", f3(mm.loc[(s, "dice"), "mean"]))
+        cmd(f"mf{k}DiceMed", f3(mm.loc[(s, "dice"), "median"]))
+        cmd(f"mf{k}NSD", f3(mm.loc[(s, "nsd"), "mean"]))
         cmd(f"mf{k}HD", f1(mm.loc[(s, "hd95"), "mean"]))
         cmd(f"mf{k}HDMed", f1(mm.loc[(s, "hd95"), "median"]))
-    organ_means = [mm.loc[(s, "dice"), "mean"] for s in order if s != "pancreatic_lesion"]
-    cmd("mfNOrgansAbove", sum(v >= 0.85 for v in organ_means))
-    cmd("mfNOrgans", len(organ_means))
-
-    # ---------------------------------------------------------------- macro vs pooled
-    pl = pooled[pooled.model == MF].set_index(["label", "metric"])
-    rows = []
-    for s in order:
-        if s == "pancreatic_lesion":
-            continue
-        pd_, pp, pr = (pl.loc[(s, k), "value"] for k in ("pooled_dice", "pooled_precision", "pooled_recall"))
-        rows.append(f"{NAME[s]} & {f3(mm.loc[(s, 'dice'), 'mean'])} & {f3(pd_)} & {f3(pp)} & {f3(pr)} \\\\")
-    table("t_levels", "lrrrr", "Structure & macro Dice & pooled Dice & pooled precision & pooled recall", rows)
-    cmd("mfGallMacro", f3(mm.loc[("gall_bladder", "dice"), "mean"]))
+    om = [mm.loc[(s, "dice"), "mean"] for s in order if s != "pancreatic_lesion"]
+    cmd("mfNOrgansAbove", sum(v >= 0.85 for v in om))
+    cmd("mfNOrgans", len(om))
     cmd("mfGallPooled", f3(pl.loc[("gall_bladder", "pooled_dice"), "value"]))
-    cmd("mfPancPooled", f3(pl.loc[("pancreas", "pooled_dice"), "value"]))
-
-    # ---------------------------------------------------------------- lesions
-    les = mf.lesions
-    lref = les[(les.kind == "ref") & (les.label == "pancreatic_lesion")]
-    cmd("nRefLesions", len(lref))
-    cmd("nRefDetected", int(lref.detected.sum()))
-    lw = wide[wide.label == "pancreatic_lesion"]
-    pos, neg = lw[lw.ref_empty == 0], lw[lw.ref_empty == 1]
-    cmd("mfLesDicePos", f3(pos.dice.mean()))
-    cmd("mfLesDiceNeg", f3(neg.dice.mean()))
-    cmd("mfNegNoPred", int((neg.pred_empty == 1).sum()))
-    cmd("nPosPatients", len(pos))
-    cmd("nNegPatients", len(neg))
-    lp = pl.loc["pancreatic_lesion"]
-    rows = []
-    for k, lab in (("pooled_lesion_sensitivity", "Lesion sensitivity (found / real lesions)"),
-                   ("pooled_lesion_precision", "Lesion precision (real / predicted lesions)"),
-                   ("pooled_lesion_f1", "Lesion F1"),
-                   ("fp_lesions_per_scan", "False-positive lesions per scan"),
-                   ("pooled_dice", "Pooled lesion Dice (all tumour voxels)")):
-        r = lp.loc[k]
-        rows.append(f"{lab} & {r.value:.3f} & [{r.ci_low:.3f}, {r.ci_high:.3f}] \\\\")
-        cmd({"pooled_lesion_sensitivity": "mfLesSens", "pooled_lesion_precision": "mfLesPrec",
-             "pooled_lesion_f1": "mfLesFone", "fp_lesions_per_scan": "mfFPScan",
-             "pooled_dice": "mfLesPooledDice"}[k], f"{r.value:.2f}")
-    table("t_lesion", "lrr", "Test-set lesion metric & value & 95\\% CI", rows)
-    p = pres.loc[MF]
-    cmd("mfAUC", f"{p.auc:.3f}")
-    cmd("mfSens", f"{p.sensitivity:.3f}")
-    cmd("mfSpec", f"{p.specificity:.3f}")
-    cmd("mfThr", f"{p.threshold:.2f}")
-    per = [("lesion_recall", "Lesion sensitivity"), ("lesion_precision", "Lesion precision"),
-           ("lesion_f1", "Lesion F1"), ("lesionwise_dice", "Lesion-wise Dice"),
-           ("panoptic_quality", "Panoptic quality"), ("dice", "Dice of the tumour voxels"),
-           ("false_positive_lesions", "False-positive lesions per scan")]
-    rows = []
-    for k, lab in per:
-        v = pos[k].dropna()
-        val = f"{v.mean():.2f}" if k == "false_positive_lesions" else f3(v.mean())
-        rows.append(f"{lab} & {val} & {len(v)} \\\\")
-    v = neg["false_positive_lesions"].dropna()
-    rows.append(f"False-positive lesions per scan, tumour-free & {v.mean():.2f} & {len(v)} \\\\")
-    cmd("mfNegFP", f"{v.mean():.2f}")
-    cmd("mfPosLesRecall", f3(pos.lesion_recall.mean()))
-    cmd("mfPosLesFone", f3(pos.lesion_f1.mean()))
-    cmd("mfPosLesPrec", f3(pos.lesion_precision.mean()))
-    table("t_lesion_case", "lrr", "Per tumour patient (mean) & value & patients", rows)
-    # detection by size (the same bins as the figure)
-    bins = [0, 0.1, 0.5, 1, 5, 20, np.inf]
-    names = ["$<$\\,0.1", "0.1--0.5", "0.5--1", "1--5", "5--20", "$>$\\,20"]
-    b = pd.cut(lref.volume_ml, bins=bins, labels=names, include_lowest=True)
-    g = lref.groupby(b, observed=False)["detected"]
-    rows = [f"{n} & {int(g.size()[n])} & {pct(g.mean()[n]) if g.size()[n] else '--'}\\% \\\\" for n in names]
-    table("t_size", "lrr", "Lesion volume (mL) & lesions & detected", rows)
-    small = lref[lref.volume_ml < 0.5]
-    big = lref[lref.volume_ml >= 1]
-    cmd("mfDetSmall", pct(small.detected.mean()))
-    cmd("mfDetBig", pct(big.detected.mean()))
-    cmd("nSmallLes", len(small))
-
-    # calibration (lesion probabilities, band within 10 mm of either mask)
-    rows = []
-    for k, lab in (("ece", "Expected calibration error"), ("brier", "Brier score"), ("auprc", "Area under PR curve")):
-        r = mm.loc[("pancreatic_lesion", k)]
-        rows.append(f"{lab} & {r['mean']:.3f} & {r['median']:.3f} & {int(r.n)} \\\\")
-        cmd({"ece": "mfECE", "brier": "mfBrier", "auprc": "mfAUPRC"}[k], f"{r['mean']:.3f}")
-    table("t_calib", "lrrr", "Lesion probability metric & mean & median & patients", rows)
-
-    # ---------------------------------------------------------------- paired comparison with TotalSegmentator
-    tm = macro[macro.model == TS].set_index(["label", "metric"])
-    rows = []
-    for s in ORGANS10:
-        cells = []
-        for m in ("dice", "nsd", "hd95"):
-            r = comp[(comp.label == s) & (comp.metric == m)].iloc[0]
-            fmt = f1 if m == "hd95" else f3
-            cells.append(f"{fmt(r.mean_a)} / {fmt(r.mean_b)} & {pct(r.frac_a_better)}\\%")
-        rows.append(f"{NAME[s]} & " + " & ".join(cells) + " \\\\")
-    table("t_compare", "lrrrrrr",
-          " & \\multicolumn{2}{c}{Dice} & \\multicolumn{2}{c}{NSD} & \\multicolumn{2}{c}{HD95 (mm)} \\\\\n"
-          "Structure & MF / TS & MF better & MF / TS & MF better & MF / TS & MF better", rows)
-    cmd("nCompSig", int(comp.significant.sum()))
-    cmd("nComp", len(comp))
-    cmd("maxPadj", ptex(comp.p_adjusted.max()))
     d = comp[comp.metric == "dice"]
     cmd("fracDiceMin", pct(d.frac_a_better.min()))
     cmd("fracDiceMax", pct(d.frac_a_better.max()))
     cmd("fracSpleenDice", pct(d[d.label == "spleen"].frac_a_better.iloc[0]))
     cmd("tsSpleenDice", f3(tm.loc[("spleen", "dice"), "mean"]))
     cmd("tsSpleenHD", f1(tm.loc[("spleen", "hd95"), "mean"]))
-    cmd("tsSpleenHDMed", f1(tm.loc[("spleen", "hd95"), "median"]))
-    cmd("tsPancDice", f3(tm.loc[("pancreas", "dice"), "mean"]))
     h = comp[comp.metric == "hd95"]
     cmd("nHDmeanWorse", int((h.mean_a > h.mean_b).sum()))
-    cmd("nHDmedBetterFrac", int((h.frac_a_better > 0.5).sum()))
-
-    # ranking schemes
-    rows, flips = [], []
+    cmd("nHDfracBetter", int((h.frac_a_better > 0.5).sum()))
+    cmd("nCompSig", int(comp.significant.sum()))
+    cmd("nComp", len(comp))
+    flips = []
     for s, dd in rank[rank.scheme != "bootstrap"].groupby("structure", sort=False):
-        a = dd[dd.scheme == "aggregate-then-rank"].set_index("method")
-        r_ = dd[dd.scheme == "rank-then-aggregate"].set_index("method")
-        wa, wr = a["rank"].idxmin(), r_["rank"].idxmin()
-        tau = rank[(rank.structure == s) & (rank.scheme == "bootstrap")].kendall_tau_median.iloc[0]
-        rows.append(f"{NAME[s]} & {f3(a.loc[MF, 'mean'])} / {f3(a.loc[TS, 'mean'])} & {wa} & "
-                    f"{r_.loc[MF, 'mean_rank']:.2f} / {r_.loc[TS, 'mean_rank']:.2f} & {wr} & {tau:.2f} \\\\")
+        wa = dd[dd.scheme == "aggregate-then-rank"].set_index("method")["rank"].idxmin()
+        wr = dd[dd.scheme == "rank-then-aggregate"].set_index("method")["rank"].idxmin()
         if wa != wr:
-            flips.append(NAME[s].lower())
-    table("t_ranking", "lrlrlr", "Structure & mean Dice MF / TS & winner & mean rank MF / TS & winner & "
-          "bootstrap $\\tau$", rows)
+            flips.append(NAME[s].lower().replace(" (l)", " (left)"))
     cmd("rankFlips", " and the ".join(flips) if flips else "none")
-    cmd("nRankFlips", len(flips))
+    cmd("tauMin", f"{rank[rank.scheme == 'bootstrap'].kendall_tau_median.min():.2f}")
 
-    # HD95 failure tail
+    # HD95 tail decomposition
     for s, k in (("spleen", "Spleen"), ("kidney_left", "KidL")):
-        x = wide[wide.label == s]
+        x, y = wide[wide.label == s], tsw[tsw.label == s]
         t = x[x.hd95 > 50]
+        both = t[(t.ref_empty == 0) & (t.pred_empty == 0)]
         cmd(f"tail{k}N", len(t))
         cmd(f"tail{k}Share", pct(t.hd95.sum() / x.hd95.sum()))
         cmd(f"tail{k}RefEmpty", int(((t.ref_empty == 1) & (t.pred_empty == 0)).sum()))
-        both = t[(t.ref_empty == 0) & (t.pred_empty == 0)]
         cmd(f"tail{k}Both", len(both))
         cmd(f"tail{k}BothDice", f3(both.dice.median()))
-        cmd(f"tail{k}BothHD", f"{both.hd95.median():.0f}")
-        y = tsw[tsw.label == s]
-        cmd(f"tsTail{k}N", int((y.hd95 > 50).sum()))
         cmd(f"refEmpty{k}", int(x.ref_empty.sum()))
-        cmd(f"mfPredOnEmpty{k}", int(((x.ref_empty == 1) & (x.pred_empty == 0)).sum()))
         cmd(f"tsPredOnEmpty{k}", int(((y.ref_empty == 1) & (y.pred_empty == 0)).sum()))
+        cmd(f"tsTail{k}N", int((y.hd95 > 50).sum()))
+        # HD95 without the empty-reference cases
+        ok = x[x.ref_empty == 0]
+        cmd(f"mf{k}HDnonEmpty", f1(ok.hd95.mean()))
+
+    # ---------------------------------------------------------------- tumours
+    les = mf.lesions
+    lref = les[(les.kind == "ref") & (les.label == "pancreatic_lesion")]
+    lpred = les[(les.kind == "pred_fp") & (les.label == "pancreatic_lesion")]  # unmatched predicted blobs
+    pos, neg = lw[lw.ref_empty == 0], lw[lw.ref_empty == 1]
+    cmd("nRefLesions", len(lref))
+    cmd("nRefDetected", int(lref.detected.sum()))
+    bins = [0, 0.5, 1, 5, 20, np.inf]
+    names = ["$<$\\,0.5", "0.5--1", "1--5", "5--20", "$>$\\,20"]
+    b = pd.cut(lref.volume_ml, bins=bins, labels=names, include_lowest=True, right=False)
+    g = lref.groupby(b, observed=False)["detected"]
+    cmd("detSmall", pct(g.mean()[names[0]]))
+    cmd("nSmall", int(g.size()[names[0]]))
+    cmd("detBig", pct(lref[lref.volume_ml >= 1].detected.mean()))
+    lp = pl.loc["pancreatic_lesion"]
+    rows = []
+    for k, lab, fmt in (("pooled_lesion_sensitivity", "Tumours found (of \\nRefLesions)", "{:.2f}"),
+                        ("pooled_lesion_precision", "Predicted tumours that are real", "{:.2f}"),
+                        ("fp_lesions_per_scan", "False tumours per scan", "{:.2f}"),
+                        ("pooled_dice", "Pooled tumour Dice", "{:.2f}")):
+        rr = lp.loc[k]
+        rows.append(f"{lab} & {fmt.format(rr.value)} {{\\scriptsize [{rr.ci_low:.2f}, {rr.ci_high:.2f}]}} \\\\")
+    fp_neg, fp_pos = neg.false_positive_lesions.mean(), pos.false_positive_lesions.mean()
+    rows += [f"False tumours per scan, tumour-free / tumour patients & {fp_neg:.2f} / {fp_pos:.2f} \\\\",
+             f"Per tumour patient: lesion precision & {f3(pos.lesion_precision.mean())} \\\\",
+             f"Per tumour patient: tumour Dice (mean / median) & {f3(pos.dice.mean())} / {f3(pos.dice.median())} \\\\",
+             f"Lesion probabilities: ECE / Brier & {mm.loc[('pancreatic_lesion', 'ece'), 'mean']:.3f} / "
+             f"{mm.loc[('pancreatic_lesion', 'brier'), 'mean']:.3f} \\\\"]
+    table("t_tumour", "lr", "Tumour metric (95\\% CI) & MedFormer", rows)
+    cmd("lesSens", f"{lp.loc['pooled_lesion_sensitivity'].value:.2f}")
+    cmd("lesPrec", f"{lp.loc['pooled_lesion_precision'].value:.2f}")
+    cmd("fpScan", f"{lp.loc['fp_lesions_per_scan'].value:.2f}")
+    cmd("fpNeg", f"{fp_neg:.2f}")
+    cmd("fpPos", f"{fp_pos:.2f}")
+    cmd("posPrec", f3(pos.lesion_precision.mean()))
+    cmd("posDice", f3(pos.dice.mean()))
+    cmd("posDiceMed", f3(pos.dice.median()))
+    cmd("nFPneg", int(lpred.merge(neg.reset_index()[["case_id"]], on="case_id").shape[0]))
+    cmd("nFPall", len(lpred))
+    fpv = lpred.merge(neg.reset_index()[["case_id"]], on="case_id").volume_ml
+    cmd("fpNegMedML", f"{fpv.median():.2f}")
+    cmd("fpNegSmallShare", pct((fpv < 0.5).mean()))
+
+    fig = P.detection_by_size(mf, label="pancreatic_lesion", bins_ml=(0, 0.1, 0.5, 1, 5, 20, np.inf),
+                              figsize=(3.25, 2.55))
+    with theme():
+        ax = fig.axes[0]
+        retitle(ax, "Reference tumours found, by size")
+        for t in list(ax.texts):
+            t.remove()
+        les_b = pd.cut(lref.volume_ml, bins=[0, 0.1, 0.5, 1, 5, 20, np.inf], include_lowest=True)
+        for i, n in enumerate(lref.groupby(les_b, observed=False).size()):
+            ax.text(i, 1.01, f"n={n}", ha="center", va="bottom", fontsize=7, color=INK["secondary"])
+        ax.set_ylim(0, 1.12)
+        ax.tick_params(labelsize=7.5)
+        ax.set_xlabel("Reference tumour volume [mL]", fontsize=8)
+        ax.set_ylabel("Fraction found", fontsize=8)
+    save(fig, "f_det_size")
+
+    # ---------------------------------------------------------------- organ figures
+    res = {MF: mf, TS: ts}
+    fig = P.metric_distribution(res, "dice", labels=ORGANS10, kind="box", figsize=(3.25, 2.55))
+    with theme():
+        ax = fig.axes[0]
+        short = {"kidney_left": "Kid L", "kidney_right": "Kid R", "gall_bladder": "Gallbl.", "postcava": "IVC",
+                 "pancreas": "Pancr.", "stomach": "Stom.", "duodenum": "Duod."}
+        ax.set_xticklabels([short.get(s, NAME[s]) for s in ORGANS10], rotation=45, ha="right", fontsize=7)
+        ax.tick_params(axis="y", labelsize=7.5)
+        ax.set_ylabel("Dice", fontsize=8)
+        retitle(ax, "Per-case Dice, 901 cases")
+        ax.legend(ax.get_legend().legend_handles, ["MedFormer", "TotalSeg."], loc="lower left", ncols=2, fontsize=7)
+        ax.set_ylim(-0.02, 1.02)
+    save(fig, "f_dice")
+
+    with theme():
+        fig, ax = plt.subplots(figsize=(3.25, 2.55), constrained_layout=True)
+    P.ecdf(res, "hd95", label="spleen", ax=ax)
+    with theme():
+        ax.set_xscale("symlog", linthresh=10)
+        ax.set_xlim(0, 700)
+        ax.axvline(50, color=INK["muted"], ls="--", lw=0.8)
+        retitle(ax, "Spleen HD95, every case")
+        ax.set_xlabel("HD95 [mm] (log above 10 mm)", fontsize=8)
+        ax.set_ylabel("Fraction of cases ≤ x", fontsize=8)
+        ax.tick_params(labelsize=7.5)
+        ax.legend(["MedFormer", "TotalSeg."], loc="center right", fontsize=7)
+    save(fig, "f_tail")
 
     # ---------------------------------------------------------------- cohorts
-    factors = ["CT phase", "scanner", "country", "slice thickness", "sex", "age", "tumour"]
     rows = []
-    for f in factors:
+    for f in ("CT phase", "scanner", "slice thickness"):
         sub = coh[(coh.factor == f) & (~coh.small) & (coh.group != "(missing)")]
         groups = list(dict.fromkeys(sub[(sub.label == "pancreas") & (sub.metric == "dice")].group))
-        ordr = {"≤ 1.25 mm": 0, "1.25–3 mm": 1, "> 3 mm": 2, "< 50": 0, "50–65": 1, "> 65": 2}
+        ordr = {"≤ 1.25 mm": 0, "1.25–3 mm": 1, "> 3 mm": 2}
         groups.sort(key=lambda g: (ordr.get(g, 9), g))
-        for i, g in enumerate(groups):
+        cells = []
+        for g in groups:
             vals = []
             for lab, met in (("pancreas", "dice"), ("pancreas", "nsd"), ("pancreatic_lesion", "dice")):
-                r = sub[(sub.group == g) & (sub.label == lab) & (sub.metric == met)]
-                vals.append(f3(r["mean"].iloc[0]) if len(r) else "--")
+                rr = sub[(sub.group == g) & (sub.label == lab) & (sub.metric == met)]
+                vals.append(f3(rr["mean"].iloc[0]))
             n = int(sub[(sub.group == g) & (sub.label == "pancreas") & (sub.metric == "dice")].n.iloc[0])
-            head = f"\\multirow{{{len(groups)}}}{{*}}{{{f[0].upper() + f[1:]}}}" if i == 0 else ""
-            rows.append(f"{head} & {tex_group(g)} & {n} & " + " & ".join(vals) + " \\\\")
+            cells.append(f" & {tex_group(g)} ({n}) & " + " & ".join(vals) + " \\\\")
+        cells[0] = f"{f[0].upper() + f[1:]}" + cells[0]
         ps = []
         for lab, met in (("pancreas", "dice"), ("pancreas", "nsd"), ("pancreatic_lesion", "dice")):
             t = coht[(coht.factor == f) & (coht.label == lab) & (coht.metric == met)]
-            ps.append(ptex(float(t.p_adjusted.iloc[0])) if len(t) else "--")
-        rows.append(" & \\emph{adjusted $p$} & & " + " & ".join(ps) + " \\\\ \\midrule")
+            ps.append(ptex(float(t.p_adjusted.iloc[0])))
+        rows += cells + [" & \\emph{adjusted $p$} & " + " & ".join(ps) + " \\\\ \\midrule"]
     rows[-1] = rows[-1].replace(" \\midrule", "")
-    table("t_cohorts", "llrrrr", "Factor & group & $n$ & pancreas Dice & pancreas NSD & lesion Dice", rows)
-    pd_ = coh[(coh.label == "pancreas") & (coh.metric == "dice")].set_index("group")["mean"]
+    table("t_cohorts", "llrrr", "Factor & group ($n$) & Pancreas Dice & Pancreas NSD & Lesion Dice", rows)
+    pdice = coh[(coh.label == "pancreas") & (coh.metric == "dice")].set_index("group")["mean"]
     for g, k in (("Venous", "Venous"), ("Non-contrast", "Noncon"), ("GE", "GE"), ("Siemens", "Siemens"),
                  ("≤ 1.25 mm", "Thin"), ("> 3 mm", "Thick")):
-        cmd(f"coh{k}", f3(pd_[g]))
-    cmd("cohPhaseP", ptex(float(coht[(coht.factor == "CT phase") & (coht.label == "pancreas") &
-                                     (coht.metric == "dice")].p_adjusted.iloc[0])))
+        cmd(f"coh{k}", f3(pdice[g]))
     cmd("nCohSig", int(coht.significant.sum()))
     cmd("nCohTests", len(coht))
 
-    # ---------------------------------------------------------------- figures
-    res = {MF: mf, TS: ts}
-    organs = ["liver", "spleen", "kidney_left", "kidney_right", "stomach", "pancreas", "gall_bladder", "duodenum",
-              "aorta", "postcava"]
-    fig = P.metric_distribution(res, "dice", labels=organs, kind="box", figsize=(6.6, 2.9))
+    # ---------------------------------------------------------------- qualitative (three real cases)
+    tp = pos[(pos.lesion_recall == 1) & (pos.ref_volume_ml.between(1, 20))]
+    hit = (tp.dice - pos.dice.median()).abs().idxmin()
+    small = lref[(lref.volume_ml < 0.5) & (~lref.detected.astype(bool))]
+    miss_row = small.sort_values("volume_ml").iloc[-1]
+    miss = miss_row.case_id
+    negfp = neg[neg.pred_volume_ml > 0]
+    fpc = (negfp.pred_volume_ml - negfp.pred_volume_ml.median()).abs().idxmin()
+    picks = [(hit, f"Found, Dice {lw.loc[hit, 'dice']:.2f}\n({lw.loc[hit, 'ref_volume_ml']:.1f} mL tumour)"),
+             (miss, f"Missed small tumour\n({miss_row.volume_ml:.3f} mL)"),
+             (fpc, f"False tumour, tumour-free\n({lw.loc[fpc, 'pred_volume_ml']:.2f} mL predicted)")]
     with theme():
-        ax = fig.axes[0]
-        short = {"postcava": "IVC", "kidney_left": "Kidney\n(left)", "kidney_right": "Kidney\n(right)"}
-        ax.set_xticklabels([short.get(s, NAME[s]) for s in organs], rotation=0, ha="center", fontsize=8)
-        retitle(ax, "Per-case Dice on the 901 PanTS test CTs")
-        ax.legend(ax.get_legend().legend_handles, [MF, TS], loc="lower left", ncols=2)
-        ax.set_ylim(-0.02, 1.02)
-    save(fig, "f_dice_dist")
-
-    with theme():
-        fig, axes = plt.subplots(1, 2, figsize=(6.6, 2.5), constrained_layout=True, sharey=True)
-    for ax, s in zip(axes, ["spleen", "kidney_left"]):
-        P.ecdf(res, "hd95", label=s, ax=ax)
+        fig, axes = plt.subplots(1, 3, figsize=(6.6, 2.35), constrained_layout=True)
+    for ax, (c, title) in zip(axes, picks):
+        ct = load_volume(PANTS / "ImageTe" / c / "ct.nii.gz", kind="image")
+        ref = load_volume(PANTS / "LabelTe" / c / "segmentations/pancreatic_lesion.nii.gz").data > 0
+        pr = load_volume(PRED / c / "predictions/pancreatic_lesion.nii.gz").data > 0
+        rc, _ = viz.overlay.to_canonical(ref, ct.affine)
+        pc, _ = viz.overlay.to_canonical(pr, ct.affine)
+        idx = viz.overlay.pick_slice(None, rc if rc.any() else pc, "axial", "ref")  # largest tumour section
+        viz.error_overlay(ct.data, pr, ref, affine=ct.affine, index=idx, ax=ax, legend=False)
         with theme():
-            ax.set_xscale("symlog", linthresh=10)
-            ax.set_xlim(0, 700)
-            ax.axvline(50, color=INK["muted"], ls="--", lw=1)
-            ax.text(52, 0.05, "50 mm", fontsize=7.5, color=INK["muted"])
-            retitle(ax, f"HD95 of every case: {NAME[s].lower()}")
-            ax.set_xlabel("HD95 [mm] (log scale above 10 mm)")
-    with theme():
-        axes[1].set_ylabel("")
-        if axes[1].get_legend():
-            axes[1].get_legend().remove()
-        axes[0].legend(loc="center right")
-    save(fig, "f_hd95_tail")
-
-    fig = P.detection_by_size(mf, label="pancreatic_lesion", figsize=(3.3, 2.5))
-    with theme():
-        retitle(fig.axes[0], "Lesions found, by lesion size")
-        for t in list(fig.axes[0].texts):  # counts are listed in the size table
-            t.remove()
-        fig.axes[0].tick_params(axis="x", labelsize=7.5)
-    save(fig, "f_det_size")
-
-    r = presence_detection(mf, "pancreatic_lesion")
-    with theme():
-        fig, ax = plt.subplots(figsize=(3.1, 2.5), constrained_layout=True)
-        o = np.lexsort((r["tpr"], r["fpr"]))
-        ax.plot(r["fpr"][o], r["tpr"][o], color=CATEGORICAL[0])
-        ax.plot([0, 1], [0, 1], color=INK["muted"], ls="--", lw=1)
-        ax.plot(1 - r["specificity"], r["sensitivity"], "o", color=CATEGORICAL[2], ms=6, zorder=5)
-        ax.annotate(f"spec. {r['specificity']:.2f}, sens. {r['sensitivity']:.2f}",
-                    (1 - r["specificity"], r["sensitivity"]), xytext=(10, -18), textcoords="offset points",
-                    fontsize=7.5, color=INK["secondary"])
-        ax.set_xlabel("1 − specificity (healthy patients flagged)")
-        ax.set_ylabel("Sensitivity (sick found)")
-        retitle(ax, f"Tumour or not? AUC {r['auc']:.3f}")
-        ax.grid(True, axis="both")
-    save(fig, "f_roc")
-
-    fig = P.cohort_plot(coh[~coh.small], "dice", "pancreas", factor="CT phase", figsize=(3.2, 2.0))
-    with theme():
-        retitle(fig.axes[0], "Pancreas Dice by CT phase")
-        for t in list(fig.axes[0].texts):  # the factor name is in the title
-            t.remove()
-    save(fig, "f_cohort_phase")
-
-    sub = comp[comp.label.isin(ORGANS10) & comp.metric.isin(["dice", "nsd"])].copy()
-    sub["label"] = sub["label"].map(lambda s: "IVC" if s == "postcava" else NAME[s].lower())
-    fig = P.comparison_forest(sub, name_a="MF", name_b="TS", figsize=(5.2, 5.0))
-    with theme():
-        retitle(fig.axes[0], "MF minus TS, paired over the 901 cases")
-    save(fig, "f_forest")
-
-    # toy illustration for the metric section (a drawing, not data)
-    toy_grid()
-    toy_rank()
+            ax.set_title(f"{c.replace('PanTS_0000', 'case ')}: {title}", fontsize=7.5, loc="left")
+            (x0, x1), (y1, y0) = ax.get_xlim(), ax.get_ylim()
+            cx, cy, half = (x0 + x1) / 2, (y0 + y1) / 2, max(x1 - x0, y1 - y0, 60) / 2 + 10
+            ax.set_xlim(cx - half, cx + half)
+            ax.set_ylim(cy + half, cy - half)
+    viz.overlay._legend(fig, True)
+    save(fig, "f_cases")
+    for i, (c, _) in enumerate(picks):
+        cmd(f"case{'ABC'[i]}", c)
 
     (GEN / "macros.tex").write_text("% generated by make_report.py\n" + "\n".join(macros) + "\n")
     print(len(macros), "macros")
-
-
-def toy_grid() -> None:
-    """6x6 toy picture: reference 10 squares, prediction 9 squares, 8 shared (TP 8, FP 1, FN 2)."""
-    ref = {(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3), (4, 2)}
-    pred = {(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 2), (3, 3), (2, 4)}
-    assert len(ref) == 10 and len(pred) == 9 and len(ref & pred) == 8
-    with theme():
-        fig, axes = plt.subplots(1, 3, figsize=(5.6, 1.75), constrained_layout=True)
-        for ax, (title, mode) in zip(axes, [("Answer (reference)", "ref"), ("Your colouring (prediction)", "pred"),
-                                             ("Compared", "both")]):
-            for i in range(6):
-                for j in range(6):
-                    c = "white"
-                    if mode == "ref" and (i, j) in ref:
-                        c = PURPLE[300]
-                    elif mode == "pred" and (i, j) in pred:
-                        c = ERROR_COLORS["fp"]
-                    elif mode == "both":
-                        c = (ERROR_COLORS["tp"] if (i, j) in ref & pred else ERROR_COLORS["fn"] if (i, j) in ref
-                             else ERROR_COLORS["fp"] if (i, j) in pred else "white")
-                    ax.add_patch(plt.Rectangle((j, 5 - i), 1, 1, facecolor=c, edgecolor=INK["grid"], lw=0.8))
-            ax.set_xlim(0, 6)
-            ax.set_ylim(0, 6)
-            ax.set_aspect("equal")
-            ax.axis("off")
-            ax.set_title(title, fontsize=8.5, loc="center")
-        from matplotlib.patches import Patch
-
-        axes[2].legend(handles=[Patch(color=ERROR_COLORS["tp"], label="TP = 8 (both)"),
-                                Patch(color=ERROR_COLORS["fp"], label="FP = 1 (extra)"),
-                                Patch(color=ERROR_COLORS["fn"], label="FN = 2 (missed)")],
-                       loc="upper left", bbox_to_anchor=(1.0, 1.0), fontsize=7.5)
-    save(fig, "f_toy_grid")
-
-
-def toy_rank() -> None:
-    """Toy example of the two ranking schemes: A = (.9, .9, .3), B = (.8, .8, .8)."""
-    a, b = [0.9, 0.9, 0.3], [0.8, 0.8, 0.8]
-    with theme():
-        fig, ax = plt.subplots(figsize=(2.9, 1.95), constrained_layout=True)
-        x = np.arange(3)
-        ax.bar(x - 0.18, a, 0.34, color=CATEGORICAL[0], label=f"A (mean {np.mean(a):.2f})")
-        ax.bar(x + 0.18, b, 0.34, color=CATEGORICAL[1], label=f"B (mean {np.mean(b):.2f})")
-        ax.set_xticks(x)
-        ax.set_xticklabels(["patient 1", "patient 2", "patient 3"])
-        ax.set_ylim(0, 1.15)
-        ax.set_ylabel("Dice")
-        ax.legend(loc="upper center", ncols=2, fontsize=7.5, bbox_to_anchor=(0.5, 1.18))
-        ax.tick_params(labelsize=8)
-    save(fig, "f_toy_rank")
 
 
 if __name__ == "__main__":
