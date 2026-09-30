@@ -52,4 +52,4 @@ if __name__ == "__main__":
     }
     jobs.update(dict(x.split("=", 1) for x in a.extra))
     for name, cmd in jobs.items():
-        record(cmd, out / f"{name}.svg", width=118 if name in ("metrics", "recommend") else 104)
+        record(cmd, out / f"{name}.svg", width={"metrics": 118, "recommend": 118}.get(name, 104))

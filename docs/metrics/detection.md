@@ -4,7 +4,7 @@ A voxel Dice of 0.97 can hide a model that finds the one large tumour and misses
 question is **"were the lesions found?"**, count lesions, not voxels. Instance metrics (panoptic quality,
 lesion-wise Dice) add per-lesion segmentation quality. Always report how lesions are defined and matched.
 
-<figure class="sk-fig sk-fig--md" markdown>
+<figure class="sk-fig sk-fig--plot" markdown>
 [![Lesion detection rate by size bin](../assets/showcase/detection_by_size.png)](../assets/showcase/detection_by_size.png)
 <figcaption>Real output on 8 PanTS test CTs (an illustration, not a benchmark): neither nnU-Net nor MedFormer finds a lesion under 1 mL; both find the two 1–10 mL lesions and one of the two above 10 mL. <a href="../../analysis/plots/#lesion-detection"><code>detection_by_size</code></a>.</figcaption>
 </figure>

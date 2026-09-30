@@ -1,5 +1,5 @@
 site_name: SegEvalKit
-site_description: Holistic, literature-grounded evaluation of volumetric (CT/MR) medical image segmentation.
+site_description: "Evaluation of volumetric (CT/MR) medical image segmentation: 53 metrics with explicit, tested conventions, statistics, plots and reports."
 site_url: https://aj-das-research.github.io/SegEvalKit/
 repo_url: https://github.com/aj-das-research/SegEvalKit
 repo_name: aj-das-research/SegEvalKit
@@ -50,6 +50,7 @@ extra_css:
   - stylesheets/compact.css
 extra_javascript:
   - javascripts/mathjax.js
+  - javascripts/figsize.js
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 markdown_extensions:

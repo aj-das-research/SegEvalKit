@@ -7,7 +7,7 @@ One self-contained HTML file (figures embedded, no server) with light and dark t
     built by `build_report` from the showcase evaluation (18 structures, 21 metrics). Eight cases
     illustrate the report; they are not a benchmark.
 
-<figure class="sk-fig sk-fig--md" markdown>
+<figure class="sk-fig sk-fig--plot" markdown>
 [![Top of the sample HTML report](../assets/showcase/report_preview.png)](../assets/showcase/report_nnunet.html){ target="_blank" }
 <figcaption>The top of the sample report: run statistics, setup and provenance, and the per-structure summary.</figcaption>
 </figure>

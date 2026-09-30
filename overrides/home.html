@@ -6,7 +6,7 @@
   <div class="sk-wrap sk-hero__inner">
     <img class="sk-hero__logo" src="{{ 'assets/logo.svg' | url }}" alt="SegEvalKit logo">
     <h1 id="segevalkit" class="sk-hero__title">SegEvalKit</h1>
-    <p class="sk-hero__tagline">Evaluation of volumetric medical image segmentation,<br>done carefully.</p>
+    <p class="sk-hero__tagline">Evaluation of volumetric medical image segmentation, done carefully.</p>
     <p class="sk-hero__lede">Fifty-three metrics with written definitions and tested conventions, a standard
       input&nbsp;/&nbsp;output format, statistics you can defend, and figures you can publish. For CT and MR, in Python.</p>
     <div class="sk-hero__actions">
@@ -26,38 +26,32 @@
     <h2 class="sk-h2">Everything an evaluation needs, in one place</h2>
     <div class="sk-features">
       <div class="sk-feature">
-        <div class="sk-feature__icon">{% include ".icons/material/shape-outline.svg" %}</div>
-        <h3>Every family of metric</h3>
+        <div class="sk-feature__head"><div class="sk-feature__icon">{% include ".icons/material/shape-outline.svg" %}</div><h3>Every family of metric</h3></div>
         <p>Overlap, volume, surface distance, topology, lesion-wise detection, calibration and agreement,
           computed from one cached context per pair.</p>
       </div>
       <div class="sk-feature">
-        <div class="sk-feature__icon">{% include ".icons/material/scale-balance.svg" %}</div>
-        <h3>Explicit, tested conventions</h3>
+        <div class="sk-feature__head"><div class="sk-feature__icon">{% include ".icons/material/scale-balance.svg" %}</div><h3>Explicit, tested conventions</h3></div>
         <p>Empty masks, HD95 variants, ASSD vs MASD, tolerances and connectivity are arguments, recorded with the
           results and checked against MONAI, MedPy and DeepMind.</p>
       </div>
       <div class="sk-feature">
-        <div class="sk-feature__icon">{% include ".icons/material/compass-outline.svg" %}</div>
-        <h3>Knows which metric to use</h3>
+        <div class="sk-feature__head"><div class="sk-feature__icon">{% include ".icons/material/compass-outline.svg" %}</div><h3>Knows which metric to use</h3></div>
         <p>A Metrics Reloaded-style recommender that derives a metric set from your problem, and a catalogue of
           metric pitfalls with worked numeric examples.</p>
       </div>
       <div class="sk-feature">
-        <div class="sk-feature__icon">{% include ".icons/material/folder-table-outline.svg" %}</div>
-        <h3>A standard interface</h3>
+        <div class="sk-feature__head"><div class="sk-feature__icon">{% include ".icons/material/folder-table-outline.svg" %}</div><h3>A standard interface</h3></div>
         <p>Reads flat, folder and per-structure NIfTI layouts, checks geometry, and writes one documented,
           plain-CSV results format.</p>
       </div>
       <div class="sk-feature">
-        <div class="sk-feature__icon">{% include ".icons/material/sigma.svg" %}</div>
-        <h3>Statistics you can defend</h3>
+        <div class="sk-feature__head"><div class="sk-feature__icon">{% include ".icons/material/sigma.svg" %}</div><h3>Statistics you can defend</h3></div>
         <p>Bootstrap confidence intervals, paired tests with multiplicity correction, effect sizes, and
           challenge-style rankings with bootstrap stability.</p>
       </div>
       <div class="sk-feature">
-        <div class="sk-feature__icon">{% include ".icons/material/image-filter-center-focus-weak.svg" %}</div>
-        <h3>See the errors</h3>
+        <div class="sk-feature__head"><div class="sk-feature__icon">{% include ".icons/material/image-filter-center-focus-weak.svg" %}</div><h3>See the errors</h3></div>
         <p>Colour-vision-safe error overlays, tri-planar views, 3D surface-distance maps and a self-contained
           HTML report; GPU-accelerated surface distances.</p>
       </div>
@@ -71,8 +65,7 @@
     <h2 class="sk-h2">From predictions to conclusions in three steps</h2>
     <div class="sk-steps">
       <div class="sk-step">
-        <div class="sk-step__num">1</div>
-        <h3>Describe what to evaluate</h3>
+        <div class="sk-step__head"><span class="sk-step__num">01</span><h3>Describe what to evaluate</h3></div>
         <p>Name the structures, their label ids, and the metrics. Unsure which metrics? Ask <code>segevalkit&nbsp;recommend</code>.</p>
 <div class="sk-code">{% filter trim %}
 <pre><span class="k">import</span> segevalkit <span class="k">as</span> sek
@@ -83,8 +76,7 @@ ev = sek.Evaluator(
 )</pre>{% endfilter %}</div>
       </div>
       <div class="sk-step">
-        <div class="sk-step__num">2</div>
-        <h3>Evaluate the folders</h3>
+        <div class="sk-step__head"><span class="sk-step__num">02</span><h3>Evaluate the folders</h3></div>
         <p>The reference defines the case list; missing predictions score as empty. Runs in parallel, or on the GPU.</p>
 <div class="sk-code">{% filter trim %}
 <pre>res = ev.evaluate(
@@ -94,8 +86,7 @@ ev = sek.Evaluator(
 res.summary()   <span class="c"># mean, IQR, 95% CI</span></pre>{% endfilter %}</div>
       </div>
       <div class="sk-step">
-        <div class="sk-step__num">3</div>
-        <h3>Analyse and report</h3>
+        <div class="sk-step__head"><span class="sk-step__num">03</span><h3>Analyse and report</h3></div>
         <p>Compare methods with paired tests, draw the figures, and write a single-file HTML report.</p>
 <div class="sk-code">{% filter trim %}
 <pre><span class="k">from</span> segevalkit.stats <span class="k">import</span> compare
@@ -126,7 +117,7 @@ sek.report.build_report(
       <a class="sk-link" href="{{ 'getting-started/cli/' | url }}">Command-line reference →</a>
     </div>
     <div class="sk-split__media">
-      <img src="{{ 'assets/terminal/recommend.svg' | url }}" alt="segevalkit recommend output">
+      <img src="{{ 'assets/terminal/home.svg' | url }}" alt="segevalkit recommend --structure large_organ">
     </div>
   </div>
 </section>

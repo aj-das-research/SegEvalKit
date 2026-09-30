@@ -5,7 +5,7 @@ up: **discrimination** ([AUROC](#auroc), [AUPRC](#auprc)) and **calibration** ([
 [NLL](#nll)). [Soft Dice](#soft_dice) sits in between. Without `prob`, these metrics are skipped, not NaN. None
 describes mask geometry (Mehrtash et al. 2020).
 
-<figure class="sk-fig sk-fig--sm" markdown>
+<figure class="sk-fig sk-fig--square" markdown>
 [![Reliability diagram of MedFormer lesion probabilities](../assets/showcase/reliability_medformer_lesion.png)](../assets/showcase/reliability_medformer_lesion.png)
 <figcaption>MedFormer lesion probabilities in a 10 mm band on 8 PanTS test CTs (an illustration, not a benchmark): over-confident in every bin, ECE = 0.108. <a href="../../analysis/plots/#calibration"><code>reliability_diagram</code></a>.</figcaption>
 </figure>

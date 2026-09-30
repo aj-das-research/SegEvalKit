@@ -168,7 +168,7 @@ P.metric_distribution({"nnU-Net": r1, "MedFormer": r2, "TotalSegmentator": r3}, 
                       labels=organs)
 ```
 
-<figure class="sk-fig" markdown>
+<figure class="sk-fig sk-fig--wide" markdown>
 [![Dice per structure and model](../assets/showcase/dist_dice.png)](../assets/showcase/dist_dice.png)
 <figcaption>Raincloud of per-case Dice: shape, median and IQR, and every case. Every figure uses one
 colour-vision-safe palette. All plots: <a href="../../analysis/plots/">plot gallery</a>.</figcaption>
@@ -182,7 +182,7 @@ viz.triplanar(ct, pred_pancreas, ref_pancreas, affine=ref.affine, window="pancre
 
 === "Three models"
 
-    <figure class="sk-fig" markdown>
+    <figure class="sk-fig sk-fig--wide" markdown>
     [![Three models on one slice](../assets/showcase/model_comparison.png)](../assets/showcase/model_comparison.png)
     <figcaption>One slice of PanTS_00009152, three models: pancreas ∪ lesion (top) and lesion (bottom). Violet
     agreement, orange missed, teal added. TotalSegmentator has no lesion class.</figcaption>
@@ -190,7 +190,7 @@ viz.triplanar(ct, pred_pancreas, ref_pancreas, affine=ref.affine, window="pancre
 
 === "Tri-planar"
 
-    <figure class="sk-fig" markdown>
+    <figure class="sk-fig sk-fig--wide" markdown>
     [![Tri-planar error view of the pancreas](../assets/showcase/triplanar_pancreas.png)](../assets/showcase/triplanar_pancreas.png)
     <figcaption>nnU-Net pancreas on the same case, through the region of largest error in each plane.</figcaption>
     </figure>

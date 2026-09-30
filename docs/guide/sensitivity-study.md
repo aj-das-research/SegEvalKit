@@ -37,7 +37,7 @@ $ python benchmarks/plot_sensitivity.py --csv outputs/sensitivity/sensitivity.cs
 
 ## Results
 
-<figure markdown>
+<figure class="sk-fig sk-fig--wide" markdown>
 ![Which metric notices which error](../assets/figures/sensitivity_matrix.png)
 <figcaption>Fraction of real PanTS structures (7 structures × 10 cases) in which each metric changes meaningfully
 under each error. Dark = the metric notices; light = it is blind to that error.</figcaption>
@@ -64,7 +64,7 @@ Three lessons stand out:
 
 ### Size bias
 
-<figure markdown>
+<figure class="sk-fig sk-fig--wide" markdown>
 ![The same erosion seen by three metrics](../assets/figures/size_bias_erode.png)
 <figcaption>The same 2 mm erosion applied to every structure. Dice falls from 0.95 on the liver to 0.72 on the
 gallbladder and 0.61 on the veins; the median HD95 stays between 1.8 and 2.8 mm, close to the true 2 mm.</figcaption>

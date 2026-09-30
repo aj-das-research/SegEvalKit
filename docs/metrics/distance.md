@@ -5,7 +5,7 @@ wrong voxels but cannot tell a rim error from one 5 cm away, and distances say l
 Reloaded therefore recommends **one overlap plus one boundary metric** per task. All distances use the physical
 spacing: on 0.8 × 0.8 × 5 mm MR a one-slice error is 5 mm.
 
-<figure class="sk-fig sk-fig--md" markdown>
+<figure class="sk-fig sk-fig--wide" markdown>
 [![Signed surface-distance map of a pancreas](../assets/showcase/surface_pancreas.png)](../assets/showcase/surface_pancreas.png)
 <figcaption>Where the boundary is wrong, in mm: nnU-Net pancreas on a PanTS test CT, purple over-, orange under-segmented. <a href="../../assets/showcase/surface_pancreas.html">Interactive version</a>.</figcaption>
 </figure>
