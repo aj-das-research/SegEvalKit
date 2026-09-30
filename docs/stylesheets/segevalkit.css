@@ -442,3 +442,13 @@ code, kbd, pre, .md-typeset code, .md-typeset pre { font-family: var(--sk-mono);
 }
 /* a collapsed details right before a section rule: one line, not two */
 .md-typeset details:not([open]):has(+ h2) { border-bottom-color: transparent !important; }
+
+/* Release marker in the hero */
+.sk-release { display: inline-flex; align-items: center; gap: .5rem; margin: 0 auto 1.1rem; padding: .18rem .75rem .18rem .2rem;
+  border: 1px solid var(--sk-200); border-radius: 999px; font-size: .66rem; color: var(--sk-800) !important;
+  background: rgba(255, 255, 255, .7); text-decoration: none !important; }
+.sk-release:hover { border-color: var(--sk-400); }
+.sk-release__tag { font-family: var(--sk-mono); font-weight: 600; font-size: .62rem; color: #fff; background: var(--sk-700);
+  border-radius: 999px; padding: .1rem .5rem; }
+[data-md-color-scheme="slate"] .sk-release { background: transparent; border-color: #3a3056; color: var(--sk-200) !important; }
+.sk-hero__inner > .sk-release { display: table; }

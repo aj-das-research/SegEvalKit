@@ -12,7 +12,7 @@ PyYAML, tqdm, Jinja2 and rich.
 === "With every extra"
 
     ```console
-    $ pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git"
+    $ pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git@v0.1.0"
     ```
 
 === "Development"

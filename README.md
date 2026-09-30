@@ -54,7 +54,7 @@ statistics and figures needed to report results you can defend.
 ## Install
 
 ```bash
-pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git"
+pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git@v0.1.0"
 ```
 
 Extras: `gpu` (PyTorch surface distances) · `sitk` (MHA / NRRD) · `interactive` (plotly 3D maps) · `dev` · `docs`.

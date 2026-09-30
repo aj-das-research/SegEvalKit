@@ -2,7 +2,12 @@
 
 ## 0.1.0 (2026-09-30)
 
-First release.
+First public release. Install with
+`pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git@v0.1.0"`.
+[GitHub release](https://github.com/aj-das-research/SegEvalKit/releases/tag/v0.1.0)
+
+**Coming next:** the full PanTS benchmark (nnU-Net, MedFormer and TotalSegmentator on the 901-case test set)
+and the accompanying technical report.
 
 - 53 metrics in 7 families (overlap, volume, distance, topology, detection, calibration, agreement) with a
   shared cached computation context and explicit empty-mask policies (`segevalkit`, `brats2023`,

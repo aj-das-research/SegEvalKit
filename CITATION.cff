@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use SegEvalKit, please cite it as below."
+title: "SegEvalKit: Explicit and Tested Evaluation of Volumetric Medical Image Segmentation"
+type: software
+authors:
+  - family-names: Das
+    given-names: Abhijit
+    affiliation: "Mohamed bin Zayed University of Artificial Intelligence (MBZUAI)"
+version: 0.1.0
+date-released: 2026-09-30
+license: Apache-2.0
+repository-code: "https://github.com/aj-das-research/SegEvalKit"
+url: "https://aj-das-research.github.io/SegEvalKit/"
+keywords:
+  - medical imaging
+  - segmentation
+  - evaluation
+  - metrics
+  - NIfTI

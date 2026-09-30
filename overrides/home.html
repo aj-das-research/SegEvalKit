@@ -4,6 +4,7 @@
 {{ super() }}
 <section class="sk-hero">
   <div class="sk-wrap sk-hero__inner">
+    <a class="sk-release" href="{{ 'about/changelog/' | url }}"><span class="sk-release__tag">v0.1.0</span> First release · release notes →</a>
     <img class="sk-hero__logo" src="{{ 'assets/logo.svg' | url }}" alt="SegEvalKit logo">
     <h1 id="segevalkit" class="sk-hero__title">SegEvalKit</h1>
     <p class="sk-hero__tagline">Evaluation of volumetric medical image segmentation, done carefully.</p>
@@ -14,7 +15,7 @@
       <a class="sk-btn sk-btn--ghost" href="{{ 'metrics/' | url }}">Browse the metrics</a>
       <a class="sk-btn sk-btn--ghost" href="{{ config.repo_url }}">GitHub</a>
     </div>
-    <div class="sk-install"><span class="sk-install__prompt">$</span><code>pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git"</code></div>
+    <div class="sk-install"><span class="sk-install__prompt">$</span><code>pip install "segevalkit[all] @ git+https://github.com/aj-das-research/SegEvalKit.git@v0.1.0"</code></div>
   </div>
 </section>
 {% endblock %}
